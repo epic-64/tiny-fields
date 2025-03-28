@@ -84,6 +84,13 @@ impl Button {
     }
 }
 
+const DEFAULT_FONT_SIZE: f32 = 30.0;
+const DEFAULT_FONT_COLOR: Color = WHITE;
+
+fn draw_text_primary(text: &str, x: f32, y: f32) {
+    draw_text(text, x, y, DEFAULT_FONT_SIZE, DEFAULT_FONT_COLOR);
+}
+
 #[macroquad::main("Tiny Idle Game")]
 async fn main() {
     let mut state = GameState::new();
@@ -101,8 +108,8 @@ async fn main() {
         }
 
         // Display resources
-        draw_text(&format!("Wood: {}", state.wood), 20.0, 40.0, 30.0, WHITE);
-        draw_text(&format!("Lumber Camps: {}", state.lumber_camps), 20.0, 80.0, 30.0, WHITE);
+        draw_text_primary(&format!("Wood: {}", state.wood), 20.0, 40.0);
+        draw_text_primary(&format!("Lumber Camps: {}", state.lumber_camps), 20.0, 80.0);
 
         // Build button
         let button = Button::new(10.0, 120.0, 240.0, 40.0, WHITE, GRAY, "BUTTON");
