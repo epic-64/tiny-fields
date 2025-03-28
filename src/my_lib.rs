@@ -1,5 +1,6 @@
 use macroquad::prelude::*;
 
+#[derive(Clone)]
 pub struct Rectangle {
     pub x: f32,
     pub y: f32,
@@ -22,6 +23,7 @@ impl Rectangle {
     }
 }
 
+#[derive(Clone)]
 pub struct Button {
     pub rect: Rectangle,
     pub color: Color,
@@ -62,3 +64,30 @@ pub const DEFAULT_FONT_COLOR: Color = WHITE;
 pub fn draw_text_primary(text: &str, x: f32, y: f32) {
     draw_text(text, x, y, DEFAULT_FONT_SIZE, DEFAULT_FONT_COLOR);
 }
+
+pub enum DrawCommand {
+    Text {
+        content: String,
+        x: f32,
+        y: f32,
+        font_size: f32,
+        color: Color,
+    },
+    Button {
+        button: Button,
+    },
+}
+
+pub fn draw(commands: &[DrawCommand]) {
+    for command in commands {
+        match command {
+            DrawCommand::Text { content, x, y, font_size, color } => {
+                draw_text(content, *x, *y, *font_size, *color);
+            }
+            DrawCommand::Button { button } => {
+                button.draw();
+            }
+        }
+    }
+}
+
