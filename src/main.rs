@@ -7,6 +7,7 @@ struct GameState {
     wood: i32,
     lumber_camps: i32,
     time_accumulator: f32,
+    build_button: Button,
 }
 
 impl GameState {
@@ -15,6 +16,7 @@ impl GameState {
             wood: 0,
             lumber_camps: 0,
             time_accumulator: 0.0,
+            build_button: Button::new(10.0, 120.0, 240.0, 40.0, WHITE, GRAY, "Build Lumber Camp (10)"),
         }
     }
 
@@ -31,33 +33,55 @@ impl GameState {
     }
 }
 
-#[macroquad::main("Tiny Idle Game")]
+// Step logic (tick + inputs)
+fn step(state: &mut GameState, dt: f32) {
+    state.time_accumulator += dt;
+    if state.time_accumulator >= 1.0 {
+        state.tick();
+        state.time_accumulator -= 1.0;
+    }
+
+    if state.build_button.is_clicked() {
+        state.try_build_lumber_camp();
+    }
+}
+
+// Render into draw commands
+fn render(state: &GameState) -> Vec<DrawCommand> {
+    vec![
+        DrawCommand::Text {
+            content: format!("Wood: {}", state.wood),
+            x: 20.0,
+            y: 40.0,
+            font_size: 30.0,
+            color: WHITE,
+        },
+        DrawCommand::Text {
+            content: format!("Lumber Camps: {}", state.lumber_camps),
+            x: 20.0,
+            y: 80.0,
+            font_size: 30.0,
+            color: WHITE,
+        },
+        DrawCommand::Button {
+            button: state.build_button.clone(),
+        },
+    ]
+}
+
+// Main draw loop
+#[macroquad::main("Tiny Fields")]
 async fn main() {
     let mut state = GameState::new();
 
     loop {
         clear_background(BLACK);
 
-        // Timing
         let dt = get_frame_time();
-        state.time_accumulator += dt;
+        step(&mut state, dt);
 
-        if state.time_accumulator >= 1.0 {
-            state.tick();
-            state.time_accumulator -= 1.0;
-        }
-
-        // Display resources
-        draw_text_primary(&format!("Wood: {}", state.wood), 20.0, 40.0);
-        draw_text_primary(&format!("Lumber Camps: {}", state.lumber_camps), 20.0, 80.0);
-
-        // Build button
-        let button = Button::new(10.0, 120.0, 240.0, 40.0, WHITE, GRAY, "BUTTON");
-        button.draw();
-
-        if button.is_clicked() {
-            state.try_build_lumber_camp();
-        }
+        let commands = render(&state);
+        draw(&commands);
 
         next_frame().await;
     }
