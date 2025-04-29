@@ -104,12 +104,34 @@ pub fn draw(commands: &[DrawCommand]) {
     }
 }
 
+pub struct Progress {
+    value: f32, // Value between 0.0 and 1.0
+}
+
+impl Progress {
+    pub fn new() -> Self {
+        Self { value: 0.0 }
+    }
+
+    pub fn set(&mut self, value: f32) {
+        self.value = value.clamp(0.0, 1.0);
+    }
+
+    pub fn get(&self) -> f32 {
+        self.value
+    }
+
+    pub fn reset(&mut self) {
+        self.value = 0.0;
+    }
+}
+
 pub struct ProgressBar {
     pub x: f32,
     pub y: f32,
     pub width: f32,
     pub height: f32,
-    pub progress: f32, // Value between 0.0 and 1.0
+    pub progress: Progress,
     pub background_color: Color,
     pub foreground_color: Color,
 }
@@ -121,14 +143,14 @@ impl ProgressBar {
             y,
             width,
             height,
-            progress: 0.0,
+            progress: Progress::new(),
             background_color,
             foreground_color,
         }
     }
 
-    pub fn set_progress(&mut self, progress: f32) {
-        self.progress = progress.clamp(0.0, 1.0);
+    pub fn set_progress(&mut self, value: f32) {
+        self.progress.set(value);
     }
 
     pub fn draw(&self) {
@@ -136,7 +158,7 @@ impl ProgressBar {
         draw_rectangle(self.x, self.y, self.width, self.height, self.background_color);
 
         // Draw foreground (progress)
-        draw_rectangle(self.x, self.y, self.width * self.progress, self.height, self.foreground_color);
+        draw_rectangle(self.x, self.y, self.width * self.progress.get(), self.height, self.foreground_color);
     }
 }
 

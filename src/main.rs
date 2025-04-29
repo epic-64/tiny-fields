@@ -79,7 +79,7 @@ fn render(state: &GameState) -> Vec<DrawCommand> {
             y: state.woodcutting_progress.y,
             width: state.woodcutting_progress.width,
             height: state.woodcutting_progress.height,
-            progress: state.woodcutting_progress.progress,
+            progress: state.woodcutting_progress.progress.get(), // Extract progress value
             background_color: state.woodcutting_progress.background_color,
             foreground_color: state.woodcutting_progress.foreground_color,
         },
