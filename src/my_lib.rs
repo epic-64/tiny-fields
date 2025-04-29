@@ -183,6 +183,7 @@ pub struct Job {
     pub control_button: Button,
     pub actions_until_level_up: i32, // Remaining actions to level up
     pub actions_done: i32, // Tracks completed actions
+    pub timeslot_cost: i32,
 }
 
 impl Job {
@@ -194,6 +195,7 @@ impl Job {
         level: i32,
         money_per_action: i32,
         action_duration: f32,
+        timeslot_cost: i32,
     ) -> Self {
         let button_x = x + 310.0;
         let button_y = y + 140.0;
@@ -211,12 +213,22 @@ impl Job {
             control_button: Button::new(button_x, button_y, 100.0, 30.0, WHITE, GRAY, "Start"),
             actions_until_level_up: 10,
             actions_done: 0,
+            timeslot_cost,
         }
     }
 
-    pub fn toggle_running(&mut self) {
-        self.running = !self.running;
-        self.control_button.label = if self.running { "Stop".to_string() } else { "Start".to_string() };
+    pub fn toggle_running(&mut self, free_timeslots: i32) -> Option<Event> {
+        if self.running {
+            self.running = false;
+            self.control_button.label = "Start".to_string();
+            Some(Event::TimeslotChanged)
+        } else if free_timeslots >= self.timeslot_cost {
+            self.running = true;
+            self.control_button.label = "Stop".to_string();
+            Some(Event::TimeslotChanged)
+        } else {
+            None
+        }
     }
 
     pub fn update_progress(&mut self, dt: f32) -> i32 {
@@ -354,4 +366,8 @@ impl JobRenderer {
 
         commands
     }
+}
+
+pub enum Event {
+    TimeslotChanged,
 }

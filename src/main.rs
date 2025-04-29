@@ -6,17 +6,26 @@ use my_lib::*;
 pub struct GameState {
     pub jobs: Vec<Job>,
     pub total_money: i32, // Tracks total money earned
+    total_timeslots: i32,
+    used_timeslots: i32,
 }
 
 impl GameState {
     pub fn new() -> Self {
         Self {
             jobs: vec![
-                Job::new("Burger", 50.0, 50.0, 1, 1, 10, 2.0),
-                Job::new("Restaurant", 50.0, 290.0, 2, 1, 20, 3.0),
+                Job::new("Burger", 50.0, 50.0, 1, 1, 10, 2.0, 2),
+                Job::new("Restaurant", 50.0, 290.0, 2, 1, 20, 3.0, 3),
+                Job::new("Car Wash", 50.0, 530.0, 3, 1, 30, 4.0, 4),
             ],
             total_money: 0,
+            total_timeslots: 3, // Total number of timeslots available
+            used_timeslots: 0,  // Tracks how many timeslots are currently in use
         }
+    }
+
+    pub fn free_timeslots(&self) -> i32 {
+        self.total_timeslots - self.used_timeslots
     }
 
     pub fn update_progress(&mut self, dt: f32) {
@@ -28,21 +37,51 @@ impl GameState {
 
 // Step logic (tick + inputs)
 fn step(state: &mut GameState, dt: f32) {
+    let free_timeslots = state.free_timeslots(); // Calculate free timeslots before the loop
+    let mut timeslot_changed = false;
+
     for job in &mut state.jobs {
         if job.control_button.is_clicked() {
-            job.toggle_running();
+            if let Some(event) = job.toggle_running(free_timeslots) {
+                if let Event::TimeslotChanged = event {
+                    timeslot_changed = true;
+                }
+            }
         }
 
         if job.running {
             state.total_money += job.update_progress(dt);
         }
     }
+
+    // Recalculate `used_timeslots` after the mutable borrow ends
+    if timeslot_changed {
+        state.used_timeslots = state.jobs.iter().filter(|j| j.running).map(|j| j.timeslot_cost).sum();
+    }
 }
 
 // Return a vector of draw commands. Pure function
 fn render(state: &GameState) -> Vec<DrawCommand> {
     let mut commands = vec![];
-    let mut y_offset = 50.0;
+
+    // Display resources
+    commands.push(DrawCommand::Text {
+        content: format!("Money: ${}", state.total_money),
+        x: 20.0,
+        y: 20.0,
+        font_size: 30.0,
+        color: WHITE,
+    });
+
+    commands.push(DrawCommand::Text {
+        content: format!("Free Timeslots: {}", state.free_timeslots()),
+        x: 20.0,
+        y: 60.0,
+        font_size: 30.0,
+        color: WHITE,
+    });
+
+    let mut y_offset = 100.0;
 
     for job in &state.jobs {
         let renderer = JobRenderer::new(50.0, y_offset, 400.0, 220.0);
