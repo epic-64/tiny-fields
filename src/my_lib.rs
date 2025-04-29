@@ -255,6 +255,21 @@ pub struct JobRenderer {
 }
 
 impl JobRenderer {
+    // Constants for layout and styling
+    const CARD_PADDING: f32 = 10.0;
+    const CARD_SPACING: f32 = 30.0;
+    const TEXT_FONT_SIZE_LARGE: f32 = 24.0;
+    const TEXT_FONT_SIZE_SMALL: f32 = 20.0;
+    const PROGRESS_BAR_HEIGHT: f32 = 20.0;
+    const BUTTON_WIDTH: f32 = 100.0;
+    const BUTTON_HEIGHT: f32 = 30.0;
+    const BACKGROUND_COLOR: Color = DARKGRAY;
+    const TEXT_COLOR_PRIMARY: Color = WHITE;
+    const TEXT_COLOR_SECONDARY: Color = LIGHTGRAY;
+    const PROGRESS_BAR_BACKGROUND: Color = GRAY;
+    const PROGRESS_BAR_FOREGROUND_ACTION: Color = GREEN;
+    const PROGRESS_BAR_FOREGROUND_LEVEL: Color = BLUE;
+
     pub fn new(x: f32, y: f32, width: f32, height: f32) -> Self {
         Self { x, y, width, height }
     }
@@ -268,76 +283,76 @@ impl JobRenderer {
             y: self.y,
             width: self.width as f64,
             height: self.height as f64,
-            color: DARKGRAY,
+            color: Self::BACKGROUND_COLOR,
         });
 
         // Job name
         commands.push(DrawCommand::Text {
             content: format!("Job: {}", job.name),
-            x: self.x + 10.0,
-            y: self.y + 20.0,
-            font_size: 24.0,
-            color: WHITE,
+            x: self.x + Self::CARD_PADDING,
+            y: self.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE,
+            font_size: Self::TEXT_FONT_SIZE_LARGE,
+            color: Self::TEXT_COLOR_PRIMARY,
         });
 
         // Level and $ per action
         commands.push(DrawCommand::Text {
             content: format!("Level: {} | $/Action: {}", job.level, job.money_per_action),
-            x: self.x + 10.0,
-            y: self.y + 50.0,
-            font_size: 20.0,
-            color: LIGHTGRAY,
+            x: self.x + Self::CARD_PADDING,
+            y: self.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + Self::CARD_SPACING,
+            font_size: Self::TEXT_FONT_SIZE_SMALL,
+            color: Self::TEXT_COLOR_SECONDARY,
         });
 
         // Seconds per action and $ per second
         commands.push(DrawCommand::Text {
             content: format!("Sec/Action: {:.2} | $/Sec: {:.2}", job.action_duration, job.dollars_per_second()),
-            x: self.x + 10.0,
-            y: self.y + 80.0,
-            font_size: 20.0,
-            color: LIGHTGRAY,
+            x: self.x + Self::CARD_PADDING,
+            y: self.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + 2.0 * Self::CARD_SPACING,
+            font_size: Self::TEXT_FONT_SIZE_SMALL,
+            color: Self::TEXT_COLOR_SECONDARY,
         });
 
         // Actions until level up
         commands.push(DrawCommand::Text {
             content: format!("Actions to Level Up: {}", job.actions_until_level_up - job.actions_done),
-            x: self.x + 10.0,
-            y: self.y + 110.0,
-            font_size: 20.0,
-            color: LIGHTGRAY,
+            x: self.x + Self::CARD_PADDING,
+            y: self.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + 3.0 * Self::CARD_SPACING,
+            font_size: Self::TEXT_FONT_SIZE_SMALL,
+            color: Self::TEXT_COLOR_SECONDARY,
         });
 
         // Action progress bar
         commands.push(DrawCommand::ProgressBar {
-            x: self.x + 10.0,
-            y: self.y + 140.0,
-            width: self.width - 20.0,
-            height: 20.0,
+            x: self.x + Self::CARD_PADDING,
+            y: self.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + 4.0 * Self::CARD_SPACING,
+            width: self.width - 2.0 * Self::CARD_PADDING,
+            height: Self::PROGRESS_BAR_HEIGHT,
             progress: job.progress.progress.get(),
-            background_color: GRAY,
-            foreground_color: GREEN,
+            background_color: Self::PROGRESS_BAR_BACKGROUND,
+            foreground_color: Self::PROGRESS_BAR_FOREGROUND_ACTION,
         });
 
         // Level-up progress bar
         commands.push(DrawCommand::ProgressBar {
-            x: self.x + 10.0,
-            y: self.y + 170.0,
-            width: self.width - 20.0,
-            height: 20.0,
+            x: self.x + Self::CARD_PADDING,
+            y: self.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + 5.0 * Self::CARD_SPACING,
+            width: self.width - 2.0 * Self::CARD_PADDING,
+            height: Self::PROGRESS_BAR_HEIGHT,
             progress: job.level_up_progress.progress.get(),
-            background_color: GRAY,
-            foreground_color: BLUE,
+            background_color: Self::PROGRESS_BAR_BACKGROUND,
+            foreground_color: Self::PROGRESS_BAR_FOREGROUND_LEVEL,
         });
 
         // Control button
         commands.push(DrawCommand::Button {
             button: Button::new(
-                self.x + self.width - 110.0,
-                self.y + 140.0,
-                100.0,
-                30.0,
-                WHITE,
-                GRAY,
+                self.x + self.width - Self::BUTTON_WIDTH - Self::CARD_PADDING,
+                self.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + 4.0 * Self::CARD_SPACING,
+                Self::BUTTON_WIDTH,
+                Self::BUTTON_HEIGHT,
+                Self::TEXT_COLOR_PRIMARY,
+                Self::PROGRESS_BAR_BACKGROUND,
                 &job.control_button.label,
             ),
         });
