@@ -8,6 +8,7 @@ struct GameState {
     lumber_camps: i32,
     time_accumulator: f32,
     build_button: Button,
+    woodcutting_progress: ProgressBar,
 }
 
 impl GameState {
@@ -17,6 +18,7 @@ impl GameState {
             lumber_camps: 0,
             time_accumulator: 0.0,
             build_button: Button::new(10.0, 120.0, 240.0, 40.0, WHITE, GRAY, "Build Lumber Camp (10)"),
+            woodcutting_progress: ProgressBar::new(10.0, 200.0, 300.0, 20.0, GRAY, GREEN),
         }
     }
 
@@ -31,11 +33,17 @@ impl GameState {
             self.lumber_camps += 1;
         }
     }
+
+    fn update_progress(&mut self, dt: f32) {
+        self.woodcutting_progress.set_progress(self.time_accumulator);
+    }
 }
 
 // Step logic (tick + inputs)
 fn step(state: &mut GameState, dt: f32) {
     state.time_accumulator += dt;
+    state.update_progress(dt);
+
     if state.time_accumulator >= 1.0 {
         state.tick();
         state.time_accumulator -= 1.0;
@@ -48,7 +56,7 @@ fn step(state: &mut GameState, dt: f32) {
 
 // Render into draw commands
 fn render(state: &GameState) -> Vec<DrawCommand> {
-    vec![
+    let mut commands = vec![
         DrawCommand::Text {
             content: format!("Wood: {}", state.wood),
             x: 20.0,
@@ -66,7 +74,12 @@ fn render(state: &GameState) -> Vec<DrawCommand> {
         DrawCommand::Button {
             button: state.build_button.clone(),
         },
-    ]
+    ];
+
+    // Draw the progress bar
+    state.woodcutting_progress.draw();
+
+    commands
 }
 
 // Main draw loop

@@ -91,3 +91,39 @@ pub fn draw(commands: &[DrawCommand]) {
     }
 }
 
+pub struct ProgressBar {
+    pub x: f32,
+    pub y: f32,
+    pub width: f32,
+    pub height: f32,
+    pub progress: f32, // Value between 0.0 and 1.0
+    pub background_color: Color,
+    pub foreground_color: Color,
+}
+
+impl ProgressBar {
+    pub fn new(x: f32, y: f32, width: f32, height: f32, background_color: Color, foreground_color: Color) -> Self {
+        Self {
+            x,
+            y,
+            width,
+            height,
+            progress: 0.0,
+            background_color,
+            foreground_color,
+        }
+    }
+
+    pub fn set_progress(&mut self, progress: f32) {
+        self.progress = progress.clamp(0.0, 1.0);
+    }
+
+    pub fn draw(&self) {
+        // Draw background
+        draw_rectangle(self.x, self.y, self.width, self.height, self.background_color);
+
+        // Draw foreground (progress)
+        draw_rectangle(self.x, self.y, self.width * self.progress, self.height, self.foreground_color);
+    }
+}
+
