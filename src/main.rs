@@ -6,8 +6,6 @@ use my_lib::*;
 pub struct Job {
     pub name: String,
     pub progress: ProgressBar,
-    pub resource: i32,
-    pub resource_name: String,
     pub production_rate: i32,
     pub level: i32, // Job level
     pub money_per_action: i32, // Money produced per action
@@ -22,7 +20,6 @@ impl Job {
         name: &str,
         x: f32,
         y: f32,
-        resource_name: &str,
         production_rate: i32,
         level: i32,
         money_per_action: i32,
@@ -31,8 +28,6 @@ impl Job {
         Self {
             name: name.to_string(),
             progress: ProgressBar::new(x, y, 300.0, 20.0, GRAY, GREEN),
-            resource: 0,
-            resource_name: resource_name.to_string(),
             production_rate,
             level,
             money_per_action,
@@ -49,7 +44,7 @@ impl Job {
     }
 
     pub fn tick(&mut self) {
-        self.resource += self.production_rate * self.level;
+        // Generates money based on production rate and level
     }
 
     pub fn update_progress(&mut self, dt: f32) -> i32 {
@@ -58,7 +53,6 @@ impl Job {
 
         if self.time_accumulator >= self.action_duration {
             self.time_accumulator -= self.action_duration;
-            self.tick();
             return self.money_per_action * self.level; // Return money earned
         }
 
@@ -75,8 +69,8 @@ impl GameState {
     pub fn new() -> Self {
         Self {
             jobs: vec![
-                Job::new("Burger", 10.0, 200.0, "Burgers", 1, 1, 10, 2.0),
-                Job::new("Restaurant", 10.0, 250.0, "Meals", 2, 1, 20, 3.0),
+                Job::new("Burger", 10.0, 200.0, 1, 1, 10, 2.0),
+                Job::new("Restaurant", 10.0, 250.0, 2, 1, 20, 3.0),
             ],
             total_money: 0,
         }
@@ -108,7 +102,7 @@ fn render(state: &GameState) -> Vec<DrawCommand> {
 
     for job in &state.jobs {
         commands.push(DrawCommand::Text {
-            content: format!("{}: {}", job.resource_name, job.resource),
+            content: format!("Level {}: ${}", job.level, state.total_money),
             x: 20.0,
             y: job.progress.y - 30.0,
             font_size: 30.0,
