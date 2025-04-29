@@ -195,18 +195,21 @@ impl Job {
         money_per_action: i32,
         action_duration: f32,
     ) -> Self {
+        let button_x = x + 310.0;
+        let button_y = y + 140.0;
+
         Self {
             name: name.to_string(),
-            progress: ProgressBar::new(x, y, 300.0, 20.0, GRAY, GREEN),
-            level_up_progress: ProgressBar::new(x, y + 30.0, 300.0, 20.0, GRAY, BLUE),
+            progress: ProgressBar::new(x + 10.0, y + 140.0, 300.0, 20.0, GRAY, GREEN),
+            level_up_progress: ProgressBar::new(x + 10.0, y + 170.0, 300.0, 20.0, GRAY, BLUE),
             production_rate,
             level,
             money_per_action,
             action_duration,
             time_accumulator: 0.0,
             running: false,
-            control_button: Button::new(x + 320.0, y, 100.0, 30.0, WHITE, GRAY, "Start"),
-            actions_until_level_up: 10, // Example: 10 actions to level up
+            control_button: Button::new(button_x, button_y, 100.0, 30.0, WHITE, GRAY, "Start"),
+            actions_until_level_up: 10,
             actions_done: 0,
         }
     }
@@ -346,15 +349,7 @@ impl JobRenderer {
 
         // Control button
         commands.push(DrawCommand::Button {
-            button: Button::new(
-                self.x + self.width - Self::BUTTON_WIDTH - Self::CARD_PADDING,
-                self.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + 4.0 * Self::CARD_SPACING,
-                Self::BUTTON_WIDTH,
-                Self::BUTTON_HEIGHT,
-                Self::TEXT_COLOR_PRIMARY,
-                Self::PROGRESS_BAR_BACKGROUND,
-                &job.control_button.label,
-            ),
+            button: job.control_button.clone(),
         });
 
         commands
