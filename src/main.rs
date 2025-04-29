@@ -54,7 +54,7 @@ fn step(state: &mut GameState, dt: f32) {
     }
 }
 
-// Render into draw commands
+// Render into draw commands. Keep this function pure.
 fn render(state: &GameState) -> Vec<DrawCommand> {
     let mut commands = vec![
         DrawCommand::Text {
@@ -74,10 +74,16 @@ fn render(state: &GameState) -> Vec<DrawCommand> {
         DrawCommand::Button {
             button: state.build_button.clone(),
         },
+        DrawCommand::ProgressBar {
+            x: state.woodcutting_progress.x,
+            y: state.woodcutting_progress.y,
+            width: state.woodcutting_progress.width,
+            height: state.woodcutting_progress.height,
+            progress: state.woodcutting_progress.progress,
+            background_color: state.woodcutting_progress.background_color,
+            foreground_color: state.woodcutting_progress.foreground_color,
+        },
     ];
-
-    // Draw the progress bar
-    state.woodcutting_progress.draw();
 
     commands
 }

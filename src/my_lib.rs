@@ -76,6 +76,15 @@ pub enum DrawCommand {
     Button {
         button: Button,
     },
+    ProgressBar {
+        x: f32,
+        y: f32,
+        width: f32,
+        height: f32,
+        progress: f32,
+        background_color: Color,
+        foreground_color: Color,
+    },
 }
 
 pub fn draw(commands: &[DrawCommand]) {
@@ -86,6 +95,10 @@ pub fn draw(commands: &[DrawCommand]) {
             }
             DrawCommand::Button { button } => {
                 button.draw();
+            }
+            DrawCommand::ProgressBar { x, y, width, height, progress, background_color, foreground_color } => {
+                draw_rectangle(*x, *y, *width, *height, *background_color);
+                draw_rectangle(*x, *y, *width * *progress, *height, *foreground_color);
             }
         }
     }
