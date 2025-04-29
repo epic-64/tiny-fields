@@ -160,5 +160,9 @@ impl ProgressBar {
         // Draw foreground (progress)
         draw_rectangle(self.x, self.y, self.width * self.progress.get(), self.height, self.foreground_color);
     }
+
+    pub fn reset(&mut self) {
+        self.progress.reset();
+    }
 }
 

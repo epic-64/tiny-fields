@@ -5,14 +5,17 @@ use my_lib::*;
 
 pub struct Job {
     pub name: String,
-    pub progress: ProgressBar,
+    pub progress: ProgressBar, // Progress for actions
+    pub level_up_progress: ProgressBar, // Progress for leveling up
     pub production_rate: i32,
-    pub level: i32, // Job level
-    pub money_per_action: i32, // Money produced per action
-    pub action_duration: f32, // Seconds to complete one action
-    pub time_accumulator: f32, // Tracks time for progress
+    pub level: i32,
+    pub money_per_action: i32,
+    pub action_duration: f32,
+    pub time_accumulator: f32,
     pub running: bool,
     pub control_button: Button,
+    pub actions_until_level_up: i32, // Remaining actions to level up
+    pub actions_done: i32, // Tracks completed actions
 }
 
 impl Job {
@@ -28,6 +31,7 @@ impl Job {
         Self {
             name: name.to_string(),
             progress: ProgressBar::new(x, y, 300.0, 20.0, GRAY, GREEN),
+            level_up_progress: ProgressBar::new(x, y + 30.0, 300.0, 20.0, GRAY, BLUE),
             production_rate,
             level,
             money_per_action,
@@ -35,6 +39,8 @@ impl Job {
             time_accumulator: 0.0,
             running: false,
             control_button: Button::new(x + 320.0, y, 100.0, 30.0, WHITE, GRAY, "Start"),
+            actions_until_level_up: 10, // Example: 10 actions to level up
+            actions_done: 0,
         }
     }
 
@@ -43,20 +49,34 @@ impl Job {
         self.control_button.label = if self.running { "Stop".to_string() } else { "Start".to_string() };
     }
 
-    pub fn tick(&mut self) {
-        // Generates money based on production rate and level
-    }
-
     pub fn update_progress(&mut self, dt: f32) -> i32 {
         self.time_accumulator += dt;
         self.progress.set_progress(self.time_accumulator / self.action_duration);
 
         if self.time_accumulator >= self.action_duration {
             self.time_accumulator -= self.action_duration;
-            return self.money_per_action * self.level; // Return money earned
+            self.actions_done += 1;
+            self.level_up_progress.set_progress(self.actions_done as f32 / self.actions_until_level_up as f32);
+
+            if self.actions_done >= self.actions_until_level_up {
+                self.level_up();
+            }
+
+            return self.money_per_action * self.level;
         }
 
-        0 // No money earned yet
+        0
+    }
+
+    fn level_up(&mut self) {
+        self.level += 1;
+        self.money_per_action += 5; // Example: Increase money per action
+        self.actions_done = 0;
+        self.level_up_progress.reset();
+    }
+
+    pub fn dollars_per_second(&self) -> f32 {
+        (self.money_per_action as f32 / self.action_duration) * self.level as f32
     }
 }
 
@@ -102,21 +122,71 @@ fn render(state: &GameState) -> Vec<DrawCommand> {
 
     for job in &state.jobs {
         commands.push(DrawCommand::Text {
-            content: format!("Level {}: ${}", job.level, state.total_money),
-            x: 20.0,
-            y: job.progress.y - 30.0,
-            font_size: 30.0,
+            content: format!("Job: {}", job.name),
+            x: job.progress.x,
+            y: job.progress.y - 60.0,
+            font_size: 20.0,
+            color: WHITE,
+        });
+
+        commands.push(DrawCommand::Text {
+            content: format!("Level: {}", job.level),
+            x: job.progress.x,
+            y: job.progress.y - 40.0,
+            font_size: 20.0,
+            color: WHITE,
+        });
+
+        commands.push(DrawCommand::Text {
+            content: format!("$ per Action: {}", job.money_per_action),
+            x: job.progress.x,
+            y: job.progress.y - 20.0,
+            font_size: 20.0,
+            color: WHITE,
+        });
+
+        commands.push(DrawCommand::Text {
+            content: format!("Seconds per Action: {:.2}", job.action_duration),
+            x: job.progress.x,
+            y: job.progress.y,
+            font_size: 20.0,
+            color: WHITE,
+        });
+
+        commands.push(DrawCommand::Text {
+            content: format!("$ per Second: {:.2}", job.dollars_per_second()),
+            x: job.progress.x,
+            y: job.progress.y + 20.0,
+            font_size: 20.0,
+            color: WHITE,
+        });
+
+        commands.push(DrawCommand::Text {
+            content: format!("Actions until Level Up: {}", job.actions_until_level_up - job.actions_done),
+            x: job.progress.x,
+            y: job.progress.y + 40.0,
+            font_size: 20.0,
             color: WHITE,
         });
 
         commands.push(DrawCommand::ProgressBar {
             x: job.progress.x,
-            y: job.progress.y,
+            y: job.progress.y + 60.0,
             width: job.progress.width,
             height: job.progress.height,
             progress: job.progress.progress.get(),
             background_color: job.progress.background_color,
             foreground_color: job.progress.foreground_color,
+        });
+
+        commands.push(DrawCommand::ProgressBar {
+            x: job.level_up_progress.x,
+            y: job.level_up_progress.y + 60.0,
+            width: job.level_up_progress.width,
+            height: job.level_up_progress.height,
+            progress: job.level_up_progress.progress.get(),
+            background_color: job.level_up_progress.background_color,
+            foreground_color: job.level_up_progress.foreground_color,
         });
 
         commands.push(DrawCommand::Button {
