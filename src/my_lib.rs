@@ -15,7 +15,7 @@ impl Rectangle {
 
     pub fn contains_point(&self, point: (f32, f32)) -> bool {
         point.0 >= self.x && point.0 <= self.x + self.width &&
-            point.1 >= self.y && point.1 <= self.y + self.height
+        point.1 >= self.y && point.1 <= self.y + self.height
     }
 
     pub fn draw(&self, color: Color) {
