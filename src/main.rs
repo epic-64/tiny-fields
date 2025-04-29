@@ -98,7 +98,7 @@ async fn main() {
     let mut state = GameState::new();
 
     loop {
-        clear_background(BLACK);
+        clear_background(ORANGE);
 
         let dt = get_frame_time();
         step(&mut state, dt);
