@@ -9,31 +9,57 @@ pub struct Job {
     pub resource: i32,
     pub resource_name: String,
     pub production_rate: i32,
+    pub level: i32, // Job level
+    pub money_per_action: i32, // Money produced per action
+    pub action_duration: f32, // Seconds to complete one action
+    pub time_accumulator: f32, // Tracks time for progress
 }
 
 impl Job {
-    pub fn new(name: &str, x: f32, y: f32, resource_name: &str, production_rate: i32) -> Self {
+    pub fn new(
+        name: &str,
+        x: f32,
+        y: f32,
+        resource_name: &str,
+        production_rate: i32,
+        level: i32,
+        money_per_action: i32,
+        action_duration: f32,
+    ) -> Self {
         Self {
             name: name.to_string(),
             progress: ProgressBar::new(x, y, 300.0, 20.0, GRAY, GREEN),
             resource: 0,
             resource_name: resource_name.to_string(),
             production_rate,
+            level,
+            money_per_action,
+            action_duration,
+            time_accumulator: 0.0,
         }
     }
 
     pub fn tick(&mut self) {
-        self.resource += self.production_rate;
+        self.resource += self.production_rate * self.level;
     }
 
-    pub fn update_progress(&mut self, dt: f32) {
-        self.progress.set_progress(dt);
+    pub fn update_progress(&mut self, dt: f32) -> i32 {
+        self.time_accumulator += dt;
+        self.progress.set_progress(self.time_accumulator / self.action_duration);
+
+        if self.time_accumulator >= self.action_duration {
+            self.time_accumulator -= self.action_duration;
+            self.tick();
+            return self.money_per_action * self.level; // Return money earned
+        }
+
+        0 // No money earned yet
     }
 }
 
 pub struct GameState {
     pub jobs: Vec<Job>,
-    pub time_accumulator: f32,
+    pub total_money: i32, // Tracks total money earned
     pub build_button: Button,
 }
 
@@ -41,36 +67,24 @@ impl GameState {
     pub fn new() -> Self {
         Self {
             jobs: vec![
-                Job::new("Burger", 10.0, 200.0, "Burgers", 1),
-                Job::new("Restaurant", 10.0, 250.0, "Meals", 2),
+                Job::new("Burger", 10.0, 200.0, "Burgers", 1, 1, 10, 2.0),
+                Job::new("Restaurant", 10.0, 250.0, "Meals", 2, 1, 20, 3.0),
             ],
-            time_accumulator: 0.0,
+            total_money: 0,
             build_button: Button::new(10.0, 120.0, 240.0, 40.0, WHITE, GRAY, "Build Restaurant"),
-        }
-    }
-
-    pub fn tick(&mut self) {
-        for job in &mut self.jobs {
-            job.tick();
         }
     }
 
     pub fn update_progress(&mut self, dt: f32) {
         for job in &mut self.jobs {
-            job.update_progress(dt);
+            self.total_money += job.update_progress(dt);
         }
     }
 }
 
 // Step logic (tick + inputs)
 fn step(state: &mut GameState, dt: f32) {
-    state.time_accumulator += dt;
     state.update_progress(dt);
-
-    if state.time_accumulator >= 1.0 {
-        state.tick();
-        state.time_accumulator -= 1.0;
-    }
 
     if state.build_button.is_clicked() {
         // Add logic for building restaurants or other jobs
