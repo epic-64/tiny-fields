@@ -85,6 +85,7 @@ pub enum DrawCommand {
         background_color: Color,
         foreground_color: Color,
     },
+    Rectangle { x: f32, y: f32, width: f64, height: f64, color: Color },
 }
 
 pub fn draw(commands: &[DrawCommand]) {
@@ -99,6 +100,9 @@ pub fn draw(commands: &[DrawCommand]) {
             DrawCommand::ProgressBar { x, y, width, height, progress, background_color, foreground_color } => {
                 draw_rectangle(*x, *y, *width, *height, *background_color);
                 draw_rectangle(*x, *y, *width * *progress, *height, *foreground_color);
+            }
+            DrawCommand::Rectangle { x, y, width, height, color } => {
+                draw_rectangle(*x, *y, *width as f32, *height as f32, *color);
             }
         }
     }

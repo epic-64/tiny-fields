@@ -121,74 +121,74 @@ fn render(state: &GameState) -> Vec<DrawCommand> {
     let mut commands = vec![];
 
     for job in &state.jobs {
+        // Card background
+        commands.push(DrawCommand::Rectangle {
+            x: job.progress.x - 10.0,
+            y: job.progress.y - 80.0,
+            width: 400.0,
+            height: 200.0,
+            color: DARKGRAY,
+        });
+
+        // Job name
         commands.push(DrawCommand::Text {
             content: format!("Job: {}", job.name),
             x: job.progress.x,
             y: job.progress.y - 60.0,
-            font_size: 20.0,
+            font_size: 24.0,
             color: WHITE,
         });
 
+        // Level and $ per action
         commands.push(DrawCommand::Text {
-            content: format!("Level: {}", job.level),
+            content: format!("Level: {} | $/Action: {}", job.level, job.money_per_action),
             x: job.progress.x,
             y: job.progress.y - 40.0,
             font_size: 20.0,
-            color: WHITE,
+            color: LIGHTGRAY,
         });
 
+        // Seconds per action and $ per second
         commands.push(DrawCommand::Text {
-            content: format!("$ per Action: {}", job.money_per_action),
+            content: format!("Sec/Action: {:.2} | $/Sec: {:.2}", job.action_duration, job.dollars_per_second()),
             x: job.progress.x,
             y: job.progress.y - 20.0,
             font_size: 20.0,
-            color: WHITE,
+            color: LIGHTGRAY,
         });
 
+        // Actions until level up
         commands.push(DrawCommand::Text {
-            content: format!("Seconds per Action: {:.2}", job.action_duration),
+            content: format!("Actions to Level Up: {}", job.actions_until_level_up - job.actions_done),
             x: job.progress.x,
             y: job.progress.y,
             font_size: 20.0,
-            color: WHITE,
+            color: LIGHTGRAY,
         });
 
-        commands.push(DrawCommand::Text {
-            content: format!("$ per Second: {:.2}", job.dollars_per_second()),
-            x: job.progress.x,
-            y: job.progress.y + 20.0,
-            font_size: 20.0,
-            color: WHITE,
-        });
-
-        commands.push(DrawCommand::Text {
-            content: format!("Actions until Level Up: {}", job.actions_until_level_up - job.actions_done),
-            x: job.progress.x,
-            y: job.progress.y + 40.0,
-            font_size: 20.0,
-            color: WHITE,
-        });
-
+        // Action progress bar
         commands.push(DrawCommand::ProgressBar {
             x: job.progress.x,
-            y: job.progress.y + 60.0,
+            y: job.progress.y + 20.0,
             width: job.progress.width,
             height: job.progress.height,
             progress: job.progress.progress.get(),
-            background_color: job.progress.background_color,
-            foreground_color: job.progress.foreground_color,
+            background_color: GRAY,
+            foreground_color: GREEN,
         });
 
+        // Level-up progress bar
         commands.push(DrawCommand::ProgressBar {
             x: job.level_up_progress.x,
-            y: job.level_up_progress.y + 60.0,
+            y: job.level_up_progress.y + 40.0,
             width: job.level_up_progress.width,
             height: job.level_up_progress.height,
             progress: job.level_up_progress.progress.get(),
-            background_color: job.level_up_progress.background_color,
-            foreground_color: job.level_up_progress.foreground_color,
+            background_color: GRAY,
+            foreground_color: BLUE,
         });
 
+        // Control button
         commands.push(DrawCommand::Button {
             button: job.control_button.clone(),
         });
