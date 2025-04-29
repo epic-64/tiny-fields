@@ -13,6 +13,8 @@ pub struct Job {
     pub money_per_action: i32, // Money produced per action
     pub action_duration: f32, // Seconds to complete one action
     pub time_accumulator: f32, // Tracks time for progress
+    pub running: bool,
+    pub control_button: Button,
 }
 
 impl Job {
@@ -36,7 +38,14 @@ impl Job {
             money_per_action,
             action_duration,
             time_accumulator: 0.0,
+            running: false,
+            control_button: Button::new(x + 320.0, y, 100.0, 30.0, WHITE, GRAY, "Start"),
         }
+    }
+
+    pub fn toggle_running(&mut self) {
+        self.running = !self.running;
+        self.control_button.label = if self.running { "Stop".to_string() } else { "Start".to_string() };
     }
 
     pub fn tick(&mut self) {
@@ -60,7 +69,6 @@ impl Job {
 pub struct GameState {
     pub jobs: Vec<Job>,
     pub total_money: i32, // Tracks total money earned
-    pub build_button: Button,
 }
 
 impl GameState {
@@ -71,7 +79,6 @@ impl GameState {
                 Job::new("Restaurant", 10.0, 250.0, "Meals", 2, 1, 20, 3.0),
             ],
             total_money: 0,
-            build_button: Button::new(10.0, 120.0, 240.0, 40.0, WHITE, GRAY, "Build Restaurant"),
         }
     }
 
@@ -84,20 +91,20 @@ impl GameState {
 
 // Step logic (tick + inputs)
 fn step(state: &mut GameState, dt: f32) {
-    state.update_progress(dt);
+    for job in &mut state.jobs {
+        if job.control_button.is_clicked() {
+            job.toggle_running();
+        }
 
-    if state.build_button.is_clicked() {
-        // Add logic for building restaurants or other jobs
+        if job.running {
+            state.total_money += job.update_progress(dt);
+        }
     }
 }
 
 // Return a vector of draw commands. Pure function
 fn render(state: &GameState) -> Vec<DrawCommand> {
-    let mut commands = vec![
-        DrawCommand::Button {
-            button: state.build_button.clone(),
-        },
-    ];
+    let mut commands = vec![];
 
     for job in &state.jobs {
         commands.push(DrawCommand::Text {
@@ -116,6 +123,10 @@ fn render(state: &GameState) -> Vec<DrawCommand> {
             progress: job.progress.progress.get(),
             background_color: job.progress.background_color,
             foreground_color: job.progress.foreground_color,
+        });
+
+        commands.push(DrawCommand::Button {
+            button: job.control_button.clone(),
         });
     }
 
