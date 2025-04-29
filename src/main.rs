@@ -3,39 +3,62 @@ use macroquad::prelude::*;
 mod my_lib;
 use my_lib::*;
 
-struct GameState {
-    wood: i32,
-    lumber_camps: i32,
-    time_accumulator: f32,
-    build_button: Button,
-    woodcutting_progress: ProgressBar,
+pub struct Job {
+    pub name: String,
+    pub progress: ProgressBar,
+    pub resource: i32,
+    pub resource_name: String,
+    pub production_rate: i32,
+}
+
+impl Job {
+    pub fn new(name: &str, x: f32, y: f32, resource_name: &str, production_rate: i32) -> Self {
+        Self {
+            name: name.to_string(),
+            progress: ProgressBar::new(x, y, 300.0, 20.0, GRAY, GREEN),
+            resource: 0,
+            resource_name: resource_name.to_string(),
+            production_rate,
+        }
+    }
+
+    pub fn tick(&mut self) {
+        self.resource += self.production_rate;
+    }
+
+    pub fn update_progress(&mut self, dt: f32) {
+        self.progress.set_progress(dt);
+    }
+}
+
+pub struct GameState {
+    pub jobs: Vec<Job>,
+    pub time_accumulator: f32,
+    pub build_button: Button,
 }
 
 impl GameState {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
-            wood: 0,
-            lumber_camps: 0,
+            jobs: vec![
+                Job::new("Burger", 10.0, 200.0, "Burgers", 1),
+                Job::new("Restaurant", 10.0, 250.0, "Meals", 2),
+            ],
             time_accumulator: 0.0,
-            build_button: Button::new(10.0, 120.0, 240.0, 40.0, WHITE, GRAY, "Build Lumber Camp (10)"),
-            woodcutting_progress: ProgressBar::new(10.0, 200.0, 300.0, 20.0, GRAY, GREEN),
+            build_button: Button::new(10.0, 120.0, 240.0, 40.0, WHITE, GRAY, "Build Restaurant"),
         }
     }
 
-    fn tick(&mut self) {
-        self.wood += 1 + self.lumber_camps;
-    }
-
-    fn try_build_lumber_camp(&mut self) {
-        let cost = 10;
-        if self.wood >= cost {
-            self.wood -= cost;
-            self.lumber_camps += 1;
+    pub fn tick(&mut self) {
+        for job in &mut self.jobs {
+            job.tick();
         }
     }
 
-    fn update_progress(&mut self, dt: f32) {
-        self.woodcutting_progress.set_progress(self.time_accumulator);
+    pub fn update_progress(&mut self, dt: f32) {
+        for job in &mut self.jobs {
+            job.update_progress(dt);
+        }
     }
 }
 
@@ -50,40 +73,37 @@ fn step(state: &mut GameState, dt: f32) {
     }
 
     if state.build_button.is_clicked() {
-        state.try_build_lumber_camp();
+        // Add logic for building restaurants or other jobs
     }
 }
 
-// Render into draw commands. Keep this function pure.
+// Return a vector of draw commands. Pure function
 fn render(state: &GameState) -> Vec<DrawCommand> {
     let mut commands = vec![
-        DrawCommand::Text {
-            content: format!("Wood: {}", state.wood),
-            x: 20.0,
-            y: 40.0,
-            font_size: 30.0,
-            color: WHITE,
-        },
-        DrawCommand::Text {
-            content: format!("Lumber Camps: {}", state.lumber_camps),
-            x: 20.0,
-            y: 80.0,
-            font_size: 30.0,
-            color: WHITE,
-        },
         DrawCommand::Button {
             button: state.build_button.clone(),
         },
-        DrawCommand::ProgressBar {
-            x: state.woodcutting_progress.x,
-            y: state.woodcutting_progress.y,
-            width: state.woodcutting_progress.width,
-            height: state.woodcutting_progress.height,
-            progress: state.woodcutting_progress.progress.get(), // Extract progress value
-            background_color: state.woodcutting_progress.background_color,
-            foreground_color: state.woodcutting_progress.foreground_color,
-        },
     ];
+
+    for job in &state.jobs {
+        commands.push(DrawCommand::Text {
+            content: format!("{}: {}", job.resource_name, job.resource),
+            x: 20.0,
+            y: job.progress.y - 30.0,
+            font_size: 30.0,
+            color: WHITE,
+        });
+
+        commands.push(DrawCommand::ProgressBar {
+            x: job.progress.x,
+            y: job.progress.y,
+            width: job.progress.width,
+            height: job.progress.height,
+            progress: job.progress.progress.get(),
+            background_color: job.progress.background_color,
+            foreground_color: job.progress.foreground_color,
+        });
+    }
 
     commands
 }
