@@ -228,7 +228,6 @@ fn render(state: &GameState, layout: &[JobLayout]) -> Vec<DrawCommand> {
 #[macroquad::main("Tiny Fields")]
 async fn main() {
     let mut state = GameState::new();
-    let mut last_frame_duration = 0.0;
 
     loop {
         let frame_start = Instant::now();
@@ -238,13 +237,12 @@ async fn main() {
 
         let job_layouts = layout(&state);           // NEW
         step(&mut state, &job_layouts, dt);         // UPDATED
-        state.game_meta.raw_fps = 1.0 / last_frame_duration;
-        state.game_meta.effective_fps = get_fps() as f32;
 
         let commands = render(&state, &job_layouts); // UPDATED
         draw(&commands);
 
-        last_frame_duration = frame_start.elapsed().as_secs_f32();
+        state.game_meta.raw_fps = 1.0 / frame_start.elapsed().as_secs_f32();
+        state.game_meta.effective_fps = get_fps() as f32;
 
         next_frame().await;
     }
