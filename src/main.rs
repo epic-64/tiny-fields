@@ -12,6 +12,12 @@ pub struct TimeSlots {
     pub used: i32,
 }
 
+impl TimeSlots {
+    pub fn get_free(&self) -> i32 {
+        self.total - self.used
+    }
+}
+
 pub struct GameState {
     pub jobs: Vec<Job>,
     pub total_money: i32,
@@ -33,10 +39,6 @@ impl GameState {
         }
     }
 
-    pub fn free_timeslots(&self) -> i32 {
-        self.time_slots.total - self.time_slots.used
-    }
-
     pub fn update_progress(&mut self, dt: f32) {
         for job in &mut self.jobs {
             self.total_money += job.update_progress(dt);
@@ -46,7 +48,7 @@ impl GameState {
 
 // Step logic (tick + inputs)
 fn step(state: &mut GameState, dt: f32) {
-    let free_timeslots = state.free_timeslots(); // Calculate free timeslots before the loop
+    let free_timeslots = state.time_slots.get_free();
 
     for job in &mut state.jobs {
         if job.control_button.is_clicked() {
@@ -83,7 +85,7 @@ fn render(state: &GameState) -> Vec<DrawCommand> {
     });
 
     commands.push(DrawCommand::Text {
-        content: format!("Free Timeslots: {}", state.free_timeslots()),
+        content: format!("Free Timeslots: {}", state.time_slots.get_free()),
         x: 20.0,
         y: 60.0,
         font_size: 30.0,
