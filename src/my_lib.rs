@@ -164,20 +164,23 @@ impl ProgressBar {
     }
 }
 
+pub struct JobBaseValues {
+    pub money_per_action: i32,
+    pub actions_until_level_up: i32,
+}
+
 pub struct Job {
     pub name: String,
     pub action_progress: ProgressBar, // Progress for actions
     pub level_up_progress: ProgressBar, // Progress for leveling up
-    pub production_rate: i32,
     pub level: i32,
-    pub base_money_per_action: i32,
     pub action_duration: f32,
     pub time_accumulator: f32,
     pub running: bool,
     pub control_button: Button,
-    pub actions_until_level_up: i32, // Remaining actions to level up
     pub actions_done: i32, // Tracks completed actions
     pub timeslot_cost: i32,
+    pub base_values: JobBaseValues,
 }
 
 impl Job {
@@ -185,29 +188,23 @@ impl Job {
         name: &str,
         x: f32,
         y: f32,
-        production_rate: i32,
         level: i32,
-        base_money_per_action: i32,
         action_duration: f32,
         timeslot_cost: i32,
+        base_values: JobBaseValues,
     ) -> Self {
-        let button_x = x + 310.0;
-        let button_y = y + 140.0;
-
         Self {
             name: name.to_string(),
             action_progress: ProgressBar::new(x + 10.0, y + 140.0, 300.0, 20.0, GRAY, GREEN),
             level_up_progress: ProgressBar::new(x + 10.0, y + 170.0, 300.0, 20.0, GRAY, BLUE),
-            production_rate,
             level,
-            base_money_per_action,
             action_duration,
             time_accumulator: 0.0,
             running: false,
-            control_button: Button::new(button_x, button_y, 100.0, 30.0, WHITE, GRAY, "Start"),
-            actions_until_level_up: 10,
+            control_button: Button::new(x + 180.0, y, 100.0, 30.0, WHITE, GRAY, "Start"),
             actions_done: 0,
             timeslot_cost,
+            base_values,
         }
     }
 
@@ -228,9 +225,9 @@ impl Job {
         if self.time_accumulator >= self.action_duration {
             self.time_accumulator -= self.action_duration;
             self.actions_done += 1;
-            self.level_up_progress.set_progress(self.actions_done as f32 / self.actions_until_level_up as f32);
+            self.level_up_progress.set_progress(self.actions_done as f32 / self.actions_to_level_up() as f32);
 
-            if self.actions_done >= self.actions_until_level_up {
+            if self.actions_done >= self.actions_to_level_up() {
                 self.level_up();
             }
 
@@ -254,11 +251,17 @@ impl Job {
     }
 
     pub fn dollars_per_action(&self) -> i64 {
-        (self.base_money_per_action as f32 * self.dollars_multiplier()) as i64
+        (self.base_values.money_per_action as f32 * self.dollars_multiplier()) as i64
     }
 
     pub fn dollars_per_second(&self) -> i64 {
         self.dollars_per_action() / self.action_duration as i64
+    }
+
+    pub fn actions_to_level_up(&self) -> i32 {
+        let base_actions = 10;        // Base number of actions for level 1
+        let growth_factor: f32 = 1.5; // Exponential growth factor
+        (base_actions as f32 * growth_factor.powi(self.level - 1)) as i32
     }
 }
 
@@ -340,7 +343,7 @@ impl JobRenderer {
 
         // Text inside the level-up progress bar
         commands.push(DrawCommand::Text {
-            content: format!("Level Up: {} / {}", job.actions_done, job.actions_until_level_up),
+            content: format!("Level Up: {} / {}", job.actions_done, job.actions_to_level_up()),
             x: x + Self::CARD_PADDING + 10.0,
             y: y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + 3.0 * Self::CARD_SPACING + 15.0,
             font_size: Self::TEXT_FONT_SIZE_SMALL,
