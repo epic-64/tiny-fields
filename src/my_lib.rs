@@ -59,13 +59,6 @@ impl Button {
     }
 }
 
-pub const DEFAULT_FONT_SIZE: f32 = 30.0;
-pub const DEFAULT_FONT_COLOR: Color = WHITE;
-
-pub fn draw_text_primary(text: &str, x: f32, y: f32) {
-    draw_text(text, x, y, DEFAULT_FONT_SIZE, DEFAULT_FONT_COLOR);
-}
-
 pub enum DrawCommand {
     Text {
         content: String,
@@ -218,17 +211,13 @@ impl Job {
         }
     }
 
-    pub fn toggle_running(&mut self, free_timeslots: i32) -> Option<Event> {
+    pub fn toggle_running(&mut self, free_timeslots: i32) -> () {
         if self.running {
             self.running = false;
             self.control_button.label = "Start".to_string();
-            Some(Event::TimeslotChanged)
         } else if free_timeslots >= self.timeslot_cost {
             self.running = true;
             self.control_button.label = "Stop".to_string();
-            Some(Event::TimeslotChanged)
-        } else {
-            None
         }
     }
 
@@ -269,7 +258,7 @@ impl Job {
     }
 
     pub fn dollars_per_second(&self) -> i64 {
-        (self.dollars_per_action() / self.action_duration as i64)
+        self.dollars_per_action() / self.action_duration as i64
     }
 }
 
@@ -364,8 +353,4 @@ impl JobRenderer {
 
         commands
     }
-}
-
-pub enum Event {
-    TimeslotChanged,
 }
