@@ -3,12 +3,16 @@ use macroquad::prelude::*;
 mod my_lib;
 use my_lib::*;
 
+pub struct PerformanceFlags {
+    pub timeslots_changed: bool,
+}
+
 pub struct GameState {
     pub jobs: Vec<Job>,
     pub total_money: i32,
-    pub timeslot_changed: bool,
     total_timeslots: i32,
     used_timeslots: i32,
+    pub performance_flags: PerformanceFlags,
 }
 
 impl GameState {
@@ -20,9 +24,11 @@ impl GameState {
                 Job::new("Car Wash", 50.0, 530.0, 3, 1, 30, 4.0, 4),
             ],
             total_money: 0,
-            timeslot_changed: false,
             total_timeslots: 3, // Total number of timeslots available
             used_timeslots: 0,  // Tracks how many timeslots are currently in use
+            performance_flags: PerformanceFlags {
+                timeslots_changed: false,
+            },
         }
     }
 
@@ -44,7 +50,7 @@ fn step(state: &mut GameState, dt: f32) {
     for job in &mut state.jobs {
         if job.control_button.is_clicked() {
             job.toggle_running(free_timeslots);
-            state.timeslot_changed = true;
+            state.performance_flags.timeslots_changed = true;
         }
 
         if job.running {
@@ -53,7 +59,7 @@ fn step(state: &mut GameState, dt: f32) {
     }
 
     // Recalculate `used_timeslots` after the mutable borrow ends
-    if state.timeslot_changed {
+    if state.performance_flags.timeslots_changed {
         state.used_timeslots = get_used_timeslots(&state.jobs);
     }
 }

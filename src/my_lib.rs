@@ -283,8 +283,6 @@ impl JobRenderer {
     const TEXT_FONT_SIZE_LARGE: f32 = 24.0;
     const TEXT_FONT_SIZE_SMALL: f32 = 20.0;
     const PROGRESS_BAR_HEIGHT: f32 = 20.0;
-    const BUTTON_WIDTH: f32 = 100.0;
-    const BUTTON_HEIGHT: f32 = 30.0;
     const BACKGROUND_COLOR: Color = DARKGRAY;
     const TEXT_COLOR_PRIMARY: Color = WHITE;
     const TEXT_COLOR_SECONDARY: Color = LIGHTGRAY;
