@@ -347,6 +347,7 @@ impl JobRenderer {
             foreground_color: Self::PROGRESS_BAR_FOREGROUND_ACTION,
         });
 
+        // Text inside the action progress bar
         commands.push(DrawCommand::Text {
             content: format!("{:.1} / {:.1}", job.time_accumulator, job.action_duration),
             x: x + Self::CARD_PADDING + 10.0,
@@ -366,7 +367,15 @@ impl JobRenderer {
             foreground_color: Self::PROGRESS_BAR_FOREGROUND_LEVEL,
         });
 
-        // Control button
+        // Text inside the level-up progress bar
+        commands.push(DrawCommand::Text {
+            content: format!("Level Up: {} / {}", job.actions_done, job.actions_until_level_up),
+            x: x + Self::CARD_PADDING + 10.0,
+            y: y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + 5.0 * Self::CARD_SPACING + 15.0,
+            font_size: Self::TEXT_FONT_SIZE_SMALL,
+            color: Self::TEXT_COLOR_PRIMARY,
+        });
+
         commands.push(DrawCommand::Button {
             button: job.control_button.clone(),
         });
