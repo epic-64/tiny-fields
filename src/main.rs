@@ -83,11 +83,14 @@ fn layout(state: &GameState) -> Vec<JobLayout> {
 }
 
 // Step logic (tick + inputs)
-fn step(state: &mut GameState, dt: f32) {
+fn step(state: &mut GameState, layout: &[JobLayout], dt: f32) {
     let free_timeslots = state.time_slots.get_free();
+    let mouse = mouse_position();
 
-    for job in &mut state.jobs {
-        if job.control_button.is_clicked() {
+    for layout in layout {
+        let job = &mut state.jobs[layout.job_index];
+
+        if layout.button_rect.contains_point(mouse) && is_mouse_button_pressed(MouseButton::Left) {
             job.toggle_running(free_timeslots);
             state.performance_flags.timeslots_changed = true;
         }
@@ -97,7 +100,6 @@ fn step(state: &mut GameState, dt: f32) {
         }
     }
 
-    // Recalculate `used_timeslots` after the mutable borrow ends
     if state.performance_flags.timeslots_changed {
         state.time_slots.used = get_used_timeslots(&state.jobs);
     }
@@ -113,10 +115,10 @@ pub struct GameMeta {
 }
 
 // Return a vector of draw commands. Pure function
-fn render(state: &GameState) -> Vec<DrawCommand> {
+fn render(state: &GameState, layout: &[JobLayout]) -> Vec<DrawCommand> {
     let mut commands = vec![];
 
-    // Display resources
+    // Display top-level info
     commands.push(DrawCommand::Text {
         content: format!("Money: ${}", state.total_money),
         x: 20.0,
@@ -133,7 +135,6 @@ fn render(state: &GameState) -> Vec<DrawCommand> {
         color: WHITE,
     });
 
-    // Display FPS
     commands.push(DrawCommand::Text {
         content: format!("FPS: {}", state.game_meta.effective_fps),
         x: 20.0,
@@ -142,7 +143,6 @@ fn render(state: &GameState) -> Vec<DrawCommand> {
         color: WHITE,
     });
 
-    // Add raw FPS to the draw commands
     commands.push(DrawCommand::Text {
         content: format!("Raw FPS: {:.2}", state.game_meta.raw_fps),
         x: 20.0,
@@ -151,39 +151,97 @@ fn render(state: &GameState) -> Vec<DrawCommand> {
         color: WHITE,
     });
 
-    let mut y_offset = 200.0;
-    let job_renderer = JobRenderer{};
+    for layout in layout {
+        let job = &state.jobs[layout.job_index];
 
-    for job in &state.jobs {
-        commands.extend(job_renderer.render(job, 50.0, y_offset, 400.0, 180.0));
-        y_offset += 240.0; // Adjust spacing between cards
+        // Background
+        commands.push(DrawCommand::Rectangle {
+            x: layout.card_rect.x,
+            y: layout.card_rect.y,
+            width: layout.card_rect.width as f64,
+            height: layout.card_rect.height as f64,
+            color: DARKGRAY,
+        });
+
+        // Job name
+        commands.push(DrawCommand::Text {
+            content: format!("Job: {} ({})", job.name, job.level),
+            x: layout.card_rect.x + 20.0,
+            y: layout.card_rect.y + 44.0,
+            font_size: 24.0,
+            color: WHITE,
+        });
+
+        // Money info
+        commands.push(DrawCommand::Text {
+            content: format!("$: {} | $/s: {}", job.dollars_per_action(), job.dollars_per_second()),
+            x: layout.card_rect.x + 20.0,
+            y: layout.card_rect.y + 74.0,
+            font_size: 20.0,
+            color: LIGHTGRAY,
+        });
+
+        // Action progress bar
+        commands.push(DrawCommand::ProgressBar {
+            x: layout.action_bar_rect.x,
+            y: layout.action_bar_rect.y,
+            width: layout.action_bar_rect.width,
+            height: layout.action_bar_rect.height,
+            progress: job.action_progress.progress.get(),
+            background_color: GRAY,
+            foreground_color: GREEN,
+        });
+
+        // Level-up progress bar
+        commands.push(DrawCommand::ProgressBar {
+            x: layout.level_bar_rect.x,
+            y: layout.level_bar_rect.y,
+            width: layout.level_bar_rect.width,
+            height: layout.level_bar_rect.height,
+            progress: job.level_up_progress.progress.get(),
+            background_color: GRAY,
+            foreground_color: BLUE,
+        });
+
+        // Button
+        commands.push(DrawCommand::Button {
+            button: Button::new(
+                layout.button_rect.x,
+                layout.button_rect.y,
+                layout.button_rect.width,
+                layout.button_rect.height,
+                WHITE,
+                GRAY,
+                if job.running { "Stop" } else { "Start" },
+            ),
+        });
     }
 
     commands
 }
 
+
 // Main draw loop
 #[macroquad::main("Tiny Fields")]
 async fn main() {
     let mut state = GameState::new();
+    let mut last_frame_duration = 0.0;
 
     loop {
-        let frame_start = Instant::now(); // Start measuring raw frame time
+        let frame_start = Instant::now();
 
         clear_background(ORANGE);
-
         let dt = get_frame_time();
-        step(&mut state, dt);
 
-        // Calculate raw FPS based on rendering and logic time
-        let raw_frame_time = frame_start.elapsed().as_secs_f32();
-        state.game_meta.raw_fps = 1.0 / raw_frame_time;
-
-        // Calculate effective FPS
+        let job_layouts = layout(&state);           // NEW
+        step(&mut state, &job_layouts, dt);         // UPDATED
+        state.game_meta.raw_fps = 1.0 / last_frame_duration;
         state.game_meta.effective_fps = get_fps() as f32;
 
-        let commands = render(&state);
+        let commands = render(&state, &job_layouts); // UPDATED
         draw(&commands);
+
+        last_frame_duration = frame_start.elapsed().as_secs_f32();
 
         next_frame().await;
     }
