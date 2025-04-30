@@ -20,7 +20,7 @@ impl TimeSlots {
 
 pub struct GameState {
     pub jobs: Vec<Job>,
-    pub total_money: i32,
+    pub total_money: i64,
     pub time_slots: TimeSlots,
     pub performance_flags: PerformanceFlags,
 }

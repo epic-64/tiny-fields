@@ -232,7 +232,7 @@ impl Job {
         }
     }
 
-    pub fn update_progress(&mut self, dt: f32) -> i32 {
+    pub fn update_progress(&mut self, dt: f32) -> i64 {
         self.time_accumulator += dt;
         self.action_progress.set_progress(self.time_accumulator / self.action_duration);
 
@@ -245,7 +245,7 @@ impl Job {
                 self.level_up();
             }
 
-            return self.dollars_per_action() as i32;
+            return self.dollars_per_action();
         }
 
         0
