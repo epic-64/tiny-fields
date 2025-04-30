@@ -2,7 +2,10 @@ use std::time::Instant;
 use macroquad::prelude::*;
 
 mod my_lib;
+mod layout;
+
 use my_lib::*;
+use layout::*;
 
 pub struct PerformanceFlags {
     pub timeslots_changed: bool,

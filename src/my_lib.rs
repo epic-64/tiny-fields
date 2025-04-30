@@ -164,14 +164,6 @@ impl ProgressBar {
     }
 }
 
-pub struct JobLayout {
-    pub card_rect: Rectangle,
-    pub button_rect: Rectangle,
-    pub action_bar_rect: Rectangle,
-    pub level_bar_rect: Rectangle,
-    pub job_index: usize,
-}
-
 pub struct JobBaseValues {
     pub money_per_action: i32,
     pub actions_until_level_up: i32,
