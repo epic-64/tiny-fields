@@ -133,22 +133,27 @@ fn render(state: &GameState) -> Vec<DrawCommand> {
 #[macroquad::main("Tiny Fields")]
 async fn main() {
     let mut state = GameState::new();
-    let mut last_frame_time = Instant::now(); // Track time for raw FPS
+    let mut last_frame_start = Instant::now(); // Track the start of the frame
 
     loop {
+        let frame_start = Instant::now(); // Start measuring raw frame time
+
         clear_background(ORANGE);
 
         let dt = get_frame_time();
         step(&mut state, dt);
 
-        // Calculate raw FPS
-        state.game_meta.raw_fps = 1.0 / last_frame_time.elapsed().as_secs_f32();
+        // Calculate raw FPS based on rendering and logic time
+        let raw_frame_time = frame_start.elapsed().as_secs_f32();
+        state.game_meta.raw_fps = 1.0 / raw_frame_time;
+
+        // Calculate effective FPS
         state.game_meta.effective_fps = get_fps() as f32;
-        last_frame_time = Instant::now();
 
         let commands = render(&state);
         draw(&commands);
 
+        last_frame_start = Instant::now(); // Update the frame start time
         next_frame().await;
     }
 }
