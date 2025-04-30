@@ -1,5 +1,6 @@
 use macroquad::math::i64;
 use macroquad::prelude::*;
+use crate::draw::DrawCommand;
 use crate::layout::JobLayout;
 
 #[derive(Clone)]
@@ -57,49 +58,6 @@ impl Button {
 
     pub fn is_clicked(&self) -> bool {
         self.is_hovered() && is_mouse_button_pressed(MouseButton::Left)
-    }
-}
-
-pub enum DrawCommand {
-    Text {
-        content: String,
-        x: f32,
-        y: f32,
-        font_size: f32,
-        color: Color,
-    },
-    Button {
-        button: Button,
-    },
-    ProgressBar {
-        x: f32,
-        y: f32,
-        width: f32,
-        height: f32,
-        progress: f32,
-        background_color: Color,
-        foreground_color: Color,
-    },
-    Rectangle { x: f32, y: f32, width: f64, height: f64, color: Color },
-}
-
-pub fn draw(commands: &[DrawCommand]) {
-    for command in commands {
-        match command {
-            DrawCommand::Text { content, x, y, font_size, color } => {
-                draw_text(content, *x, *y, *font_size, *color);
-            }
-            DrawCommand::Button { button } => {
-                button.draw();
-            }
-            DrawCommand::ProgressBar { x, y, width, height, progress, background_color, foreground_color } => {
-                draw_rectangle(*x, *y, *width, *height, *background_color);
-                draw_rectangle(*x, *y, *width * *progress, *height, *foreground_color);
-            }
-            DrawCommand::Rectangle { x, y, width, height, color } => {
-                draw_rectangle(*x, *y, *width as f32, *height as f32, *color);
-            }
-        }
     }
 }
 
@@ -202,7 +160,12 @@ impl Job {
             action_duration,
             time_accumulator: 0.0,
             running: false,
-            control_button: Button::new(x + 180.0, y, 100.0, 30.0, WHITE, GRAY, "Start"),
+            control_button: Button{
+                rect: Rectangle::new(x + 180.0, y, 100.0, 30.0),
+                color: Color{ r: 0.2, g: 0.5, b: 0.8, a: 1.0, },
+                hover_color: Color{ r: 0.3, g: 0.6, b: 0.9, a: 1.0, },
+                label: "Start".to_string(),
+            },
             actions_done: 0,
             timeslot_cost,
             base_values,

@@ -3,9 +3,11 @@ use macroquad::prelude::*;
 
 mod my_lib;
 mod layout;
+mod draw;
 
 use my_lib::*;
-use layout::*;
+use crate::layout::JobLayout;
+use crate::draw::{draw, DrawCommand};
 
 pub struct PerformanceFlags {
     pub timeslots_changed: bool,
