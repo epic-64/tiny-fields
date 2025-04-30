@@ -7,11 +7,15 @@ pub struct PerformanceFlags {
     pub timeslots_changed: bool,
 }
 
+pub struct TimeSlots {
+    pub total: i32,
+    pub used: i32,
+}
+
 pub struct GameState {
     pub jobs: Vec<Job>,
     pub total_money: i32,
-    total_timeslots: i32,
-    used_timeslots: i32,
+    pub time_slots: TimeSlots,
     pub performance_flags: PerformanceFlags,
 }
 
@@ -24,16 +28,13 @@ impl GameState {
                 Job::new("Car Wash", 50.0, 530.0, 3, 1, 30, 4.0, 4),
             ],
             total_money: 0,
-            total_timeslots: 3, // Total number of timeslots available
-            used_timeslots: 0,  // Tracks how many timeslots are currently in use
-            performance_flags: PerformanceFlags {
-                timeslots_changed: false,
-            },
+            time_slots: TimeSlots { total: 3, used: 0, },
+            performance_flags: PerformanceFlags { timeslots_changed: false, },
         }
     }
 
     pub fn free_timeslots(&self) -> i32 {
-        self.total_timeslots - self.used_timeslots
+        self.time_slots.total - self.time_slots.used
     }
 
     pub fn update_progress(&mut self, dt: f32) {
@@ -60,7 +61,7 @@ fn step(state: &mut GameState, dt: f32) {
 
     // Recalculate `used_timeslots` after the mutable borrow ends
     if state.performance_flags.timeslots_changed {
-        state.used_timeslots = get_used_timeslots(&state.jobs);
+        state.time_slots.used = get_used_timeslots(&state.jobs);
     }
 }
 
