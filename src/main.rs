@@ -1,3 +1,4 @@
+use std::time::Instant;
 use macroquad::prelude::*;
 
 mod my_lib;
@@ -23,6 +24,7 @@ pub struct GameState {
     pub total_money: i64,
     pub time_slots: TimeSlots,
     pub performance_flags: PerformanceFlags,
+    pub game_meta: GameMeta,
 }
 
 impl GameState {
@@ -36,6 +38,7 @@ impl GameState {
             total_money: 0,
             time_slots: TimeSlots { total: 3, used: 0, },
             performance_flags: PerformanceFlags { timeslots_changed: false, },
+            game_meta: GameMeta { effective_fps: 0.0, raw_fps: 0.0, },
         }
     }
 
@@ -71,6 +74,11 @@ fn get_used_timeslots(jobs: &[Job]) -> i32 {
     jobs.iter().filter(|j| j.running).map(|j| j.timeslot_cost).sum()
 }
 
+pub struct GameMeta {
+    pub effective_fps: f32,
+    pub raw_fps: f32,
+}
+
 // Return a vector of draw commands. Pure function
 fn render(state: &GameState) -> Vec<DrawCommand> {
     let mut commands = vec![];
@@ -92,11 +100,29 @@ fn render(state: &GameState) -> Vec<DrawCommand> {
         color: WHITE,
     });
 
-    let mut y_offset = 100.0;
+    // Display FPS
+    commands.push(DrawCommand::Text {
+        content: format!("FPS: {}", state.game_meta.effective_fps),
+        x: 20.0,
+        y: 100.0,
+        font_size: 30.0,
+        color: WHITE,
+    });
+
+    // Add raw FPS to the draw commands
+    commands.push(DrawCommand::Text {
+        content: format!("Raw FPS: {:.2}", state.game_meta.raw_fps),
+        x: 20.0,
+        y: 140.0,
+        font_size: 30.0,
+        color: WHITE,
+    });
+
+    let mut y_offset = 200.0;
+    let job_renderer = JobRenderer{};
 
     for job in &state.jobs {
-        let renderer = JobRenderer::new(50.0, y_offset, 400.0, 220.0);
-        commands.extend(renderer.render(job));
+        commands.extend(job_renderer.render(job, 50.0, y_offset, 400.0, 220.0));
         y_offset += 240.0; // Adjust spacing between cards
     }
 
@@ -107,12 +133,18 @@ fn render(state: &GameState) -> Vec<DrawCommand> {
 #[macroquad::main("Tiny Fields")]
 async fn main() {
     let mut state = GameState::new();
+    let mut last_frame_time = Instant::now(); // Track time for raw FPS
 
     loop {
         clear_background(ORANGE);
 
         let dt = get_frame_time();
         step(&mut state, dt);
+
+        // Calculate raw FPS
+        state.game_meta.raw_fps = 1.0 / last_frame_time.elapsed().as_secs_f32();
+        state.game_meta.effective_fps = get_fps() as f32;
+        last_frame_time = Instant::now();
 
         let commands = render(&state);
         draw(&commands);

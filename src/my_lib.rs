@@ -273,12 +273,7 @@ impl Job {
     }
 }
 
-pub struct JobRenderer {
-    pub x: f32,
-    pub y: f32,
-    pub width: f32,
-    pub height: f32,
-}
+pub struct JobRenderer {}
 
 impl JobRenderer {
     const CARD_PADDING: f32 = 10.0;
@@ -293,27 +288,29 @@ impl JobRenderer {
     const PROGRESS_BAR_FOREGROUND_ACTION: Color = GREEN;
     const PROGRESS_BAR_FOREGROUND_LEVEL: Color = BLUE;
 
-    pub fn new(x: f32, y: f32, width: f32, height: f32) -> Self {
-        Self { x, y, width, height }
-    }
-
-    pub fn render(&self, job: &Job) -> Vec<DrawCommand> {
+    pub fn render(
+        &self, job: &Job,
+        x: f32,
+        y: f32,
+        width: f64,
+        height: f64,
+    ) -> Vec<DrawCommand> {
         let mut commands = vec![];
 
         // Card background
         commands.push(DrawCommand::Rectangle {
-            x: self.x,
-            y: self.y,
-            width: self.width as f64,
-            height: self.height as f64,
+            x,
+            y,
+            width,
+            height,
             color: Self::BACKGROUND_COLOR,
         });
 
         // Job name
         commands.push(DrawCommand::Text {
             content: format!("Job: {}", job.name),
-            x: self.x + Self::CARD_PADDING,
-            y: self.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE,
+            x: x + Self::CARD_PADDING,
+            y: y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE,
             font_size: Self::TEXT_FONT_SIZE_LARGE,
             color: Self::TEXT_COLOR_PRIMARY,
         });
@@ -321,8 +318,8 @@ impl JobRenderer {
         // Level and $ per action
         commands.push(DrawCommand::Text {
             content: format!("Level: {} | $/Action: {}", job.level, job.dollars_per_action()),
-            x: self.x + Self::CARD_PADDING,
-            y: self.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + Self::CARD_SPACING,
+            x: x + Self::CARD_PADDING,
+            y: y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + Self::CARD_SPACING,
             font_size: Self::TEXT_FONT_SIZE_SMALL,
             color: Self::TEXT_COLOR_SECONDARY,
         });
@@ -330,8 +327,8 @@ impl JobRenderer {
         // Seconds per action and $ per second
         commands.push(DrawCommand::Text {
             content: format!("Sec/Action: {:.2} | $/Sec: {:.2}", job.action_duration, job.dollars_per_second()),
-            x: self.x + Self::CARD_PADDING,
-            y: self.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + 2.0 * Self::CARD_SPACING,
+            x: x + Self::CARD_PADDING,
+            y: y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + 2.0 * Self::CARD_SPACING,
             font_size: Self::TEXT_FONT_SIZE_SMALL,
             color: Self::TEXT_COLOR_SECONDARY,
         });
@@ -339,17 +336,17 @@ impl JobRenderer {
         // Actions until level up
         commands.push(DrawCommand::Text {
             content: format!("Actions to Level Up: {}", job.actions_until_level_up - job.actions_done),
-            x: self.x + Self::CARD_PADDING,
-            y: self.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + 3.0 * Self::CARD_SPACING,
+            x: x + Self::CARD_PADDING,
+            y: y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + 3.0 * Self::CARD_SPACING,
             font_size: Self::TEXT_FONT_SIZE_SMALL,
             color: Self::TEXT_COLOR_SECONDARY,
         });
 
         // Action progress bar
         commands.push(DrawCommand::ProgressBar {
-            x: self.x + Self::CARD_PADDING,
-            y: self.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + 4.0 * Self::CARD_SPACING,
-            width: self.width - 2.0 * Self::CARD_PADDING,
+            x: x + Self::CARD_PADDING,
+            y: y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + 4.0 * Self::CARD_SPACING,
+            width: width as f32 - 2.0 * Self::CARD_PADDING,
             height: Self::PROGRESS_BAR_HEIGHT,
             progress: job.action_progress.progress.get(),
             background_color: Self::PROGRESS_BAR_BACKGROUND,
@@ -358,9 +355,9 @@ impl JobRenderer {
 
         // Level-up progress bar
         commands.push(DrawCommand::ProgressBar {
-            x: self.x + Self::CARD_PADDING,
-            y: self.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + 5.0 * Self::CARD_SPACING,
-            width: self.width - 2.0 * Self::CARD_PADDING,
+            x: x + Self::CARD_PADDING,
+            y: y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + 5.0 * Self::CARD_SPACING,
+            width: width as f32 - 2.0 * Self::CARD_PADDING,
             height: Self::PROGRESS_BAR_HEIGHT,
             progress: job.level_up_progress.progress.get(),
             background_color: Self::PROGRESS_BAR_BACKGROUND,
