@@ -71,20 +71,23 @@ impl GameState {
 }
 
 // Step logic (tick + inputs)
-fn step(state: &mut GameState, layouts: &[JobLayout], dt: f32) {
+fn step(state: &mut GameState, actions: &[Action], dt: f32) {
     let free_timeslots = state.time_slots.get_free();
-    let mouse = mouse_position();
 
-    for layout in layouts {
-        let job = &mut state.jobs[layout.job_index];
-
-        if layout.button_rect.contains_point(mouse) && is_mouse_button_pressed(MouseButton::Left) {
-            job.toggle_running(free_timeslots);
-            state.performance_flags.timeslots_changed = true;
+    for action in actions {
+        match action {
+            Action::ToggleJob(index) => {
+                if let Some(job) = state.jobs.get_mut(*index) {
+                    job.toggle_running(free_timeslots);
+                    state.performance_flags.timeslots_changed = true;
+                }
+            }
         }
+    }
 
+    for job in &mut state.jobs {
         if job.running {
-            state.total_money += job.update_progress(dt);
+            job.update_progress(dt);
         }
     }
 
@@ -95,6 +98,23 @@ fn step(state: &mut GameState, layouts: &[JobLayout], dt: f32) {
 
 fn get_used_timeslots(jobs: &[Job]) -> i32 {
     jobs.iter().filter(|j| j.running).map(|j| j.timeslot_cost).sum()
+}
+
+enum Action {
+    ToggleJob(usize),
+}
+
+fn process_input(layouts: &[JobLayout]) -> Vec<Action> {
+    let mouse = mouse_position();
+
+    let mut actions = vec![];
+    for layout in layouts {
+        if layout.button_rect.contains_point(mouse) && is_mouse_button_pressed(MouseButton::Left) {
+            actions.push(Action::ToggleJob(layout.job_index));
+        }
+    }
+
+    actions
 }
 
 #[macroquad::main("Tiny Fields")]
@@ -108,8 +128,11 @@ async fn main() {
         // Create layout, so we can use it in step and render
         let job_layouts = layout(&state);
 
+        // Process input
+        let actions = process_input(&job_layouts);
+
         // Update game state
-        step(&mut state, &job_layouts, dt);
+        step(&mut state, &actions, dt);
 
         // Compile list of draw commands
         let commands = render(&state, &job_layouts);
