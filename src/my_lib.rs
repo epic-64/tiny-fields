@@ -1,3 +1,4 @@
+use macroquad::math::i64;
 use macroquad::prelude::*;
 
 #[derive(Clone)]
@@ -260,12 +261,12 @@ impl Job {
         1.0 + (self.level as f32 * 0.3)
     }
 
-    pub fn dollars_per_action(&self) -> f32 {
-        self.base_money_per_action as f32 * self.dollars_multiplier()
+    pub fn dollars_per_action(&self) -> i64 {
+        (self.base_money_per_action as f32 * self.dollars_multiplier()) as i64
     }
 
-    pub fn dollars_per_second(&self) -> f32 {
-        self.dollars_per_action() / self.action_duration
+    pub fn dollars_per_second(&self) -> i64 {
+        (self.dollars_per_action() / self.action_duration as i64)
     }
 }
 
@@ -277,7 +278,6 @@ pub struct JobRenderer {
 }
 
 impl JobRenderer {
-    // Constants for layout and styling
     const CARD_PADDING: f32 = 10.0;
     const CARD_SPACING: f32 = 30.0;
     const TEXT_FONT_SIZE_LARGE: f32 = 24.0;
