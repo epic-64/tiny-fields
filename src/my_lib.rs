@@ -265,7 +265,7 @@ impl Job {
 pub struct JobRenderer {}
 
 impl JobRenderer {
-    const CARD_PADDING: f32 = 10.0;
+    const CARD_PADDING: f32 = 20.0;
     const CARD_SPACING: f32 = 30.0;
     const TEXT_FONT_SIZE_LARGE: f32 = 24.0;
     const TEXT_FONT_SIZE_SMALL: f32 = 20.0;
