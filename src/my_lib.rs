@@ -258,7 +258,10 @@ impl Job {
     }
 
     pub fn dollars_multiplier(&self) -> f32 {
-        1.0 + (self.level as f32 * 0.3)
+        let level_multiplier = 0.3;
+        let level_portion = self.level - 1;
+
+        1.0 + (level_portion as f32 * level_multiplier)
     }
 
     pub fn dollars_per_action(&self) -> i64 {
