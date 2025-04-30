@@ -1,7 +1,5 @@
 use macroquad::math::i64;
 use macroquad::prelude::*;
-use crate::draw::DrawCommand;
-use crate::layout::JobLayout;
 
 #[derive(Clone)]
 pub struct Rectangle {
@@ -209,115 +207,9 @@ impl Job {
         (self.base_values.money_per_action as f32 * self.dollars_multiplier()) as i64
     }
 
-    pub fn dollars_per_second(&self) -> i64 {
-        self.dollars_per_action() / self.action_duration as i64
-    }
-
     pub fn actions_to_level_up(&self) -> i32 {
         let base_actions = 10;        // Base number of actions for level 1
         let growth_factor: f32 = 1.5; // Exponential growth factor
         (base_actions as f32 * growth_factor.powi(self.level - 1)) as i32
-    }
-}
-
-pub struct JobRenderer {}
-
-impl JobRenderer {
-    const CARD_PADDING: f32 = 20.0;
-    const CARD_SPACING: f32 = 30.0;
-    const TEXT_FONT_SIZE_LARGE: f32 = 24.0;
-    const TEXT_FONT_SIZE_SMALL: f32 = 20.0;
-    const PROGRESS_BAR_HEIGHT: f32 = 20.0;
-    const BACKGROUND_COLOR: Color = DARKGRAY;
-    const TEXT_COLOR_PRIMARY: Color = WHITE;
-    const TEXT_COLOR_SECONDARY: Color = LIGHTGRAY;
-    const PROGRESS_BAR_BACKGROUND: Color = GRAY;
-    const PROGRESS_BAR_FOREGROUND_ACTION: Color = GREEN;
-    const PROGRESS_BAR_FOREGROUND_LEVEL: Color = BLUE;
-
-    pub fn render(&self, job: &Job, layout: &JobLayout) -> Vec<DrawCommand> {
-        let mut commands = vec![];
-
-        // Card background
-        commands.push(DrawCommand::Rectangle {
-            x: layout.card_rect.x,
-            y: layout.card_rect.y,
-            width: layout.card_rect.width as f64,
-            height: layout.card_rect.height as f64,
-            color: Self::BACKGROUND_COLOR,
-        });
-
-        // Job name
-        commands.push(DrawCommand::Text {
-            content: format!("Job: {}", job.name),
-            x: layout.card_rect.x + Self::CARD_PADDING,
-            y: layout.card_rect.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE,
-            font_size: Self::TEXT_FONT_SIZE_LARGE,
-            color: Self::TEXT_COLOR_PRIMARY,
-        });
-
-        // Info Line
-        commands.push(DrawCommand::Text {
-            content: format!(
-                "Lvl {} | ${} | {}s | Slots: {}",
-                job.level, job.dollars_per_action(), job.action_duration, job.timeslot_cost
-            ),
-            x: layout.card_rect.x + Self::CARD_PADDING,
-            y: layout.card_rect.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + Self::CARD_SPACING,
-            font_size: Self::TEXT_FONT_SIZE_SMALL,
-            color: Self::TEXT_COLOR_SECONDARY,
-        });
-
-        // Action progress bar
-        commands.push(DrawCommand::ProgressBar {
-            x: layout.action_bar_rect.x,
-            y: layout.action_bar_rect.y,
-            width: layout.action_bar_rect.width,
-            height: layout.action_bar_rect.height,
-            progress: job.action_progress.progress.get(),
-            background_color: Self::PROGRESS_BAR_BACKGROUND,
-            foreground_color: Self::PROGRESS_BAR_FOREGROUND_ACTION,
-        });
-
-        // Text inside the action progress bar
-        commands.push(DrawCommand::Text {
-            content: format!("{:.1} / {:.1}", job.time_accumulator, job.action_duration),
-            x: layout.action_bar_rect.x + 10.0,
-            y: layout.action_bar_rect.y + 15.0,
-            font_size: Self::TEXT_FONT_SIZE_SMALL,
-            color: Self::TEXT_COLOR_PRIMARY,
-        });
-
-        // Level-up progress bar
-        commands.push(DrawCommand::ProgressBar {
-            x: layout.level_bar_rect.x,
-            y: layout.level_bar_rect.y,
-            width: layout.level_bar_rect.width,
-            height: layout.level_bar_rect.height,
-            progress: job.level_up_progress.progress.get(),
-            background_color: Self::PROGRESS_BAR_BACKGROUND,
-            foreground_color: Self::PROGRESS_BAR_FOREGROUND_LEVEL,
-        });
-
-        // Text inside the level-up progress bar
-        commands.push(DrawCommand::Text {
-            content: format!("Level Up: {} / {}", job.actions_done, job.actions_to_level_up()),
-            x: layout.level_bar_rect.x + 10.0,
-            y: layout.level_bar_rect.y + 15.0,
-            font_size: Self::TEXT_FONT_SIZE_SMALL,
-            color: Self::TEXT_COLOR_PRIMARY,
-        });
-
-        // Control button using layout's button_rect
-        commands.push(DrawCommand::Button {
-            button: Button{
-                rect: layout.button_rect.clone(),
-                color: job.control_button.color,
-                hover_color: job.control_button.hover_color,
-                label: job.control_button.label.clone(),
-            },
-        });
-
-        commands
     }
 }

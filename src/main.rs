@@ -4,10 +4,12 @@ use macroquad::prelude::*;
 mod my_lib;
 mod layout;
 mod draw;
+mod render;
 
 use my_lib::*;
 use crate::layout::{layout, JobLayout};
-use crate::draw::{draw, DrawCommand};
+use crate::draw::{draw};
+use crate::render::{render};
 
 pub struct PerformanceFlags {
     pub timeslots_changed: bool,
@@ -22,6 +24,11 @@ impl TimeSlots {
     pub fn get_free(&self) -> i32 {
         self.total - self.used
     }
+}
+
+pub struct GameMeta {
+    pub effective_fps: f32,
+    pub raw_fps: f32,
 }
 
 pub struct GameState {
@@ -88,61 +95,6 @@ fn step(state: &mut GameState, layouts: &[JobLayout], dt: f32) {
 
 fn get_used_timeslots(jobs: &[Job]) -> i32 {
     jobs.iter().filter(|j| j.running).map(|j| j.timeslot_cost).sum()
-}
-
-pub struct GameMeta {
-    pub effective_fps: f32,
-    pub raw_fps: f32,
-}
-
-// Return a vector of draw commands. Pure function
-fn render(state: &GameState, layout: &[JobLayout]) -> Vec<DrawCommand> {
-    let mut commands = vec![];
-
-    // Display top-level info
-    commands.push(DrawCommand::Text {
-        content: format!("Money: ${}", state.total_money),
-        x: 20.0,
-        y: 20.0,
-        font_size: 30.0,
-        color: WHITE,
-    });
-
-    // Display timeslots
-    commands.push(DrawCommand::Text {
-        content: format!("Timeslots: {} / {}", state.time_slots.get_free(), state.time_slots.total),
-        x: 20.0,
-        y: 60.0,
-        font_size: 30.0,
-        color: WHITE,
-    });
-
-    // Display FPS
-    commands.push(DrawCommand::Text {
-        content: format!("FPS: {}", state.game_meta.effective_fps),
-        x: 20.0,
-        y: 100.0,
-        font_size: 30.0,
-        color: WHITE,
-    });
-
-    // Display raw FPS
-    commands.push(DrawCommand::Text {
-        content: format!("Raw FPS: {:.2}", state.game_meta.raw_fps),
-        x: 20.0,
-        y: 140.0,
-        font_size: 30.0,
-        color: WHITE,
-    });
-
-    // Use JobRenderer for each job
-    let job_renderer = JobRenderer {};
-    for layout in layout {
-        let job = &state.jobs[layout.job_index];
-        commands.extend(job_renderer.render(job, layout));
-    }
-
-    commands
 }
 
 #[macroquad::main("Tiny Fields")]
