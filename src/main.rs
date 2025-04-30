@@ -6,7 +6,7 @@ mod layout;
 mod draw;
 
 use my_lib::*;
-use crate::layout::JobLayout;
+use crate::layout::{layout, JobLayout};
 use crate::draw::{draw, DrawCommand};
 
 pub struct PerformanceFlags {
@@ -36,7 +36,7 @@ impl GameState {
     pub fn new() -> Self {
         Self {
             jobs: vec![
-                Job::new("Burger", 50.0, 50.0, 1, 2.0, 2, JobBaseValues {
+                Job::new("Burger", 50.0, 50.0, 1, 2.0, 1, JobBaseValues {
                     money_per_action: 10,
                     actions_until_level_up: 5,
                 }),
@@ -44,7 +44,7 @@ impl GameState {
                     money_per_action: 80,
                     actions_until_level_up: 10,
                 }),
-                Job::new("Sushi", 50.0, 50.0, 1, 10.0, 2, JobBaseValues {
+                Job::new("Sushi", 50.0, 50.0, 1, 10.0, 3, JobBaseValues {
                     money_per_action: 250,
                     actions_until_level_up: 15,
                 }),
@@ -61,30 +61,6 @@ impl GameState {
             self.total_money += job.update_progress(dt);
         }
     }
-}
-
-fn layout(state: &GameState) -> Vec<JobLayout> {
-    let mut layouts = vec![];
-    let mut y_offset = 200.0;
-
-    for (i, _job) in state.jobs.iter().enumerate() {
-        let card_x = 50.0;
-        let card_y = y_offset;
-        let card_w = 400.0;
-        let card_h = 180.0;
-
-        layouts.push(JobLayout {
-            job_index: i,
-            card_rect: Rectangle::new(card_x, card_y, card_w, card_h),
-            button_rect: Rectangle::new(card_x + 180.0, card_y, 100.0, 30.0),
-            action_bar_rect: Rectangle::new(card_x + 10.0, card_y + 140.0, 300.0, 20.0),
-            level_bar_rect: Rectangle::new(card_x + 10.0, card_y + 170.0, 300.0, 20.0),
-        });
-
-        y_offset += 240.0;
-    }
-
-    layouts
 }
 
 // Step logic (tick + inputs)

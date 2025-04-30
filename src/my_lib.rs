@@ -249,7 +249,7 @@ impl JobRenderer {
 
         // Job name
         commands.push(DrawCommand::Text {
-            content: format!("Job: {} ({})", job.name, job.level),
+            content: format!("Job: {}", job.name),
             x: layout.card_rect.x + Self::CARD_PADDING,
             y: layout.card_rect.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE,
             font_size: Self::TEXT_FONT_SIZE_LARGE,
@@ -258,7 +258,10 @@ impl JobRenderer {
 
         // Info Line
         commands.push(DrawCommand::Text {
-            content: format!("$: {} | $/s: {}", job.dollars_per_action(), job.dollars_per_second()),
+            content: format!(
+                "Lvl {} | ${} | {}s | Slots: {}",
+                job.level, job.dollars_per_action(), job.action_duration, job.timeslot_cost
+            ),
             x: layout.card_rect.x + Self::CARD_PADDING,
             y: layout.card_rect.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + Self::CARD_SPACING,
             font_size: Self::TEXT_FONT_SIZE_SMALL,
