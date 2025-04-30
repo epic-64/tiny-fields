@@ -175,16 +175,22 @@ async fn main() {
 
     loop {
         let frame_start = Instant::now();
-
-        clear_background(ORANGE);
         let dt = get_frame_time();
 
-        let job_layouts = layout(&state);           // NEW
-        step(&mut state, &job_layouts, dt);         // UPDATED
+        // Create layout, so we can use it in step and render
+        let job_layouts = layout(&state);
 
-        let commands = render(&state, &job_layouts); // UPDATED
+        // Update game state
+        step(&mut state, &job_layouts, dt);
+
+        // Compile list of draw commands
+        let commands = render(&state, &job_layouts);
+
+        // Draw the game
+        clear_background(ORANGE);
         draw(&commands);
 
+        // Keep track of FPS
         state.game_meta.raw_fps = 1.0 / frame_start.elapsed().as_secs_f32();
         state.game_meta.effective_fps = get_fps() as f32;
 

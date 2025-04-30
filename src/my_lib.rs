@@ -35,15 +35,6 @@ pub struct Button {
 }
 
 impl Button {
-    pub fn new(x: f32, y: f32, width: f32, height: f32, color: Color, hover_color: Color, label: &str) -> Self {
-        Self {
-            rect: Rectangle::new(x, y, width, height),
-            color,
-            hover_color,
-            label: label.to_string(),
-        }
-    }
-
     pub fn draw(&self) {
         let color = if self.is_hovered() { self.hover_color } else { self.color };
         self.rect.draw(color);
@@ -316,15 +307,12 @@ impl JobRenderer {
 
         // Control button using layout's button_rect
         commands.push(DrawCommand::Button {
-            button: Button::new(
-                layout.button_rect.x,
-                layout.button_rect.y,
-                layout.button_rect.width,
-                layout.button_rect.height,
-                job.control_button.color,
-                job.control_button.hover_color,
-                &job.control_button.label,
-            ),
+            button: Button{
+                rect: layout.button_rect.clone(),
+                color: job.control_button.color,
+                hover_color: job.control_button.hover_color,
+                label: job.control_button.label.clone(),
+            },
         });
 
         commands
