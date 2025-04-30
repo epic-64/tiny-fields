@@ -351,9 +351,17 @@ impl JobRenderer {
             color: Self::TEXT_COLOR_PRIMARY,
         });
 
-        // Control button
+        // Control button using layout's button_rect
         commands.push(DrawCommand::Button {
-            button: job.control_button.clone(),
+            button: Button::new(
+                layout.button_rect.x,
+                layout.button_rect.y,
+                layout.button_rect.width,
+                layout.button_rect.height,
+                job.control_button.color,
+                job.control_button.hover_color,
+                &job.control_button.label,
+            ),
         });
 
         commands
