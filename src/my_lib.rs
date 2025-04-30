@@ -1,5 +1,6 @@
 use macroquad::math::i64;
 use macroquad::prelude::*;
+use crate::layout::JobLayout;
 
 #[derive(Clone)]
 pub struct Rectangle {
@@ -280,23 +281,23 @@ impl JobRenderer {
     const PROGRESS_BAR_FOREGROUND_ACTION: Color = GREEN;
     const PROGRESS_BAR_FOREGROUND_LEVEL: Color = BLUE;
 
-    pub fn render(&self, job: &Job, x: f32, y: f32, width: f64, height: f64, ) -> Vec<DrawCommand> {
+    pub fn render(&self, job: &Job, layout: &JobLayout) -> Vec<DrawCommand> {
         let mut commands = vec![];
 
         // Card background
         commands.push(DrawCommand::Rectangle {
-            x,
-            y,
-            width,
-            height,
+            x: layout.card_rect.x,
+            y: layout.card_rect.y,
+            width: layout.card_rect.width as f64,
+            height: layout.card_rect.height as f64,
             color: Self::BACKGROUND_COLOR,
         });
 
         // Job name
         commands.push(DrawCommand::Text {
             content: format!("Job: {} ({})", job.name, job.level),
-            x: x + Self::CARD_PADDING,
-            y: y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE,
+            x: layout.card_rect.x + Self::CARD_PADDING,
+            y: layout.card_rect.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE,
             font_size: Self::TEXT_FONT_SIZE_LARGE,
             color: Self::TEXT_COLOR_PRIMARY,
         });
@@ -304,18 +305,18 @@ impl JobRenderer {
         // Info Line
         commands.push(DrawCommand::Text {
             content: format!("$: {} | $/s: {}", job.dollars_per_action(), job.dollars_per_second()),
-            x: x + Self::CARD_PADDING,
-            y: y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + Self::CARD_SPACING,
+            x: layout.card_rect.x + Self::CARD_PADDING,
+            y: layout.card_rect.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + Self::CARD_SPACING,
             font_size: Self::TEXT_FONT_SIZE_SMALL,
             color: Self::TEXT_COLOR_SECONDARY,
         });
 
         // Action progress bar
         commands.push(DrawCommand::ProgressBar {
-            x: x + Self::CARD_PADDING,
-            y: y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + 2.0 * Self::CARD_SPACING,
-            width: width as f32 - 2.0 * Self::CARD_PADDING,
-            height: Self::PROGRESS_BAR_HEIGHT,
+            x: layout.action_bar_rect.x,
+            y: layout.action_bar_rect.y,
+            width: layout.action_bar_rect.width,
+            height: layout.action_bar_rect.height,
             progress: job.action_progress.progress.get(),
             background_color: Self::PROGRESS_BAR_BACKGROUND,
             foreground_color: Self::PROGRESS_BAR_FOREGROUND_ACTION,
@@ -324,18 +325,18 @@ impl JobRenderer {
         // Text inside the action progress bar
         commands.push(DrawCommand::Text {
             content: format!("{:.1} / {:.1}", job.time_accumulator, job.action_duration),
-            x: x + Self::CARD_PADDING + 10.0,
-            y: y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + 2.0 * Self::CARD_SPACING + 15.0,
+            x: layout.action_bar_rect.x + 10.0,
+            y: layout.action_bar_rect.y + 15.0,
             font_size: Self::TEXT_FONT_SIZE_SMALL,
             color: Self::TEXT_COLOR_PRIMARY,
         });
 
         // Level-up progress bar
         commands.push(DrawCommand::ProgressBar {
-            x: x + Self::CARD_PADDING,
-            y: y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + 3.0 * Self::CARD_SPACING,
-            width: width as f32 - 2.0 * Self::CARD_PADDING,
-            height: Self::PROGRESS_BAR_HEIGHT,
+            x: layout.level_bar_rect.x,
+            y: layout.level_bar_rect.y,
+            width: layout.level_bar_rect.width,
+            height: layout.level_bar_rect.height,
             progress: job.level_up_progress.progress.get(),
             background_color: Self::PROGRESS_BAR_BACKGROUND,
             foreground_color: Self::PROGRESS_BAR_FOREGROUND_LEVEL,
@@ -344,12 +345,13 @@ impl JobRenderer {
         // Text inside the level-up progress bar
         commands.push(DrawCommand::Text {
             content: format!("Level Up: {} / {}", job.actions_done, job.actions_to_level_up()),
-            x: x + Self::CARD_PADDING + 10.0,
-            y: y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + 3.0 * Self::CARD_SPACING + 15.0,
+            x: layout.level_bar_rect.x + 10.0,
+            y: layout.level_bar_rect.y + 15.0,
             font_size: Self::TEXT_FONT_SIZE_SMALL,
             color: Self::TEXT_COLOR_PRIMARY,
         });
 
+        // Control button
         commands.push(DrawCommand::Button {
             button: job.control_button.clone(),
         });

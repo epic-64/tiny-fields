@@ -86,11 +86,11 @@ fn layout(state: &GameState) -> Vec<JobLayout> {
 }
 
 // Step logic (tick + inputs)
-fn step(state: &mut GameState, layout: &[JobLayout], dt: f32) {
+fn step(state: &mut GameState, layouts: &[JobLayout], dt: f32) {
     let free_timeslots = state.time_slots.get_free();
     let mouse = mouse_position();
 
-    for layout in layout {
+    for layout in layouts {
         let job = &mut state.jobs[layout.job_index];
 
         if layout.button_rect.contains_point(mouse) && is_mouse_button_pressed(MouseButton::Left) {
@@ -130,14 +130,16 @@ fn render(state: &GameState, layout: &[JobLayout]) -> Vec<DrawCommand> {
         color: WHITE,
     });
 
+    // Display timeslots
     commands.push(DrawCommand::Text {
-        content: format!("Free Timeslots: {}", state.time_slots.get_free()),
+        content: format!("Timeslots: {} / {}", state.time_slots.get_free(), state.time_slots.total),
         x: 20.0,
         y: 60.0,
         font_size: 30.0,
         color: WHITE,
     });
 
+    // Display FPS
     commands.push(DrawCommand::Text {
         content: format!("FPS: {}", state.game_meta.effective_fps),
         x: 20.0,
@@ -146,6 +148,7 @@ fn render(state: &GameState, layout: &[JobLayout]) -> Vec<DrawCommand> {
         color: WHITE,
     });
 
+    // Display raw FPS
     commands.push(DrawCommand::Text {
         content: format!("Raw FPS: {:.2}", state.game_meta.raw_fps),
         x: 20.0,
@@ -154,77 +157,16 @@ fn render(state: &GameState, layout: &[JobLayout]) -> Vec<DrawCommand> {
         color: WHITE,
     });
 
+    // Use JobRenderer for each job
+    let job_renderer = JobRenderer {};
     for layout in layout {
         let job = &state.jobs[layout.job_index];
-
-        // Background
-        commands.push(DrawCommand::Rectangle {
-            x: layout.card_rect.x,
-            y: layout.card_rect.y,
-            width: layout.card_rect.width as f64,
-            height: layout.card_rect.height as f64,
-            color: DARKGRAY,
-        });
-
-        // Job name
-        commands.push(DrawCommand::Text {
-            content: format!("Job: {} ({})", job.name, job.level),
-            x: layout.card_rect.x + 20.0,
-            y: layout.card_rect.y + 44.0,
-            font_size: 24.0,
-            color: WHITE,
-        });
-
-        // Money info
-        commands.push(DrawCommand::Text {
-            content: format!("$: {} | $/s: {}", job.dollars_per_action(), job.dollars_per_second()),
-            x: layout.card_rect.x + 20.0,
-            y: layout.card_rect.y + 74.0,
-            font_size: 20.0,
-            color: LIGHTGRAY,
-        });
-
-        // Action progress bar
-        commands.push(DrawCommand::ProgressBar {
-            x: layout.action_bar_rect.x,
-            y: layout.action_bar_rect.y,
-            width: layout.action_bar_rect.width,
-            height: layout.action_bar_rect.height,
-            progress: job.action_progress.progress.get(),
-            background_color: GRAY,
-            foreground_color: GREEN,
-        });
-
-        // Level-up progress bar
-        commands.push(DrawCommand::ProgressBar {
-            x: layout.level_bar_rect.x,
-            y: layout.level_bar_rect.y,
-            width: layout.level_bar_rect.width,
-            height: layout.level_bar_rect.height,
-            progress: job.level_up_progress.progress.get(),
-            background_color: GRAY,
-            foreground_color: BLUE,
-        });
-
-        // Button
-        commands.push(DrawCommand::Button {
-            button: Button::new(
-                layout.button_rect.x,
-                layout.button_rect.y,
-                layout.button_rect.width,
-                layout.button_rect.height,
-                WHITE,
-                GRAY,
-                if job.running { "Stop" } else { "Start" },
-            ),
-        });
+        commands.extend(job_renderer.render(job, layout));
     }
 
     commands
 }
 
-
-// Main draw loop
 #[macroquad::main("Tiny Fields")]
 async fn main() {
     let mut state = GameState::new();
