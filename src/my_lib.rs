@@ -288,13 +288,7 @@ impl JobRenderer {
     const PROGRESS_BAR_FOREGROUND_ACTION: Color = GREEN;
     const PROGRESS_BAR_FOREGROUND_LEVEL: Color = BLUE;
 
-    pub fn render(
-        &self, job: &Job,
-        x: f32,
-        y: f32,
-        width: f64,
-        height: f64,
-    ) -> Vec<DrawCommand> {
+    pub fn render(&self, job: &Job, x: f32, y: f32, width: f64, height: f64, ) -> Vec<DrawCommand> {
         let mut commands = vec![];
 
         // Card background
@@ -351,6 +345,14 @@ impl JobRenderer {
             progress: job.action_progress.progress.get(),
             background_color: Self::PROGRESS_BAR_BACKGROUND,
             foreground_color: Self::PROGRESS_BAR_FOREGROUND_ACTION,
+        });
+
+        commands.push(DrawCommand::Text {
+            content: format!("{:.1} / {:.1}", job.time_accumulator, job.action_duration),
+            x: x + Self::CARD_PADDING + 10.0,
+            y: y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + 4.0 * Self::CARD_SPACING + 15.0,
+            font_size: Self::TEXT_FONT_SIZE_SMALL,
+            color: Self::TEXT_COLOR_PRIMARY,
         });
 
         // Level-up progress bar
