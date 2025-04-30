@@ -122,7 +122,7 @@ fn render(state: &GameState) -> Vec<DrawCommand> {
     let job_renderer = JobRenderer{};
 
     for job in &state.jobs {
-        commands.extend(job_renderer.render(job, 50.0, y_offset, 400.0, 220.0));
+        commands.extend(job_renderer.render(job, 50.0, y_offset, 400.0, 180.0));
         y_offset += 240.0; // Adjust spacing between cards
     }
 
