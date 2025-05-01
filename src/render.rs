@@ -1,7 +1,35 @@
-use macroquad::color::{Color, BLUE, DARKGRAY, GRAY, GREEN, LIGHTGRAY, WHITE};
+use macroquad::color::{Color, BLACK, BLUE, DARKGRAY, GRAY, GREEN, LIGHTGRAY, PINK, WHITE};
+use macroquad::input::mouse_position;
+use macroquad::prelude::draw_text;
 use crate::draw::DrawCommand;
 use crate::layout::JobLayout;
-use crate::my_lib::{Button, Job};
+use crate::my_lib::{Job, Rectangle};
+
+#[derive(Clone)]
+pub struct Button {
+    pub rect: Rectangle,
+    pub color: Color,
+    pub hover_color: Color,
+    pub label: String,
+}
+
+impl Button {
+    pub fn draw(&self) {
+        let color = if self.is_hovered() { self.hover_color } else { self.color };
+        self.rect.draw(color);
+
+        draw_text(&self.label, self.rect.x + 10.0, self.rect.y + 10.0, 20.0, BLACK);
+    }
+
+    pub fn is_hovered(&self) -> bool {
+        let mouse = mouse_position();
+        self.rect.contains_point(mouse)
+    }
+
+    pub fn is_clicked(&self) -> bool {
+        self.rect.is_clicked()
+    }
+}
 
 pub struct JobRenderer {}
 
@@ -94,9 +122,9 @@ impl JobRenderer {
         commands.push(DrawCommand::Button {
             button: Button{
                 rect: layout.button_rect.clone(),
-                color: job.control_button.color,
-                hover_color: job.control_button.hover_color,
-                label: job.control_button.label.clone(),
+                color: PINK,
+                hover_color: BLUE,
+                label: if job.running { "Stop" } else { "Start" }.to_string(),
             },
         });
 

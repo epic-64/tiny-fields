@@ -1,6 +1,6 @@
 use macroquad::color::Color;
 use macroquad::prelude::{draw_rectangle, draw_text};
-use crate::my_lib::Button;
+use crate::render::Button;
 
 pub enum DrawCommand {
     Text {

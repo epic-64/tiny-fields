@@ -29,32 +29,6 @@ impl Rectangle {
     }
 }
 
-#[derive(Clone)]
-pub struct Button {
-    pub rect: Rectangle,
-    pub color: Color,
-    pub hover_color: Color,
-    pub label: String,
-}
-
-impl Button {
-    pub fn draw(&self) {
-        let color = if self.is_hovered() { self.hover_color } else { self.color };
-        self.rect.draw(color);
-
-        draw_text(&self.label, self.rect.x + 10.0, self.rect.y + 10.0, 20.0, BLACK);
-    }
-
-    pub fn is_hovered(&self) -> bool {
-        let mouse = mouse_position();
-        self.rect.contains_point(mouse)
-    }
-
-    pub fn is_clicked(&self) -> bool {
-        self.rect.is_clicked()
-    }
-}
-
 pub struct Progress {
     value: f32, // Value between 0.0 and 1.0
 }
@@ -90,7 +64,6 @@ pub struct Job {
     pub action_duration: f32,
     pub time_accumulator: f32,
     pub running: bool,
-    pub control_button: Button,
     pub actions_done: i32, // Tracks completed actions
     pub timeslot_cost: i32,
     pub base_values: JobBaseValues,
@@ -114,12 +87,6 @@ impl Job {
             action_duration,
             time_accumulator: 0.0,
             running: false,
-            control_button: Button{
-                rect: Rectangle::new(x + 180.0, y, 100.0, 30.0),
-                color: Color{ r: 0.2, g: 0.5, b: 0.8, a: 1.0, },
-                hover_color: Color{ r: 0.3, g: 0.6, b: 0.9, a: 1.0, },
-                label: "Start".to_string(),
-            },
             actions_done: 0,
             timeslot_cost,
             base_values,
@@ -129,10 +96,8 @@ impl Job {
     pub fn toggle_running(&mut self, free_timeslots: i32) -> () {
         if self.running {
             self.running = false;
-            self.control_button.label = "Start".to_string();
         } else if free_timeslots >= self.timeslot_cost {
             self.running = true;
-            self.control_button.label = "Stop".to_string();
         }
     }
 
