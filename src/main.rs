@@ -104,19 +104,6 @@ enum Action {
     ToggleJob(usize),
 }
 
-fn process_input(layouts: &[JobLayout]) -> Vec<Action> {
-    let mouse = mouse_position();
-
-    let mut actions = vec![];
-    for layout in layouts {
-        if layout.button_rect.contains_point(mouse) && is_mouse_button_pressed(MouseButton::Left) {
-            actions.push(Action::ToggleJob(layout.job_index));
-        }
-    }
-
-    actions
-}
-
 struct UserInterface {
     layouts: Vec<JobLayout>,
 }
@@ -192,8 +179,10 @@ impl UserInterface {
 
 #[macroquad::main("Tiny Fields")]
 async fn main() {
+    request_new_screen_size(1600.0, 900.0);
+
     let mut state = GameState::new();
-    let mut ui = UserInterface::new(&state);
+    let ui = UserInterface::new(&state);
 
     loop {
         let frame_start = Instant::now();
