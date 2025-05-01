@@ -77,46 +77,6 @@ impl Progress {
     }
 }
 
-pub struct ProgressBar {
-    pub x: f32,
-    pub y: f32,
-    pub width: f32,
-    pub height: f32,
-    pub progress: Progress,
-    pub background_color: Color,
-    pub foreground_color: Color,
-}
-
-impl ProgressBar {
-    pub fn new(x: f32, y: f32, width: f32, height: f32, background_color: Color, foreground_color: Color) -> Self {
-        Self {
-            x,
-            y,
-            width,
-            height,
-            progress: Progress::new(),
-            background_color,
-            foreground_color,
-        }
-    }
-
-    pub fn set_progress(&mut self, value: f32) {
-        self.progress.set(value);
-    }
-
-    pub fn draw(&self) {
-        // Draw background
-        draw_rectangle(self.x, self.y, self.width, self.height, self.background_color);
-
-        // Draw foreground (progress)
-        draw_rectangle(self.x, self.y, self.width * self.progress.get(), self.height, self.foreground_color);
-    }
-
-    pub fn reset(&mut self) {
-        self.progress.reset();
-    }
-}
-
 pub struct JobBaseValues {
     pub money_per_action: i32,
     pub actions_until_level_up: i32,
