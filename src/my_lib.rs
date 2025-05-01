@@ -58,13 +58,13 @@ pub struct JobBaseValues {
 
 pub struct Job {
     pub name: String,
-    pub action_progress: Progress, // Progress for actions
-    pub level_up_progress: Progress, // Progress for leveling up
+    pub action_progress: Progress,
+    pub level_up_progress: Progress,
     pub level: i32,
     pub action_duration: f32,
     pub time_accumulator: f32,
     pub running: bool,
-    pub actions_done: i32, // Tracks completed actions
+    pub actions_done: i32,
     pub timeslot_cost: i32,
     pub base_values: JobBaseValues,
 }
@@ -136,7 +136,7 @@ impl Job {
     }
 
     pub fn actions_to_level_up(&self) -> i32 {
-        let base_actions = 10;        // Base number of actions for level 1
+        let base_actions = self.base_values.actions_until_level_up;
         let growth_factor: f32 = 1.5; // Exponential growth factor
         (base_actions as f32 * growth_factor.powi(self.level - 1)) as i32
     }

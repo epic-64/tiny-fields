@@ -65,7 +65,9 @@ impl GameState {
 
     pub fn update_progress(&mut self, dt: f32) {
         for job in &mut self.jobs {
-            self.total_money += job.update_progress(dt);
+            if job.running {
+                self.total_money += job.update_progress(dt);
+            }
         }
     }
 }
@@ -85,11 +87,7 @@ fn step(state: &mut GameState, actions: &[Action], dt: f32) {
         }
     }
 
-    for job in &mut state.jobs {
-        if job.running {
-            job.update_progress(dt);
-        }
-    }
+    state.update_progress(dt);
 
     if state.performance_flags.timeslots_changed {
         state.time_slots.used = get_used_timeslots(&state.jobs);
