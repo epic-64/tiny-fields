@@ -124,8 +124,8 @@ pub struct JobBaseValues {
 
 pub struct Job {
     pub name: String,
-    pub action_progress: ProgressBar, // Progress for actions
-    pub level_up_progress: ProgressBar, // Progress for leveling up
+    pub action_progress: Progress, // Progress for actions
+    pub level_up_progress: Progress, // Progress for leveling up
     pub level: i32,
     pub action_duration: f32,
     pub time_accumulator: f32,
@@ -148,8 +148,8 @@ impl Job {
     ) -> Self {
         Self {
             name: name.to_string(),
-            action_progress: ProgressBar::new(x + 10.0, y + 140.0, 300.0, 20.0, GRAY, GREEN),
-            level_up_progress: ProgressBar::new(x + 10.0, y + 170.0, 300.0, 20.0, GRAY, BLUE),
+            action_progress: Progress{value: 0.0},
+            level_up_progress: Progress{value: 0.0},
             level,
             action_duration,
             time_accumulator: 0.0,
@@ -178,12 +178,12 @@ impl Job {
 
     pub fn update_progress(&mut self, dt: f32) -> i64 {
         self.time_accumulator += dt;
-        self.action_progress.set_progress(self.time_accumulator / self.action_duration);
+        self.action_progress.set(self.time_accumulator / self.action_duration);
 
         if self.time_accumulator >= self.action_duration {
             self.time_accumulator -= self.action_duration;
             self.actions_done += 1;
-            self.level_up_progress.set_progress(self.actions_done as f32 / self.actions_to_level_up() as f32);
+            self.level_up_progress.set(self.actions_done as f32 / self.actions_to_level_up() as f32);
 
             if self.actions_done >= self.actions_to_level_up() {
                 self.level_up();

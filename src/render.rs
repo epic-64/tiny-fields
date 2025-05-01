@@ -56,7 +56,7 @@ impl JobRenderer {
             y: layout.action_bar_rect.y,
             width: layout.action_bar_rect.width,
             height: layout.action_bar_rect.height,
-            progress: job.action_progress.progress.get(),
+            progress: job.action_progress.get(),
             background_color: Self::PROGRESS_BAR_BACKGROUND,
             foreground_color: Self::PROGRESS_BAR_FOREGROUND_ACTION,
         });
@@ -76,7 +76,7 @@ impl JobRenderer {
             y: layout.level_bar_rect.y,
             width: layout.level_bar_rect.width,
             height: layout.level_bar_rect.height,
-            progress: job.level_up_progress.progress.get(),
+            progress: job.level_up_progress.get(),
             background_color: Self::PROGRESS_BAR_BACKGROUND,
             foreground_color: Self::PROGRESS_BAR_FOREGROUND_LEVEL,
         });
