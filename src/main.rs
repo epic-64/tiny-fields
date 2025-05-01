@@ -43,15 +43,15 @@ impl GameState {
     pub fn new() -> Self {
         Self {
             jobs: vec![
-                Job::new("Burger", 50.0, 50.0, 1, 2.0, 1, JobBaseValues {
+                Job::new("Burger", 1, 2.0, 1, JobBaseValues {
                     money_per_action: 10,
                     actions_until_level_up: 5,
                 }),
-                Job::new("Pizza", 50.0, 50.0, 1, 5.0, 2, JobBaseValues {
+                Job::new("Pizza", 1, 5.0, 2, JobBaseValues {
                     money_per_action: 80,
                     actions_until_level_up: 10,
                 }),
-                Job::new("Sushi", 50.0, 50.0, 1, 10.0, 3, JobBaseValues {
+                Job::new("Sushi", 1, 10.0, 3, JobBaseValues {
                     money_per_action: 250,
                     actions_until_level_up: 15,
                 }),

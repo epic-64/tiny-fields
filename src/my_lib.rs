@@ -72,8 +72,6 @@ pub struct Job {
 impl Job {
     pub fn new(
         name: &str,
-        x: f32,
-        y: f32,
         level: i32,
         action_duration: f32,
         timeslot_cost: i32,

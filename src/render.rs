@@ -25,10 +25,6 @@ impl Button {
         let mouse = mouse_position();
         self.rect.contains_point(mouse)
     }
-
-    pub fn is_clicked(&self) -> bool {
-        self.rect.is_clicked()
-    }
 }
 
 pub struct JobRenderer {}
