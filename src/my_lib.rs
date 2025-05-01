@@ -19,6 +19,11 @@ impl Rectangle {
         point.1 >= self.y && point.1 <= self.y + self.height
     }
 
+    pub fn is_clicked(&self) -> bool {
+        let mouse = mouse_position();
+        self.contains_point(mouse) && is_mouse_button_pressed(MouseButton::Left)
+    }
+
     pub fn draw(&self, color: Color) {
         draw_rectangle(self.x, self.y, self.width, self.height, color);
     }
@@ -46,7 +51,7 @@ impl Button {
     }
 
     pub fn is_clicked(&self) -> bool {
-        self.is_hovered() && is_mouse_button_pressed(MouseButton::Left)
+        self.rect.is_clicked()
     }
 }
 

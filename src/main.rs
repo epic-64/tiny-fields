@@ -8,8 +8,8 @@ mod render;
 
 use my_lib::*;
 use crate::layout::{layout, JobLayout};
-use crate::draw::{draw};
-use crate::render::{render};
+use crate::draw::{draw, DrawCommand};
+use crate::render::{JobRenderer};
 
 pub struct PerformanceFlags {
     pub timeslots_changed: bool,
@@ -117,25 +117,96 @@ fn process_input(layouts: &[JobLayout]) -> Vec<Action> {
     actions
 }
 
+struct UserInterface {
+    layouts: Vec<JobLayout>,
+}
+
+impl UserInterface {
+    fn new(state: &GameState) -> Self {
+        Self {
+            layouts: layout(state),
+        }
+    }
+
+    fn process_input(&self) -> Vec<Action> {
+        let mut actions = vec![];
+
+        for layout in &self.layouts {
+            if layout.button_rect.is_clicked() {
+                actions.push(Action::ToggleJob(layout.job_index));
+            }
+        }
+
+        actions
+    }
+
+    fn render(&self, state: &GameState) -> Vec<DrawCommand> {
+        let mut commands = vec![];
+
+        // Display top-level info
+        commands.push(DrawCommand::Text {
+            content: format!("Money: ${}", state.total_money),
+            x: 20.0,
+            y: 20.0,
+            font_size: 30.0,
+            color: WHITE,
+        });
+
+        // Display timeslots
+        commands.push(DrawCommand::Text {
+            content: format!("Timeslots: {} / {}", state.time_slots.get_free(), state.time_slots.total),
+            x: 20.0,
+            y: 60.0,
+            font_size: 30.0,
+            color: WHITE,
+        });
+
+        // Display FPS
+        commands.push(DrawCommand::Text {
+            content: format!("FPS: {}", state.game_meta.effective_fps),
+            x: 20.0,
+            y: 100.0,
+            font_size: 30.0,
+            color: WHITE,
+        });
+
+        // Display raw FPS
+        commands.push(DrawCommand::Text {
+            content: format!("Raw FPS: {:.2}", state.game_meta.raw_fps),
+            x: 20.0,
+            y: 140.0,
+            font_size: 30.0,
+            color: WHITE,
+        });
+
+        // Use JobRenderer for each job
+        let job_renderer = JobRenderer {};
+        for layout in &self.layouts {
+            let job = &state.jobs[layout.job_index];
+            commands.extend(job_renderer.render(job, layout));
+        }
+
+        commands
+    }
+}
+
 #[macroquad::main("Tiny Fields")]
 async fn main() {
     let mut state = GameState::new();
+    let mut ui = UserInterface::new(&state);
 
     loop {
         let frame_start = Instant::now();
         let dt = get_frame_time();
 
-        // Create layout, so we can use it in step and render
-        let job_layouts = layout(&state);
-
         // Process input
-        let actions = process_input(&job_layouts);
+        let actions = ui.process_input();
 
         // Update game state
         step(&mut state, &actions, dt);
 
         // Compile list of draw commands
-        let commands = render(&state, &job_layouts);
+        let commands = ui.render(&state);
 
         // Draw the game
         clear_background(ORANGE);

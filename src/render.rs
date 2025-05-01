@@ -1,6 +1,5 @@
 use macroquad::color::{Color, BLUE, DARKGRAY, GRAY, GREEN, LIGHTGRAY, WHITE};
 use crate::draw::DrawCommand;
-use crate::GameState;
 use crate::layout::JobLayout;
 use crate::my_lib::{Button, Job};
 
@@ -103,54 +102,4 @@ impl JobRenderer {
 
         commands
     }
-}
-
-// Return a vector of draw commands. Pure function
-pub fn render(state: &GameState, layout: &[JobLayout]) -> Vec<DrawCommand> {
-    let mut commands = vec![];
-
-    // Display top-level info
-    commands.push(DrawCommand::Text {
-        content: format!("Money: ${}", state.total_money),
-        x: 20.0,
-        y: 20.0,
-        font_size: 30.0,
-        color: WHITE,
-    });
-
-    // Display timeslots
-    commands.push(DrawCommand::Text {
-        content: format!("Timeslots: {} / {}", state.time_slots.get_free(), state.time_slots.total),
-        x: 20.0,
-        y: 60.0,
-        font_size: 30.0,
-        color: WHITE,
-    });
-
-    // Display FPS
-    commands.push(DrawCommand::Text {
-        content: format!("FPS: {}", state.game_meta.effective_fps),
-        x: 20.0,
-        y: 100.0,
-        font_size: 30.0,
-        color: WHITE,
-    });
-
-    // Display raw FPS
-    commands.push(DrawCommand::Text {
-        content: format!("Raw FPS: {:.2}", state.game_meta.raw_fps),
-        x: 20.0,
-        y: 140.0,
-        font_size: 30.0,
-        color: WHITE,
-    });
-
-    // Use JobRenderer for each job
-    let job_renderer = JobRenderer {};
-    for layout in layout {
-        let job = &state.jobs[layout.job_index];
-        commands.extend(job_renderer.render(job, layout));
-    }
-
-    commands
 }
