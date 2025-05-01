@@ -43,17 +43,17 @@ impl GameState {
     pub fn new() -> Self {
         Self {
             jobs: vec![
-                Job::new("Burger", 1, 2.0, 1, JobBaseValues {
+                Job::new("Burger", 1, 10.0, 1, JobBaseValues {
                     money_per_action: 10,
-                    actions_until_level_up: 5,
+                    actions_until_level_up: 10,
                 }),
-                Job::new("Pizza", 1, 5.0, 2, JobBaseValues {
+                Job::new("Pizza", 1, 15.0, 2, JobBaseValues {
                     money_per_action: 80,
                     actions_until_level_up: 10,
                 }),
-                Job::new("Sushi", 1, 10.0, 3, JobBaseValues {
+                Job::new("Sushi", 1, 20.0, 3, JobBaseValues {
                     money_per_action: 250,
-                    actions_until_level_up: 15,
+                    actions_until_level_up: 10,
                 }),
             ],
             total_money: 0,
@@ -63,34 +63,34 @@ impl GameState {
         }
     }
 
-    pub fn update_progress(&mut self, dt: f32) {
+    // Step logic (tick + inputs)
+    fn step(&mut self, actions: &[Action], dt: f32) {
+        let free_timeslots = self.time_slots.get_free();
+
+        for action in actions {
+            match action {
+                Action::ToggleJob(index) => {
+                    if let Some(job) = self.jobs.get_mut(*index) {
+                        job.toggle_running(free_timeslots);
+                        self.performance_flags.timeslots_changed = true;
+                    }
+                }
+            }
+        }
+
+        self.update_progress(dt);
+
+        if self.performance_flags.timeslots_changed {
+            self.time_slots.used = get_used_timeslots(&self.jobs);
+        }
+    }
+
+    fn update_progress(&mut self, dt: f32) {
         for job in &mut self.jobs {
             if job.running {
                 self.total_money += job.update_progress(dt);
             }
         }
-    }
-}
-
-// Step logic (tick + inputs)
-fn step(state: &mut GameState, actions: &[Action], dt: f32) {
-    let free_timeslots = state.time_slots.get_free();
-
-    for action in actions {
-        match action {
-            Action::ToggleJob(index) => {
-                if let Some(job) = state.jobs.get_mut(*index) {
-                    job.toggle_running(free_timeslots);
-                    state.performance_flags.timeslots_changed = true;
-                }
-            }
-        }
-    }
-
-    state.update_progress(dt);
-
-    if state.performance_flags.timeslots_changed {
-        state.time_slots.used = get_used_timeslots(&state.jobs);
     }
 }
 
@@ -190,7 +190,7 @@ async fn main() {
         let actions = ui.process_input();
 
         // Update game state
-        step(&mut state, &actions, dt);
+        state.step(&actions, dt);
 
         // Compile list of draw commands
         let commands = ui.render(&state);
