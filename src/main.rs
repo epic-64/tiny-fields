@@ -1,6 +1,12 @@
 use std::time::Instant;
 use macroquad::prelude::*;
 
+use macroquad::ui::{
+    hash, root_ui,
+    widgets::{self, Group},
+    Drag, Ui,
+};
+
 mod my_lib;
 mod layout;
 mod draw;
@@ -175,6 +181,33 @@ impl UserInterface {
     }
 }
 
+fn my_ui(state: &mut GameState) -> Vec<Action> {
+    let mut actions = vec![];
+
+    widgets::Window::new(hash!(), vec2(480., 200.), vec2(340., 360.))
+        .label("Shop")
+        .titlebar(false)
+        .ui(&mut *root_ui(), |ui| {
+            for job in &state.jobs {
+                Group::new(hash!("shop", &job.name), Vec2::new(300., 100.)).ui(ui, |ui| {
+                    ui.label(Vec2::new(10., 10.), &format!("Job: {}", job.name));
+                    ui.label(Vec2::new(10., 30.), &format!("Level: {}", job.level));
+                    ui.label(Vec2::new(10., 50.), &format!("Money per action: {}", job.base_values.money_per_action));
+                    ui.label(Vec2::new(10., 70.), &format!("Actions until level up: {}", job.base_values.actions_until_level_up));
+
+                    let label = if job.running { "Stop" } else { "Start" };
+                    if ui.button(Vec2::new(240., 10.), label) {
+                        let job_index = state.jobs.iter().position(|j| j.name == job.name).unwrap();
+                        actions.push(Action::ToggleJob(job_index));
+                    }
+                });
+            }
+        });
+
+    actions
+}
+
+
 #[macroquad::main("Tiny Fields")]
 async fn main() {
     request_new_screen_size(1600.0, 900.0);
@@ -186,8 +219,9 @@ async fn main() {
         let frame_start = Instant::now();
         let dt = get_frame_time();
 
-        // Process input
-        let actions = ui.process_input();
+        clear_background(ORANGE);
+        let mut actions = ui.process_input();
+        actions.extend(my_ui(&mut state));
 
         // Update game state
         state.step(&actions, dt);
@@ -196,7 +230,6 @@ async fn main() {
         let commands = ui.render(&state);
 
         // Draw the game
-        clear_background(ORANGE);
         draw(&commands);
 
         // Keep track of FPS
