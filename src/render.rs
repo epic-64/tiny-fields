@@ -1,9 +1,11 @@
-use macroquad::color::{Color, BLACK, BLUE, DARKGRAY, GRAY, GREEN, LIGHTGRAY, PINK, WHITE};
-use macroquad::input::mouse_position;
-use macroquad::prelude::draw_text;
 use crate::draw::DrawCommand;
 use crate::layout::JobLayout;
 use crate::my_lib::{Job, Rectangle};
+use macroquad::color::{Color, BLACK, BLUE, DARKGRAY, GRAY, GREEN, LIGHTGRAY, PINK, WHITE};
+use macroquad::input::mouse_position;
+use macroquad::math::Vec2;
+use macroquad::prelude::{draw_text, draw_texture, draw_texture_ex, DrawTextureParams};
+use crate::game::Assets;
 
 #[derive(Clone)]
 pub struct Button {
@@ -41,8 +43,11 @@ impl JobRenderer {
     const PROGRESS_BAR_FOREGROUND_ACTION: Color = GREEN;
     const PROGRESS_BAR_FOREGROUND_LEVEL: Color = BLUE;
 
-    pub fn render(&self, job: &Job, layout: &JobLayout) -> Vec<DrawCommand> {
+    pub fn render(&self, assets: &Assets, job: &Job, layout: &JobLayout) -> Vec<DrawCommand> {
         let mut commands = vec![];
+        let image_width = 128.0f32;
+        let card_inner_x = layout.card.x + Self::CARD_PADDING + image_width + Self::CARD_PADDING;
+        let progress_bar_text_padding = 10.0;
 
         // Card background
         commands.push(DrawCommand::Rectangle {
@@ -53,10 +58,18 @@ impl JobRenderer {
             color: Self::BACKGROUND_COLOR,
         });
 
+        commands.push(DrawCommand::Image {
+            x: layout.card.x + Self::CARD_PADDING,
+            y: layout.card.y,
+            width: image_width as f64,
+            height: layout.card.height as f64,
+            texture: assets.wood_cutting_image_1.clone(),
+        });
+
         // Job name
         commands.push(DrawCommand::Text {
             content: format!("Job: {}", job.name),
-            x: layout.card.x + Self::CARD_PADDING,
+            x: card_inner_x,
             y: layout.card.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE,
             font_size: Self::TEXT_FONT_SIZE_LARGE,
             color: Self::TEXT_COLOR_PRIMARY,
@@ -68,7 +81,7 @@ impl JobRenderer {
                 "Lvl {} | ${} | {}s | Slots: {}",
                 job.level, job.dollars_per_action(), job.action_duration, job.timeslot_cost
             ),
-            x: layout.card.x + Self::CARD_PADDING,
+            x: card_inner_x,
             y: layout.card.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + Self::CARD_SPACING,
             font_size: Self::TEXT_FONT_SIZE_SMALL,
             color: Self::TEXT_COLOR_SECONDARY,
@@ -76,7 +89,7 @@ impl JobRenderer {
 
         // Action progress bar
         commands.push(DrawCommand::ProgressBar {
-            x: layout.action_bar.x,
+            x: card_inner_x,
             y: layout.action_bar.y,
             width: layout.action_bar.width,
             height: layout.action_bar.height,
@@ -88,7 +101,7 @@ impl JobRenderer {
         // Text inside the action progress bar
         commands.push(DrawCommand::Text {
             content: format!("{:.1} / {:.1}", job.time_accumulator, job.action_duration),
-            x: layout.action_bar.x + 10.0,
+            x: card_inner_x + progress_bar_text_padding,
             y: layout.action_bar.y + 15.0,
             font_size: Self::TEXT_FONT_SIZE_SMALL,
             color: Self::TEXT_COLOR_PRIMARY,
@@ -96,7 +109,7 @@ impl JobRenderer {
 
         // Level-up progress bar
         commands.push(DrawCommand::ProgressBar {
-            x: layout.level_bar.x,
+            x: card_inner_x,
             y: layout.level_bar.y,
             width: layout.level_bar.width,
             height: layout.level_bar.height,
@@ -108,7 +121,7 @@ impl JobRenderer {
         // Text inside the level-up progress bar
         commands.push(DrawCommand::Text {
             content: format!("Level Up: {} / {}", job.actions_done, job.actions_to_level_up()),
-            x: layout.level_bar.x + 10.0,
+            x: card_inner_x + progress_bar_text_padding,
             y: layout.level_bar.y + 15.0,
             font_size: Self::TEXT_FONT_SIZE_SMALL,
             color: Self::TEXT_COLOR_PRIMARY,

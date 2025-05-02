@@ -128,20 +128,17 @@ impl Job {
         self.level_up_progress.reset();
     }
 
-    pub fn dollars_multiplier(&self) -> f32 {
-        let level_multiplier = 0.3;
-        let level_portion = self.level - 1;
-
-        1.0 + (level_portion as f32 * level_multiplier)
-    }
-
     pub fn dollars_per_action(&self) -> i64 {
-        (self.base_values.money_per_action as f32 * self.dollars_multiplier()) as i64
+        let base_money_per_action = self.base_values.money_per_action;
+        let growth_factor: f32 = 1.3;
+
+        (base_money_per_action as f32 * growth_factor.powi(self.level - 1)) as i64
     }
 
     pub fn actions_to_level_up(&self) -> i32 {
         let base_actions = self.base_values.actions_until_level_up;
-        let growth_factor: f32 = 1.5; // Exponential growth factor
+        let growth_factor: f32 = 1.5;
+
         (base_actions as f32 * growth_factor.powi(self.level - 1)) as i32
     }
 }

@@ -1,10 +1,16 @@
 use macroquad::color::WHITE;
 use macroquad::input::{is_mouse_button_pressed, mouse_position, MouseButton};
 use macroquad::math::Vec2;
+use macroquad::prelude::Texture2D;
 use crate::draw::DrawCommand;
 use crate::layout::{layout, JobLayout};
 use crate::my_lib::{Job, JobBaseValues, JobParameters};
 use crate::render::JobRenderer;
+
+pub struct Assets {
+    pub wood_cutting_image_1: Texture2D,
+    pub wood_cutting_image_2: Texture2D,
+}
 
 pub struct PerformanceFlags {
     pub timeslots_changed: bool,
@@ -167,7 +173,7 @@ impl UserInterface {
         actions
     }
 
-    pub fn render(&self, state: &GameState) -> Vec<DrawCommand> {
+    pub fn render(&self, state: &GameState, assets: &Assets) -> Vec<DrawCommand> {
         let mut commands = vec![];
 
         // Display top-level info
@@ -210,7 +216,7 @@ impl UserInterface {
         let job_renderer = JobRenderer {};
         for layout in &self.job_layouts {
             let job = &state.jobs[layout.job_index];
-            commands.extend(job_renderer.render(job, layout));
+            commands.extend(job_renderer.render(assets, job, layout));
         }
 
         commands

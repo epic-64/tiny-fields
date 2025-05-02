@@ -16,7 +16,7 @@ impl JobLayout {
         let card_padding = 20.0;
         let card_x = offset.x;
         let card_y = offset.y;
-        let card_w = 400.0;
+        let card_w = 500.0;
         let card_h = 175.0;
 
         Self {

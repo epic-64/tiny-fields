@@ -8,11 +8,21 @@ mod render;
 pub mod game;
 
 use draw::{draw};
-use game::{GameState, UserInterface};
+use game::{GameState, UserInterface, Assets};
 
 #[macroquad::main("Tiny Fields")]
 async fn main() {
+    set_pc_assets_folder("assets");
     request_new_screen_size(1600.0, 900.0);
+
+    let wood_1: Texture2D = load_texture("WoodChop_1.png").await.expect("Couldn't load file");
+    let wood_2: Texture2D = load_texture("WoodChop_2.png").await.expect("Couldn't load file");
+    wood_1.set_filter(FilterMode::Nearest);
+
+    let assets = Assets {
+        wood_cutting_image_1: wood_1,
+        wood_cutting_image_2: wood_2,
+    };
 
     let mut state = GameState::new();
     let mut ui = UserInterface::new(&state);
@@ -44,7 +54,7 @@ async fn main() {
         state.step(&intents, dt);
 
         // Compile list of draw commands
-        let commands = ui.render(&state);
+        let commands = ui.render(&state, &assets);
 
         // Draw the game
         draw(&commands);
