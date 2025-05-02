@@ -3,19 +3,16 @@ use crate::GameState;
 use crate::my_lib::Rectangle;
 
 pub struct JobLayout {
-    pub card_rect: Rectangle,
-    pub button_rect: Rectangle,
-    pub action_bar_rect: Rectangle,
-    pub level_bar_rect: Rectangle,
+    pub card: Rectangle,
+    pub toggle_button: Rectangle,
+    pub action_bar: Rectangle,
+    pub level_bar: Rectangle,
     pub job_index: usize,
     pub offset: Vec2,
 }
 
 impl JobLayout {
-    pub fn new(
-        job_index: usize,
-        offset: Vec2,
-    ) -> Self {
+    pub fn new(job_index: usize, offset: Vec2, ) -> Self {
         let card_padding = 20.0;
         let card_x = 50.0 + offset.x;
         let card_y = 0.0 + offset.y;
@@ -24,20 +21,20 @@ impl JobLayout {
 
         Self {
             job_index,
-            card_rect: Rectangle::new(card_x, card_y, card_w, card_h),
-            button_rect: Rectangle {
+            card: Rectangle::new(card_x, card_y, card_w, card_h),
+            toggle_button: Rectangle {
                 x: card_x + card_w - card_padding - 90.0,
                 y: card_y + card_padding,
                 width: 90.0,
                 height: 40.0,
             },
-            action_bar_rect: Rectangle {
+            action_bar: Rectangle {
                 x: card_x + card_padding,
                 y: card_y + card_padding + 80.0,
                 width: card_w - card_padding * 2.0,
                 height: 20.0,
             },
-            level_bar_rect: Rectangle {
+            level_bar: Rectangle {
                 x: card_x + card_padding,
                 y: card_y + card_padding + 110.0,
                 width: card_w - card_padding * 2.0,

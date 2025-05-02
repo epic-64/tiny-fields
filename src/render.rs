@@ -46,18 +46,18 @@ impl JobRenderer {
 
         // Card background
         commands.push(DrawCommand::Rectangle {
-            x: layout.card_rect.x,
-            y: layout.card_rect.y,
-            width: layout.card_rect.width as f64,
-            height: layout.card_rect.height as f64,
+            x: layout.card.x,
+            y: layout.card.y,
+            width: layout.card.width as f64,
+            height: layout.card.height as f64,
             color: Self::BACKGROUND_COLOR,
         });
 
         // Job name
         commands.push(DrawCommand::Text {
             content: format!("Job: {}", job.name),
-            x: layout.card_rect.x + Self::CARD_PADDING,
-            y: layout.card_rect.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE,
+            x: layout.card.x + Self::CARD_PADDING,
+            y: layout.card.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE,
             font_size: Self::TEXT_FONT_SIZE_LARGE,
             color: Self::TEXT_COLOR_PRIMARY,
         });
@@ -68,18 +68,18 @@ impl JobRenderer {
                 "Lvl {} | ${} | {}s | Slots: {}",
                 job.level, job.dollars_per_action(), job.action_duration, job.timeslot_cost
             ),
-            x: layout.card_rect.x + Self::CARD_PADDING,
-            y: layout.card_rect.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + Self::CARD_SPACING,
+            x: layout.card.x + Self::CARD_PADDING,
+            y: layout.card.y + Self::CARD_PADDING + Self::TEXT_FONT_SIZE_LARGE + Self::CARD_SPACING,
             font_size: Self::TEXT_FONT_SIZE_SMALL,
             color: Self::TEXT_COLOR_SECONDARY,
         });
 
         // Action progress bar
         commands.push(DrawCommand::ProgressBar {
-            x: layout.action_bar_rect.x,
-            y: layout.action_bar_rect.y,
-            width: layout.action_bar_rect.width,
-            height: layout.action_bar_rect.height,
+            x: layout.action_bar.x,
+            y: layout.action_bar.y,
+            width: layout.action_bar.width,
+            height: layout.action_bar.height,
             progress: job.action_progress.get(),
             background_color: Self::PROGRESS_BAR_BACKGROUND,
             foreground_color: Self::PROGRESS_BAR_FOREGROUND_ACTION,
@@ -88,18 +88,18 @@ impl JobRenderer {
         // Text inside the action progress bar
         commands.push(DrawCommand::Text {
             content: format!("{:.1} / {:.1}", job.time_accumulator, job.action_duration),
-            x: layout.action_bar_rect.x + 10.0,
-            y: layout.action_bar_rect.y + 15.0,
+            x: layout.action_bar.x + 10.0,
+            y: layout.action_bar.y + 15.0,
             font_size: Self::TEXT_FONT_SIZE_SMALL,
             color: Self::TEXT_COLOR_PRIMARY,
         });
 
         // Level-up progress bar
         commands.push(DrawCommand::ProgressBar {
-            x: layout.level_bar_rect.x,
-            y: layout.level_bar_rect.y,
-            width: layout.level_bar_rect.width,
-            height: layout.level_bar_rect.height,
+            x: layout.level_bar.x,
+            y: layout.level_bar.y,
+            width: layout.level_bar.width,
+            height: layout.level_bar.height,
             progress: job.level_up_progress.get(),
             background_color: Self::PROGRESS_BAR_BACKGROUND,
             foreground_color: Self::PROGRESS_BAR_FOREGROUND_LEVEL,
@@ -108,8 +108,8 @@ impl JobRenderer {
         // Text inside the level-up progress bar
         commands.push(DrawCommand::Text {
             content: format!("Level Up: {} / {}", job.actions_done, job.actions_to_level_up()),
-            x: layout.level_bar_rect.x + 10.0,
-            y: layout.level_bar_rect.y + 15.0,
+            x: layout.level_bar.x + 10.0,
+            y: layout.level_bar.y + 15.0,
             font_size: Self::TEXT_FONT_SIZE_SMALL,
             color: Self::TEXT_COLOR_PRIMARY,
         });
@@ -117,7 +117,7 @@ impl JobRenderer {
         // Control button using layout's button_rect
         commands.push(DrawCommand::Button {
             button: Button{
-                rect: layout.button_rect.clone(),
+                rect: layout.toggle_button.clone(),
                 color: PINK,
                 hover_color: BLUE,
                 label: if job.running { "Stop" } else { "Start" }.to_string(),

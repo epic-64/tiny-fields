@@ -138,12 +138,8 @@ enum Action {
 
 struct UserInterface {
     global_offset: Vec2,
-    layouts: Vec<JobLayout>,
     last_mouse_position: Vec2,
-}
-
-trait OffsetAdjustable {
-    fn adjust_offset(&self, offset: Vec2) -> Self;
+    job_layouts: Vec<JobLayout>,
 }
 
 impl UserInterface {
@@ -151,7 +147,7 @@ impl UserInterface {
         Self {
             last_mouse_position: Vec2::new(0.0, 0.0),
             global_offset: Vec2::new(0.0, 0.0),
-            layouts: layout(state, Vec2::new(0.0, 0.0)),
+            job_layouts: layout(state, Vec2::new(0.0, 0.0)),
         }
     }
 
@@ -159,15 +155,15 @@ impl UserInterface {
         Self {
             last_mouse_position: self.last_mouse_position,
             global_offset: offset,
-            layouts: layout(state, offset),
+            job_layouts: layout(state, offset),
         }
     }
 
     fn process_input(&mut self) -> Vec<Action> {
         let mut actions = vec![];
 
-        for layout in &self.layouts {
-            if layout.button_rect.is_clicked() {
+        for layout in &self.job_layouts {
+            if layout.toggle_button.is_clicked() {
                 actions.push(Action::ToggleJob(layout.job_index));
             }
         }
@@ -220,7 +216,7 @@ impl UserInterface {
 
         // Use JobRenderer for each job
         let job_renderer = JobRenderer {};
-        for layout in &self.layouts {
+        for layout in &self.job_layouts {
             let job = &state.jobs[layout.job_index];
             commands.extend(job_renderer.render(job, layout));
         }
