@@ -58,12 +58,19 @@ impl JobRenderer {
             color: Self::BACKGROUND_COLOR,
         });
 
+        let chosen_image = if job.running && job.time_accumulator % 2.0 < 1.0 {
+            assets.wood_cutting_image_2.clone()
+        } else {
+            assets.wood_cutting_image_1.clone()
+        };
+
+
         commands.push(DrawCommand::Image {
             x: layout.card.x + Self::CARD_PADDING,
             y: layout.card.y,
             width: image_width as f64,
             height: layout.card.height as f64,
-            texture: assets.wood_cutting_image_1.clone(),
+            texture: chosen_image,
         });
 
         // Job name
