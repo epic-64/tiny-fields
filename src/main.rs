@@ -98,12 +98,12 @@ impl GameState {
     }
 
     // Step logic (tick + inputs)
-    fn step(&mut self, actions: &[Action], dt: f32) {
+    fn step(&mut self, actions: &[Intent], dt: f32) {
         let free_timeslots = self.time_slots.get_free();
 
         for action in actions {
             match action {
-                Action::ToggleJob(index) => {
+                Intent::ToggleJob(index) => {
                     if let Some(job) = self.jobs.get_mut(*index) {
                         job.toggle_running(free_timeslots);
                         self.performance_flags.timeslots_changed = true;
@@ -132,7 +132,7 @@ fn get_used_timeslots(jobs: &[Job]) -> i32 {
     jobs.iter().filter(|j| j.running).map(|j| j.timeslot_cost).sum()
 }
 
-enum Action {
+enum Intent {
     ToggleJob(usize),
 }
 
@@ -159,12 +159,12 @@ impl UserInterface {
         }
     }
 
-    fn process_input(&mut self) -> Vec<Action> {
+    fn process_input(&mut self) -> Vec<Intent> {
         let mut actions = vec![];
 
         for layout in &self.job_layouts {
             if layout.toggle_button.is_clicked() {
-                actions.push(Action::ToggleJob(layout.job_index));
+                actions.push(Intent::ToggleJob(layout.job_index));
             }
         }
 
