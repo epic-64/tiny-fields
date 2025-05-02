@@ -142,12 +142,24 @@ struct UserInterface {
     last_mouse_position: Vec2,
 }
 
+trait OffsetAdjustable {
+    fn adjust_offset(&self, offset: Vec2) -> Self;
+}
+
 impl UserInterface {
     fn new(state: &GameState) -> Self {
         Self {
             last_mouse_position: Vec2::new(0.0, 0.0),
             global_offset: Vec2::new(0.0, 0.0),
-            layouts: layout(state),
+            layouts: layout(state, Vec2::new(0.0, 0.0)),
+        }
+    }
+
+    fn recreate(&mut self, state: &GameState, offset: Vec2) -> Self {
+        Self {
+            last_mouse_position: self.last_mouse_position,
+            global_offset: offset,
+            layouts: layout(state, offset),
         }
     }
 
@@ -159,13 +171,6 @@ impl UserInterface {
                 actions.push(Action::ToggleJob(layout.job_index));
             }
         }
-
-        // move global offset with right-click drag
-        if is_mouse_button_down(MouseButton::Right) {
-            self.global_offset = Vec2::from(mouse_position()) - self.last_mouse_position;
-        }
-
-        self.last_mouse_position = Vec2::from(mouse_position());
 
         actions
     }
@@ -260,6 +265,13 @@ async fn main() {
 
         clear_background(ORANGE);
         let mut actions = ui.process_input();
+        // move global offset with right-click drag
+
+        if is_mouse_button_down(MouseButton::Right) {
+            ui = ui.recreate(&state, ui.global_offset + Vec2::from(mouse_position()) - ui.last_mouse_position);
+            ui.last_mouse_position = Vec2::from(mouse_position());
+        }
+
         actions.extend(my_ui(&mut state));
 
         // Update game state

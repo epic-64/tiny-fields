@@ -48,12 +48,12 @@ impl JobLayout {
     }
 }
 
-pub fn layout(state: &GameState) -> Vec<JobLayout> {
+pub fn layout(state: &GameState, offset: Vec2) -> Vec<JobLayout> {
     let mut layouts = vec![];
-    let mut y_offset = 200.0;
+    let mut y_offset = 50.0 + offset.y;
 
     for (i, _job) in state.jobs.iter().enumerate() {
-        layouts.push(JobLayout::new(i, Vec2::new(0., y_offset)));
+        layouts.push(JobLayout::new(i, Vec2::new(offset.x, y_offset)));
 
         y_offset += 200.0;
     }
