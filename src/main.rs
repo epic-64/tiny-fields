@@ -249,7 +249,12 @@ async fn main() {
             let delta = current_mouse_pos - ui.last_mouse_position;
 
             if delta.length_squared() > 0.0 {
-                ui = ui.recreate(&state, ui.global_offset + delta);
+                let new_offset = {ui.global_offset + delta}.clamp(
+                    Vec2::new(-200.0, -600.0),
+                    Vec2::new(1000.0, 600.0),
+                );
+
+                ui = ui.recreate(&state, new_offset);
             }
 
             ui.last_mouse_position = current_mouse_pos;
