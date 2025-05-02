@@ -34,6 +34,40 @@ pub struct GameMeta {
     pub raw_fps: f32,
 }
 
+fn define_jobs() -> Vec<Job> {
+    vec![
+        Job::new(JobParameters {
+            name: "Burger".to_string(),
+            action_duration: 10.0,
+            timeslot_cost: 1,
+            base_values: JobBaseValues {
+                money_per_action: 10,
+                actions_until_level_up: 10,
+            },
+        }),
+
+        Job::new(JobParameters {
+            name: "Pizza".to_string(),
+            action_duration: 15.0,
+            timeslot_cost: 2,
+            base_values: JobBaseValues {
+                money_per_action: 80,
+                actions_until_level_up: 10,
+            },
+        }),
+
+        Job::new(JobParameters {
+            name: "Sushi".to_string(),
+            action_duration: 20.0,
+            timeslot_cost: 3,
+            base_values: JobBaseValues {
+                money_per_action: 250,
+                actions_until_level_up: 10,
+            },
+        }),
+    ]
+}
+
 pub struct GameState {
     pub jobs: Vec<Job>,
     pub total_money: i64,
@@ -45,20 +79,7 @@ pub struct GameState {
 impl GameState {
     pub fn new() -> Self {
         Self {
-            jobs: vec![
-                Job::new("Burger", 1, 10.0, 1, JobBaseValues {
-                    money_per_action: 10,
-                    actions_until_level_up: 10,
-                }),
-                Job::new("Pizza", 1, 15.0, 2, JobBaseValues {
-                    money_per_action: 80,
-                    actions_until_level_up: 10,
-                }),
-                Job::new("Sushi", 1, 20.0, 3, JobBaseValues {
-                    money_per_action: 250,
-                    actions_until_level_up: 10,
-                }),
-            ],
+            jobs: define_jobs(),
             total_money: 0,
             time_slots: TimeSlots { total: 3, used: 0, },
             performance_flags: PerformanceFlags { timeslots_changed: false, },

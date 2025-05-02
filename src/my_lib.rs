@@ -69,25 +69,27 @@ pub struct Job {
     pub base_values: JobBaseValues,
 }
 
+pub struct JobParameters {
+    pub name: String,
+    pub action_duration: f32,
+    pub timeslot_cost: i32,
+    pub base_values: JobBaseValues,
+}
+
 impl Job {
-    pub fn new(
-        name: &str,
-        level: i32,
-        action_duration: f32,
-        timeslot_cost: i32,
-        base_values: JobBaseValues,
-    ) -> Self {
+    pub fn new(p: JobParameters) -> Self {
         Self {
-            name: name.to_string(),
+            level: 1,
+            running: false,
             action_progress: Progress{value: 0.0},
             level_up_progress: Progress{value: 0.0},
-            level,
-            action_duration,
             time_accumulator: 0.0,
-            running: false,
             actions_done: 0,
-            timeslot_cost,
-            base_values,
+
+            name: p.name,
+            timeslot_cost: p.timeslot_cost,
+            base_values: p.base_values,
+            action_duration: p.action_duration,
         }
     }
 
