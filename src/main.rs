@@ -65,6 +65,16 @@ fn define_jobs() -> Vec<Job> {
                 actions_until_level_up: 10,
             },
         }),
+
+        Job::new(JobParameters {
+            name: "Tacos".to_string(),
+            action_duration: 25.0,
+            timeslot_cost: 3,
+            base_values: JobBaseValues {
+                money_per_action: 500,
+                actions_until_level_up: 10,
+            },
+        }),
     ]
 }
 
