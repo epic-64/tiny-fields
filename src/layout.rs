@@ -1,5 +1,5 @@
 use macroquad::math::Vec2;
-use crate::GameState;
+use crate::game::GameState;
 use crate::my_lib::Rectangle;
 
 pub struct JobLayout {
@@ -14,8 +14,8 @@ pub struct JobLayout {
 impl JobLayout {
     pub fn new(job_index: usize, offset: Vec2, ) -> Self {
         let card_padding = 20.0;
-        let card_x = 50.0 + offset.x;
-        let card_y = 0.0 + offset.y;
+        let card_x = offset.x;
+        let card_y = offset.y;
         let card_w = 400.0;
         let card_h = 175.0;
 
@@ -47,10 +47,11 @@ impl JobLayout {
 
 pub fn layout(state: &GameState, offset: Vec2) -> Vec<JobLayout> {
     let mut layouts = vec![];
+    let x_offset = 50.0 + offset.x;
     let mut y_offset = 50.0 + offset.y;
 
     for (i, _job) in state.jobs.iter().enumerate() {
-        layouts.push(JobLayout::new(i, Vec2::new(offset.x, y_offset)));
+        layouts.push(JobLayout::new(i, Vec2::new(x_offset, y_offset)));
 
         y_offset += 200.0;
     }
