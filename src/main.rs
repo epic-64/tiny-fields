@@ -172,6 +172,10 @@ impl UserInterface {
             }
         }
 
+        if is_mouse_button_pressed(MouseButton::Right) {
+            self.last_mouse_position = Vec2::from(mouse_position());
+        }
+
         actions
     }
 
@@ -225,33 +229,6 @@ impl UserInterface {
     }
 }
 
-fn my_ui(state: &mut GameState) -> Vec<Action> {
-    let mut actions = vec![];
-
-    widgets::Window::new(hash!(), vec2(480., 200.), vec2(340., 360.))
-        .label("Shop")
-        .titlebar(false)
-        .ui(&mut *root_ui(), |ui| {
-            for job in &state.jobs {
-                Group::new(hash!("shop", &job.name), Vec2::new(300., 100.)).ui(ui, |ui| {
-                    ui.label(Vec2::new(10., 10.), &format!("Job: {}", job.name));
-                    ui.label(Vec2::new(10., 30.), &format!("Level: {}", job.level));
-                    ui.label(Vec2::new(10., 50.), &format!("Money per action: {}", job.base_values.money_per_action));
-                    ui.label(Vec2::new(10., 70.), &format!("Actions until level up: {}", job.base_values.actions_until_level_up));
-
-                    let label = if job.running { "Stop" } else { "Start" };
-                    if ui.button(Vec2::new(240., 10.), label) {
-                        let job_index = state.jobs.iter().position(|j| j.name == job.name).unwrap();
-                        actions.push(Action::ToggleJob(job_index));
-                    }
-                });
-            }
-        });
-
-    actions
-}
-
-
 #[macroquad::main("Tiny Fields")]
 async fn main() {
     request_new_screen_size(1600.0, 900.0);
@@ -267,10 +244,6 @@ async fn main() {
         let mut actions = ui.process_input();
         // move global offset with right-click drag
 
-        if is_mouse_button_pressed(MouseButton::Right) {
-            ui.last_mouse_position = Vec2::from(mouse_position());
-        }
-
         if is_mouse_button_down(MouseButton::Right) {
             let current_mouse_pos = Vec2::from(mouse_position());
             let delta = current_mouse_pos - ui.last_mouse_position;
@@ -281,8 +254,6 @@ async fn main() {
 
             ui.last_mouse_position = current_mouse_pos;
         }
-
-        actions.extend(my_ui(&mut state));
 
         // Update game state
         state.step(&actions, dt);
