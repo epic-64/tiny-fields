@@ -137,17 +137,21 @@ enum Action {
 }
 
 struct UserInterface {
+    global_offset: Vec2,
     layouts: Vec<JobLayout>,
+    last_mouse_position: Vec2,
 }
 
 impl UserInterface {
     fn new(state: &GameState) -> Self {
         Self {
+            last_mouse_position: Vec2::new(0.0, 0.0),
+            global_offset: Vec2::new(0.0, 0.0),
             layouts: layout(state),
         }
     }
 
-    fn process_input(&self) -> Vec<Action> {
+    fn process_input(&mut self) -> Vec<Action> {
         let mut actions = vec![];
 
         for layout in &self.layouts {
@@ -155,6 +159,13 @@ impl UserInterface {
                 actions.push(Action::ToggleJob(layout.job_index));
             }
         }
+
+        // move global offset with right-click drag
+        if is_mouse_button_down(MouseButton::Right) {
+            self.global_offset = Vec2::from(mouse_position()) - self.last_mouse_position;
+        }
+
+        self.last_mouse_position = Vec2::from(mouse_position());
 
         actions
     }
@@ -241,7 +252,7 @@ async fn main() {
     request_new_screen_size(1600.0, 900.0);
 
     let mut state = GameState::new();
-    let ui = UserInterface::new(&state);
+    let mut ui = UserInterface::new(&state);
 
     loop {
         let frame_start = Instant::now();
