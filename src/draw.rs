@@ -25,7 +25,7 @@ pub enum DrawCommand {
     Rectangle { x: f32, y: f32, width: f64, height: f64, color: Color },
 }
 
-pub fn draw(commands: &[DrawCommand]) {
+pub fn draw(commands: &[DrawCommand]) -> () {
     for command in commands {
         match command {
             DrawCommand::Text { content, x, y, font_size, color } => {

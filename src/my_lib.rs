@@ -108,7 +108,9 @@ impl Job {
         if self.time_accumulator >= self.action_duration {
             self.time_accumulator -= self.action_duration;
             self.actions_done += 1;
-            self.level_up_progress.set(self.actions_done as f32 / self.actions_to_level_up() as f32);
+            self.level_up_progress.set(
+                self.actions_done as f32 / self.actions_to_level_up() as f32
+            );
 
             if self.actions_done >= self.actions_to_level_up() {
                 self.level_up();
