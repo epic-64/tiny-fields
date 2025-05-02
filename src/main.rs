@@ -267,9 +267,19 @@ async fn main() {
         let mut actions = ui.process_input();
         // move global offset with right-click drag
 
-        if is_mouse_button_down(MouseButton::Right) {
-            ui = ui.recreate(&state, ui.global_offset + Vec2::from(mouse_position()) - ui.last_mouse_position);
+        if is_mouse_button_pressed(MouseButton::Right) {
             ui.last_mouse_position = Vec2::from(mouse_position());
+        }
+
+        if is_mouse_button_down(MouseButton::Right) {
+            let current_mouse_pos = Vec2::from(mouse_position());
+            let delta = current_mouse_pos - ui.last_mouse_position;
+
+            if delta.length_squared() > 0.0 {
+                ui = ui.recreate(&state, ui.global_offset + delta);
+            }
+
+            ui.last_mouse_position = current_mouse_pos;
         }
 
         actions.extend(my_ui(&mut state));
