@@ -110,7 +110,7 @@ impl Ui2 {
             let job_draw_container = get_job_draw_container(assets, id, job, self.global_offset + job_offset);
             job_draw_containers.push(job_draw_container);
 
-            job_offset += Vec2::new(0.0, 200.0);
+            job_offset += Vec2::new(0.0, 165.0);
         }
 
         for container in &job_draw_containers {
@@ -136,13 +136,15 @@ pub fn get_job_draw_container(assets: &Assets, job_id: usize, job: &Job, offset:
     let font_size_small = 20.0;
 
     let card_width = 500.0;
-    let card_height = 140.0;
+    let card_height = 150.0;
     let image_width = 100.0f32;
     let card_padding = 20.0;
     let card_spacing = 10.0;
     let inner_x = offset.x + card_padding + image_width + card_padding;
 
     let progress_bar_width = card_width - card_padding - image_width - card_padding - card_padding;
+
+    let button_width = 80.0;
 
     let chosen_image = if job.running && job.time_accumulator % 2.0 < 1.0 {
         assets.wood_2.clone()
@@ -158,7 +160,7 @@ pub fn get_job_draw_container(assets: &Assets, job_id: usize, job: &Job, offset:
             height: card_height,
             color: color_card
         },
-            DrawCommand::Image {
+        DrawCommand::Image {
             x: offset.x + card_padding,
             y: offset.y,
             width: image_width as f64,
@@ -175,13 +177,13 @@ pub fn get_job_draw_container(assets: &Assets, job_id: usize, job: &Job, offset:
         DrawCommand::Text {
             content: format!("Lvl {} | ${} | {}s | {} Slots", job.level, job.money_per_action(), job.action_duration, job.timeslot_cost),
             x: inner_x,
-            y: offset.y + 50.0,
+            y: offset.y + 60.0,
             font_size: font_size_small,
             color: color_secondary,
         },
         DrawCommand::ProgressBar {
             x: inner_x,
-            y: offset.y + 60.0,
+            y: offset.y + 75.0,
             width: progress_bar_width,
             height: 20.0,
             progress: job.action_progress.get(),
@@ -191,14 +193,14 @@ pub fn get_job_draw_container(assets: &Assets, job_id: usize, job: &Job, offset:
         DrawCommand::Text {
             content: format!("{:.1} / {:.1}", job.time_accumulator, job.action_duration),
             x: inner_x + 10.0,
-            y: offset.y + 75.0,
+            y: offset.y + 90.0,
             font_size: 20.0,
             color: WHITE,
         },
         DrawCommand::ProgressBar {
             x: inner_x,
-            y: offset.y + 100.0,
-            width: 480.0,
+            y: offset.y + 110.0,
+            width: progress_bar_width,
             height: 20.0,
             progress: job.level_up_progress.get(),
             background_color: Color::from_rgba(200, 200, 200, 255),
@@ -207,15 +209,15 @@ pub fn get_job_draw_container(assets: &Assets, job_id: usize, job: &Job, offset:
         DrawCommand::Text {
             content: format!("Level Up: {} / {}", job.actions_done, job.actions_to_level_up()),
             x: inner_x + 10.0,
-            y: offset.y + 115.0,
+            y: offset.y + 125.0,
             font_size: 20.0,
             color: WHITE,
         },
         DrawCommand::Button2 {
-            x: offset.x + 10.0 + 480.0 - 100.0,
+            x: offset.x + card_width - button_width - card_padding,
             y: offset.y + 15.0,
-            width: 100.0,
-            height: 30.0,
+            width: button_width,
+            height: 40.0,
             text: if job.running { "Stop".to_string() } else { "Start".to_string() },
             color: Color::from_rgba(0, 255, 0, 255),
             hover_color: Color::from_rgba(0, 200, 0, 255),
