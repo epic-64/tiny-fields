@@ -40,7 +40,7 @@ fn define_jobs() -> Vec<Job> {
 
         Job::new(JobParameters {
             name: "Spruce".to_string(),
-            action_duration: 15.0,
+            action_duration: 14.0,
             timeslot_cost: 2,
             base_values: JobBaseValues {
                 money_per_action: 80,
@@ -60,7 +60,7 @@ fn define_jobs() -> Vec<Job> {
 
         Job::new(JobParameters {
             name: "Oak".to_string(),
-            action_duration: 25.0,
+            action_duration: 24.0,
             timeslot_cost: 3,
             base_values: JobBaseValues {
                 money_per_action: 500,
@@ -203,6 +203,10 @@ pub struct JobParameters {
 
 impl Job {
     pub fn new(p: JobParameters) -> Self {
+        if p.action_duration % 2.0 != 0.0 {
+            panic!("action_duration must be divisible by 2.0");
+        }
+
         Self {
             level: 1,
             running: false,
@@ -210,7 +214,6 @@ impl Job {
             level_up_progress: Progress{value: 0.0},
             time_accumulator: 0.0,
             actions_done: 0,
-
             name: p.name,
             timeslot_cost: p.timeslot_cost,
             base_values: p.base_values,
