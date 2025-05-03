@@ -33,17 +33,17 @@ fn define_jobs() -> Vec<Job> {
             action_duration: 2.0,
             timeslot_cost: 1,
             base_values: JobBaseValues {
-                money_per_action: 10,
+                money_per_action: 3,
                 actions_until_level_up: 10,
             },
         }),
 
         Job::new(JobParameters {
             name: "Spruce".to_string(),
-            action_duration: 14.0,
+            action_duration: 10.0,
             timeslot_cost: 2,
             base_values: JobBaseValues {
-                money_per_action: 80,
+                money_per_action: 30,
                 actions_until_level_up: 10,
             },
         }),
@@ -53,7 +53,7 @@ fn define_jobs() -> Vec<Job> {
             action_duration: 20.0,
             timeslot_cost: 3,
             base_values: JobBaseValues {
-                money_per_action: 250,
+                money_per_action: 100,
                 actions_until_level_up: 10,
             },
         }),

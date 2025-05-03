@@ -106,7 +106,19 @@ impl Ui2 {
     pub fn run(&mut self, state: &GameState, assets: &Assets) -> Vec<Intent> {
         let mut intents = vec![];
 
-        let mut job_draw_containers: Vec<JobDrawContainer> = vec![];
+        let job_draw_containers: Vec<JobDrawContainer> = self.get_job_draw_containers(state, assets);
+
+        for container in &job_draw_containers {
+            draw_multiple(&container.draw_commands); // side effects: draw to scene
+            intents.extend(container.get_intents())  // collect inputs based on screen state
+        }
+
+        intents
+    }
+
+    fn get_job_draw_containers(&self, state: &GameState, assets: &Assets) -> Vec<JobDrawContainer>
+    {
+        let mut job_draw_containers = vec![];
 
         let mut job_offset = Vec2::new(50.0, 50.0);
         let card_height = 170.0;
@@ -128,12 +140,7 @@ impl Ui2 {
             job_offset += Vec2::new(0.0, card_height as f32 + 15.0);
         }
 
-        for container in &job_draw_containers {
-            draw_multiple(&container.draw_commands); // side effects: draw to scene
-            intents.extend(container.get_intents())  // collect inputs based on screen state
-        }
-
-        intents
+        job_draw_containers
     }
 }
 
