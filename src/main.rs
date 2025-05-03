@@ -103,9 +103,9 @@ impl Ui2 {
         let mut job_draw_containers: Vec<JobDrawContainer> = vec![];
 
         let mut job_offset = Vec2::new(50.0, 50.0);
-        let card_height = 190.0;
+        let card_height = 170.0;
         let card_spacing = 10.0;
-        let card_padding = 30.0;
+        let card_padding = 26.0;
 
         for (id, job) in state.jobs.iter().enumerate() {
             let job_draw_container = get_job_draw_container(
@@ -162,6 +162,7 @@ pub fn get_job_draw_container(
     };
 
     let commands = vec![
+        // Background
         DrawCommand::Rectangle {
             x: offset.x,
             y: offset.y,
@@ -169,6 +170,8 @@ pub fn get_job_draw_container(
             height: card_height,
             color: color_card
         },
+
+        // Job Animation
         DrawCommand::Image {
             x: offset.x + card_padding,
             y: offset.y,
@@ -176,17 +179,21 @@ pub fn get_job_draw_container(
             height: card_height,
             texture: chosen_image,
         },
+
+        // Title Bar
         DrawCommand::Text {
-            content: job.name.clone() + " ◼◼◼◼",
+            content: job.name.clone() + " ",
             x: inner_x,
-            y: offset.y + card_padding + 10.0,
+            y: offset.y + card_padding + 15.0,
             font_size: font_size_large,
             color: color_primary,
         },
+
+        // Job Info
         DrawCommand::Text {
             content: format!("Lvl {} | ${} | {}s | {} Slots", job.level, job.money_per_action(), job.action_duration, job.timeslot_cost),
             x: inner_x,
-            y: offset.y + 60.0,
+            y: offset.y + 72.0,
             font_size: font_size_small,
             color: color_secondary,
         },
@@ -194,7 +201,7 @@ pub fn get_job_draw_container(
         // Action Progress Bar
         DrawCommand::ProgressBar {
             x: inner_x,
-            y: offset.y + 80.0,
+            y: offset.y + 96.0,
             width: progress_bar_width,
             height: 20.0,
             progress: job.action_progress.get(),
@@ -206,7 +213,7 @@ pub fn get_job_draw_container(
         DrawCommand::Text {
             content: format!("{:.1} / {:.1}", job.time_accumulator, job.action_duration),
             x: inner_x + 10.0,
-            y: offset.y + 95.0,
+            y: offset.y + 111.0,
             font_size: 20.0,
             color: WHITE,
         },
@@ -214,7 +221,7 @@ pub fn get_job_draw_container(
         // Level Up Progress Bar
         DrawCommand::ProgressBar {
             x: inner_x,
-            y: offset.y + 110.0,
+            y: offset.y + 126.0,
             width: progress_bar_width,
             height: 20.0,
             progress: job.level_up_progress.get(),
@@ -226,7 +233,7 @@ pub fn get_job_draw_container(
         DrawCommand::Text {
             content: format!("Level Up: {} / {}", job.actions_done, job.actions_to_level_up()),
             x: inner_x + 10.0,
-            y: offset.y + 125.0,
+            y: offset.y + 141.0,
             font_size: 20.0,
             color: WHITE,
         },
@@ -236,7 +243,8 @@ pub fn get_job_draw_container(
             x: offset.x + card_width - button_width - card_padding,
             y: offset.y + card_padding,
             width: button_width,
-            height: 40.0,
+            font_size: font_size_large,
+            height: 46.0,
             text: if job.running { "Stop".to_string() } else { "Start".to_string() },
             color: color_button,
             hover_color: color_button_hover,
