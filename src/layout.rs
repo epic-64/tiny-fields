@@ -1,6 +1,6 @@
-use macroquad::math::Vec2;
 use crate::game::GameState;
 use crate::my_lib::Rectangle;
+use macroquad::math::Vec2;
 
 pub struct JobLayout {
     pub card: Rectangle,

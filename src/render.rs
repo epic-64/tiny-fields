@@ -1,11 +1,10 @@
 use crate::draw::DrawCommand;
+use crate::game::Assets;
 use crate::layout::JobLayout;
 use crate::my_lib::{Job, Rectangle};
 use macroquad::color::{Color, BLACK, BLUE, DARKGRAY, GRAY, GREEN, LIGHTGRAY, PINK, WHITE};
 use macroquad::input::mouse_position;
-use macroquad::math::Vec2;
-use macroquad::prelude::{draw_text, draw_texture, draw_texture_ex, DrawTextureParams};
-use crate::game::Assets;
+use macroquad::prelude::draw_text;
 
 #[derive(Clone)]
 pub struct Button {

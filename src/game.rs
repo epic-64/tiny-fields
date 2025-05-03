@@ -1,11 +1,11 @@
-use macroquad::color::WHITE;
-use macroquad::input::{is_mouse_button_pressed, mouse_position, MouseButton};
-use macroquad::math::Vec2;
-use macroquad::prelude::Texture2D;
 use crate::draw::DrawCommand;
 use crate::layout::{layout, JobLayout};
 use crate::my_lib::{Job, JobBaseValues, JobParameters};
 use crate::render::JobRenderer;
+use macroquad::color::WHITE;
+use macroquad::input::{is_mouse_button_pressed, mouse_position, MouseButton};
+use macroquad::math::Vec2;
+use macroquad::prelude::Texture2D;
 
 pub struct Assets {
     pub wood_1: Texture2D,

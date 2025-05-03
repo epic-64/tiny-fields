@@ -1,5 +1,5 @@
-use std::time::Instant;
 use macroquad::prelude::*;
+use std::time::Instant;
 
 mod my_lib;
 mod layout;
@@ -7,8 +7,8 @@ mod draw;
 mod render;
 pub mod game;
 
-use draw::{draw};
-use game::{GameState, UserInterface, Assets};
+use draw::draw;
+use game::{Assets, GameState, UserInterface};
 
 #[macroquad::main("Tiny Fields")]
 async fn main() {
