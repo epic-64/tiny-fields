@@ -1,13 +1,11 @@
 use macroquad::prelude::*;
 use std::time::Instant;
 
-mod my_lib;
 mod draw;
 pub mod game;
 
 use crate::draw::{draw_multiple, DrawCommand};
-use crate::game::{Assets, GameState, Intent};
-use crate::my_lib::{Job, Rectangle};
+use crate::game::{Assets, GameState, Intent, Job, UiRect};
 
 #[macroquad::main("Tiny Fields")]
 async fn main() {
@@ -59,7 +57,7 @@ impl JobDrawContainer {
         for command in &self.draw_commands {
             match command {
                 DrawCommand::Button { x, y, width, height, .. } => {
-                    let rectangle = Rectangle { x: *x, y: *y, width: *width, height: *height };
+                    let rectangle = UiRect { x: *x, y: *y, width: *width, height: *height };
 
                     if rectangle.is_clicked() {
                         intents.push(Intent::ToggleJob(self.job));
@@ -255,7 +253,7 @@ pub fn get_job_intents(commands: &[(usize, Vec<DrawCommand>)]) -> Vec<Intent> {
         for command in commands {
             match command {
                 DrawCommand::Button { x, y, width, height, .. } => {
-                    let rectangle = Rectangle { x: *x, y: *y, width: *width, height: *height };
+                    let rectangle = UiRect { x: *x, y: *y, width: *width, height: *height };
 
                     if rectangle.is_clicked() {
                         intents.push(Intent::ToggleJob(*job_id));
