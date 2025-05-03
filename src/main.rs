@@ -267,25 +267,3 @@ pub fn get_job_draw_container(
 
     JobDrawContainer { job: job_id, draw_commands: commands }
 }
-
-pub fn get_job_intents(commands: &[(usize, Vec<DrawCommand>)]) -> Vec<Intent>
-{
-    let mut intents = vec![];
-
-    for (job_id, commands) in commands {
-        for command in commands {
-            match command {
-                DrawCommand::Button { x, y, width, height, .. } => {
-                    let rectangle = UiRect { x: *x, y: *y, width: *width, height: *height };
-
-                    if rectangle.is_clicked() {
-                        intents.push(Intent::ToggleJob(*job_id));
-                    }
-                }
-                _ => {}
-            }
-        }
-    }
-
-    intents
-}
