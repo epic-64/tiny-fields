@@ -21,7 +21,7 @@ async fn main() {
     };
 
     let mut state = GameState::new();
-    // let mut ui = UserInterface::new(&state);
+
     let mut ui = Ui2 {
         last_mouse_position: Vec2::new(0.0, 0.0),
         global_offset: Vec2::new(0.0, 0.0),

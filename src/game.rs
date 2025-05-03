@@ -30,7 +30,7 @@ fn define_jobs() -> Vec<Job> {
     vec![
         Job::new(JobParameters {
             name: "Pine".to_string(),
-            action_duration: 10.0,
+            action_duration: 2.0,
             timeslot_cost: 1,
             base_values: JobBaseValues {
                 money_per_action: 10,
@@ -83,7 +83,7 @@ impl GameState {
         Self {
             jobs: define_jobs(),
             total_money: 0,
-            time_slots: TimeSlots { total: 3, used: 0, },
+            time_slots: TimeSlots { total: 6, used: 0, },
             performance_flags: PerformanceFlags { timeslots_changed: false, },
             game_meta: GameMeta { effective_fps: 0.0, raw_fps: 0.0, },
         }
