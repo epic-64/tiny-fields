@@ -17,11 +17,10 @@ async fn main() {
 
     let wood_1: Texture2D = load_texture("WoodChop_1.png").await.expect("Couldn't load file");
     let wood_2: Texture2D = load_texture("WoodChop_2.png").await.expect("Couldn't load file");
-    wood_1.set_filter(FilterMode::Nearest);
 
     let assets = Assets {
-        wood_cutting_image_1: wood_1,
-        wood_cutting_image_2: wood_2,
+        wood_1,
+        wood_2,
     };
 
     let mut state = GameState::new();

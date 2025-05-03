@@ -48,6 +48,8 @@ impl JobRenderer {
         let image_width = 128.0f32;
         let card_inner_x = layout.card.x + Self::CARD_PADDING + image_width + Self::CARD_PADDING;
         let progress_bar_text_padding = 10.0;
+        let progress_bar_width = layout.card.width - 2.0 * Self::CARD_PADDING - image_width - 2.0 * progress_bar_text_padding;
+        let progress_bar_height = 20.0;
 
         // Card background
         commands.push(DrawCommand::Rectangle {
@@ -59,9 +61,9 @@ impl JobRenderer {
         });
 
         let chosen_image = if job.running && job.time_accumulator % 2.0 < 1.0 {
-            assets.wood_cutting_image_2.clone()
+            assets.wood_2.clone()
         } else {
-            assets.wood_cutting_image_1.clone()
+            assets.wood_1.clone()
         };
 
 
@@ -98,8 +100,8 @@ impl JobRenderer {
         commands.push(DrawCommand::ProgressBar {
             x: card_inner_x,
             y: layout.action_bar.y,
-            width: layout.action_bar.width,
-            height: layout.action_bar.height,
+            width: progress_bar_width,
+            height: progress_bar_height,
             progress: job.action_progress.get(),
             background_color: Self::PROGRESS_BAR_BACKGROUND,
             foreground_color: Self::PROGRESS_BAR_FOREGROUND_ACTION,
@@ -118,8 +120,8 @@ impl JobRenderer {
         commands.push(DrawCommand::ProgressBar {
             x: card_inner_x,
             y: layout.level_bar.y,
-            width: layout.level_bar.width,
-            height: layout.level_bar.height,
+            width: progress_bar_width,
+            height: progress_bar_height,
             progress: job.level_up_progress.get(),
             background_color: Self::PROGRESS_BAR_BACKGROUND,
             foreground_color: Self::PROGRESS_BAR_FOREGROUND_LEVEL,

@@ -8,8 +8,8 @@ use crate::my_lib::{Job, JobBaseValues, JobParameters};
 use crate::render::JobRenderer;
 
 pub struct Assets {
-    pub wood_cutting_image_1: Texture2D,
-    pub wood_cutting_image_2: Texture2D,
+    pub wood_1: Texture2D,
+    pub wood_2: Texture2D,
 }
 
 pub struct PerformanceFlags {
