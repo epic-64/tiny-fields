@@ -2,11 +2,10 @@ use macroquad::prelude::*;
 use std::time::Instant;
 
 mod my_lib;
-mod layout;
 mod draw;
 pub mod game;
 
-use crate::draw::{draw, draw_multiple, DrawCommand};
+use crate::draw::{draw_multiple, DrawCommand};
 use crate::game::{Assets, GameState, Intent};
 use crate::my_lib::{Job, Rectangle};
 
@@ -59,7 +58,7 @@ impl JobDrawContainer {
 
         for command in &self.draw_commands {
             match command {
-                DrawCommand::Button2 { x, y, width, height, .. } => {
+                DrawCommand::Button { x, y, width, height, .. } => {
                     let rectangle = Rectangle { x: *x, y: *y, width: *width, height: *height };
 
                     if rectangle.is_clicked() {
@@ -106,11 +105,23 @@ impl Ui2 {
         let mut job_draw_containers: Vec<JobDrawContainer> = vec![];
 
         let mut job_offset = Vec2::new(50.0, 50.0);
+        let card_height = 190.0;
+        let card_spacing = 10.0;
+        let card_padding = 30.0;
+
         for (id, job) in state.jobs.iter().enumerate() {
-            let job_draw_container = get_job_draw_container(assets, id, job, self.global_offset + job_offset);
+            let job_draw_container = get_job_draw_container(
+                assets,
+                id,
+                job,
+                self.global_offset + job_offset,
+                card_height,
+                card_padding,
+                card_spacing,
+            );
             job_draw_containers.push(job_draw_container);
 
-            job_offset += Vec2::new(0.0, 165.0);
+            job_offset += Vec2::new(0.0, card_height as f32 + 15.0);
         }
 
         for container in &job_draw_containers {
@@ -122,28 +133,28 @@ impl Ui2 {
     }
 }
 
-pub fn get_job_draw_container(assets: &Assets, job_id: usize, job: &Job, offset: Vec2) -> JobDrawContainer {
-    let color_card = Color::from_rgba(20, 20, 20, 200);
+pub fn get_job_draw_container(
+    assets: &Assets,
+    job_id: usize,
+    job: &Job,
+    offset: Vec2,
+    card_height: f64,
+    card_padding: f32,
+    card_spacing: f32,
+) -> JobDrawContainer {
+    let color_card = Color::from_rgba(50, 50, 50, 255);
     let color_primary = WHITE;
     let color_secondary = LIGHTGRAY;
-    let color_button = Color::from_rgba(0, 255, 0, 255);
-    let color_button_hover = Color::from_rgba(0, 200, 0, 255);
-
-    let color_progress_bar_background = Color::from_rgba(200, 200, 200, 255);
-    let color_progress_bar_foreground = Color::from_rgba(0, 255, 0, 255);
+    let color_button = DARKGRAY;
+    let color_button_hover = SKYBLUE;
 
     let font_size_large = 24.0;
     let font_size_small = 20.0;
 
     let card_width = 500.0;
-    let card_height = 150.0;
     let image_width = 100.0f32;
-    let card_padding = 20.0;
-    let card_spacing = 10.0;
-    let inner_x = offset.x + card_padding + image_width + card_padding;
-
-    let progress_bar_width = card_width - card_padding - image_width - card_padding - card_padding;
-
+    let inner_x = offset.x + card_padding + image_width + card_spacing;
+    let progress_bar_width = card_width - card_padding - image_width - card_spacing - card_padding;
     let button_width = 80.0;
 
     let chosen_image = if job.running && job.time_accumulator % 2.0 < 1.0 {
@@ -168,7 +179,7 @@ pub fn get_job_draw_container(assets: &Assets, job_id: usize, job: &Job, offset:
             texture: chosen_image,
         },
         DrawCommand::Text {
-            content: job.name.clone(),
+            content: job.name.clone() + " ◼◼◼◼",
             x: inner_x,
             y: offset.y + card_padding + 10.0,
             font_size: font_size_large,
@@ -181,31 +192,39 @@ pub fn get_job_draw_container(assets: &Assets, job_id: usize, job: &Job, offset:
             font_size: font_size_small,
             color: color_secondary,
         },
+
+        // Action Progress Bar
         DrawCommand::ProgressBar {
             x: inner_x,
-            y: offset.y + 75.0,
+            y: offset.y + 80.0,
             width: progress_bar_width,
             height: 20.0,
             progress: job.action_progress.get(),
-            background_color: color_progress_bar_background,
-            foreground_color: color_progress_bar_foreground,
+            background_color: GRAY,
+            foreground_color: GREEN,
         },
+
+        // Action Progress Text
         DrawCommand::Text {
             content: format!("{:.1} / {:.1}", job.time_accumulator, job.action_duration),
             x: inner_x + 10.0,
-            y: offset.y + 90.0,
+            y: offset.y + 95.0,
             font_size: 20.0,
             color: WHITE,
         },
+
+        // Level Up Progress Bar
         DrawCommand::ProgressBar {
             x: inner_x,
             y: offset.y + 110.0,
             width: progress_bar_width,
             height: 20.0,
             progress: job.level_up_progress.get(),
-            background_color: Color::from_rgba(200, 200, 200, 255),
-            foreground_color: Color::from_rgba(0, 0, 255, 255),
+            background_color: GRAY,
+            foreground_color: BLUE,
         },
+
+        // Level Up Progress Text
         DrawCommand::Text {
             content: format!("Level Up: {} / {}", job.actions_done, job.actions_to_level_up()),
             x: inner_x + 10.0,
@@ -213,14 +232,16 @@ pub fn get_job_draw_container(assets: &Assets, job_id: usize, job: &Job, offset:
             font_size: 20.0,
             color: WHITE,
         },
-        DrawCommand::Button2 {
+
+        // Start / Stop Button
+        DrawCommand::Button {
             x: offset.x + card_width - button_width - card_padding,
-            y: offset.y + 15.0,
+            y: offset.y + card_padding,
             width: button_width,
             height: 40.0,
             text: if job.running { "Stop".to_string() } else { "Start".to_string() },
-            color: Color::from_rgba(0, 255, 0, 255),
-            hover_color: Color::from_rgba(0, 200, 0, 255),
+            color: color_button,
+            hover_color: color_button_hover,
         }
     ];
 
@@ -233,7 +254,7 @@ pub fn get_job_intents(commands: &[(usize, Vec<DrawCommand>)]) -> Vec<Intent> {
     for (job_id, commands) in commands {
         for command in commands {
             match command {
-                DrawCommand::Button2 { x, y, width, height, .. } => {
+                DrawCommand::Button { x, y, width, height, .. } => {
                     let rectangle = Rectangle { x: *x, y: *y, width: *width, height: *height };
 
                     if rectangle.is_clicked() {

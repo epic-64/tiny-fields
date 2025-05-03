@@ -1,7 +1,7 @@
+use crate::my_lib::Rectangle;
 use macroquad::color::{Color, WHITE};
 use macroquad::math::Vec2;
 use macroquad::prelude::{draw_rectangle, draw_text, draw_texture_ex, DrawTextureParams, Texture2D};
-use crate::my_lib::Rectangle;
 
 pub enum DrawCommand {
     Text {
@@ -11,7 +11,7 @@ pub enum DrawCommand {
         font_size: f32,
         color: Color,
     },
-    Button2 {
+    Button {
         x: f32,
         y: f32,
         width: f32,
@@ -58,7 +58,7 @@ pub fn draw(command: &DrawCommand) {
             };
             draw_texture_ex(texture, *x, *y, WHITE, params);
         }
-        DrawCommand::Button2 { x, y, width, height, text, color, hover_color } => {
+        DrawCommand::Button { x, y, width, height, text, color, hover_color } => {
             let rect = Rectangle {
                 x: *x,
                 y: *y,
