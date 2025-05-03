@@ -35,7 +35,7 @@ pub struct GameMeta {
 fn define_jobs() -> Vec<Job> {
     vec![
         Job::new(JobParameters {
-            name: "Burger".to_string(),
+            name: "Pine".to_string(),
             action_duration: 10.0,
             timeslot_cost: 1,
             base_values: JobBaseValues {
@@ -45,7 +45,7 @@ fn define_jobs() -> Vec<Job> {
         }),
 
         Job::new(JobParameters {
-            name: "Pizza".to_string(),
+            name: "Spruce".to_string(),
             action_duration: 15.0,
             timeslot_cost: 2,
             base_values: JobBaseValues {
@@ -55,7 +55,7 @@ fn define_jobs() -> Vec<Job> {
         }),
 
         Job::new(JobParameters {
-            name: "Sushi".to_string(),
+            name: "Rosewood".to_string(),
             action_duration: 20.0,
             timeslot_cost: 3,
             base_values: JobBaseValues {
@@ -65,7 +65,7 @@ fn define_jobs() -> Vec<Job> {
         }),
 
         Job::new(JobParameters {
-            name: "Tacos".to_string(),
+            name: "Oak".to_string(),
             action_duration: 25.0,
             timeslot_cost: 3,
             base_values: JobBaseValues {

@@ -7,16 +7,16 @@ mod draw;
 mod render;
 pub mod game;
 
-use draw::draw;
-use game::{Assets, GameState, UserInterface};
+use crate::draw::draw;
+use crate::game::{Assets, GameState, UserInterface};
 
 #[macroquad::main("Tiny Fields")]
 async fn main() {
     set_pc_assets_folder("assets");
     request_new_screen_size(1600.0, 900.0);
 
-    let wood_1: Texture2D = load_texture("WoodChop_1.png").await.expect("Couldn't load file");
-    let wood_2: Texture2D = load_texture("WoodChop_2.png").await.expect("Couldn't load file");
+    let wood_1: Texture2D = load_texture("ChopChop_1.png").await.expect("Couldn't load file");
+    let wood_2: Texture2D = load_texture("ChopChop_2.png").await.expect("Couldn't load file");
 
     let assets = Assets {
         wood_1,
