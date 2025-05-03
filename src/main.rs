@@ -31,6 +31,8 @@ async fn main() {
         let frame_start = Instant::now();
         let dt = get_frame_time();
 
+        ui.update_offset();
+
         clear_background(ORANGE);
         let intents = ui.run(&state, &assets);
 
@@ -77,9 +79,7 @@ struct Ui2 {
 }
 
 impl Ui2 {
-    pub fn run(&mut self, state: &GameState, assets: &Assets) -> Vec<Intent> {
-        let mut intents = vec![];
-
+    pub fn update_offset(&mut self) {
         if is_mouse_button_pressed(MouseButton::Right) {
             self.last_mouse_position = Vec2::from(mouse_position());
         }
@@ -99,6 +99,12 @@ impl Ui2 {
 
             self.last_mouse_position = current_mouse_pos;
         }
+    }
+}
+
+impl Ui2 {
+    pub fn run(&mut self, state: &GameState, assets: &Assets) -> Vec<Intent> {
+        let mut intents = vec![];
 
         let mut job_draw_containers: Vec<JobDrawContainer> = vec![];
 
@@ -139,7 +145,8 @@ pub fn get_job_draw_container(
     card_height: f64,
     card_padding: f32,
     card_spacing: f32,
-) -> JobDrawContainer {
+) -> JobDrawContainer
+{
     let color_card = Color::from_rgba(50, 50, 50, 255);
     let color_primary = WHITE;
     let color_secondary = LIGHTGRAY;
@@ -254,7 +261,8 @@ pub fn get_job_draw_container(
     JobDrawContainer { job: job_id, draw_commands: commands }
 }
 
-pub fn get_job_intents(commands: &[(usize, Vec<DrawCommand>)]) -> Vec<Intent> {
+pub fn get_job_intents(commands: &[(usize, Vec<DrawCommand>)]) -> Vec<Intent>
+{
     let mut intents = vec![];
 
     for (job_id, commands) in commands {
