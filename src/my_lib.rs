@@ -29,6 +29,7 @@ impl Rectangle {
     }
 }
 
+#[derive(Clone)]
 pub struct Progress {
     value: f32, // Value between 0.0 and 1.0
 }
@@ -51,11 +52,13 @@ impl Progress {
     }
 }
 
+#[derive(Clone)]
 pub struct JobBaseValues {
     pub money_per_action: i32,
     pub actions_until_level_up: i32,
 }
 
+#[derive(Clone)]
 pub struct Job {
     pub name: String,
     pub action_progress: Progress,

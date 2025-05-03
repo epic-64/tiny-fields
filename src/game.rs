@@ -107,6 +107,8 @@ impl GameState {
                         self.performance_flags.timeslots_changed = true;
                     }
                 }
+                Intent::ToggleJob2(job) => {
+                }
             }
         }
 
@@ -132,6 +134,7 @@ fn get_used_timeslots(jobs: &[Job]) -> i32 {
 
 pub enum Intent {
     ToggleJob(usize),
+    ToggleJob2(Job),
 }
 
 pub struct UserInterface {
