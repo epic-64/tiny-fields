@@ -1,4 +1,3 @@
-use crate::render::Button;
 use macroquad::color::{Color, WHITE};
 use macroquad::math::Vec2;
 use macroquad::prelude::{draw_rectangle, draw_text, draw_texture_ex, DrawTextureParams, Texture2D};
@@ -10,9 +9,6 @@ pub enum DrawCommand {
         y: f32,
         font_size: f32,
         color: Color,
-    },
-    Button {
-        button: Button,
     },
     Button2 {
         x: f32,
@@ -46,9 +42,6 @@ pub fn draw(command: &DrawCommand) {
     match command {
         DrawCommand::Text { content, x, y, font_size, color } => {
             draw_text(content, *x, *y, *font_size, *color);
-        }
-        DrawCommand::Button { button } => {
-            button.draw();
         }
         DrawCommand::ProgressBar { x, y, width, height, progress, background_color, foreground_color } => {
             draw_rectangle(*x, *y, *width, *height, *background_color);

@@ -4,11 +4,10 @@ use std::time::Instant;
 mod my_lib;
 mod layout;
 mod draw;
-mod render;
 pub mod game;
 
 use crate::draw::{draw, draw_multiple, DrawCommand};
-use crate::game::{Assets, GameState, Intent, UserInterface};
+use crate::game::{Assets, GameState, Intent};
 use crate::my_lib::{Job, Rectangle};
 
 #[macroquad::main("Tiny Fields")]
@@ -36,33 +35,10 @@ async fn main() {
         let dt = get_frame_time();
 
         clear_background(ORANGE);
-        let intents = ui.run(&state);
-        // let intents = ui.process_input();
-
-        // if is_mouse_button_down(MouseButton::Right) {
-        //     let current_mouse_pos = Vec2::from(mouse_position());
-        //     let delta = current_mouse_pos - ui.last_mouse_position;
-        //
-        //     if delta.length_squared() > 0.0 {
-        //         let new_offset = {ui.global_offset + delta}.clamp(
-        //             Vec2::new(-200.0, -600.0),
-        //             Vec2::new(1000.0, 600.0),
-        //         );
-        //
-        //         ui = ui.recreate(&state, new_offset);
-        //     }
-        //
-        //     ui.last_mouse_position = current_mouse_pos;
-        // }
+        let intents = ui.run(&state, &assets);
 
         // Update game state
         state.step(&intents, dt);
-
-        // Compile list of draw commands
-        //let commands = ui.render(&state, &assets);
-
-        // Draw the game
-        //draw_multiple(&commands);
 
         // Keep track of FPS
         state.game_meta.raw_fps = 1.0 / frame_start.elapsed().as_secs_f32();
@@ -104,7 +80,7 @@ struct Ui2 {
 }
 
 impl Ui2 {
-    pub fn run(&mut self, state: &GameState) -> Vec<Intent> {
+    pub fn run(&mut self, state: &GameState, assets: &Assets) -> Vec<Intent> {
         let mut intents = vec![];
 
         if is_mouse_button_pressed(MouseButton::Right) {
@@ -131,7 +107,7 @@ impl Ui2 {
 
         let mut job_offset = Vec2::new(0.0, 0.0);
         for (id, job) in state.jobs.iter().enumerate() {
-            let job_draw_container = get_job_draw_container(id, job, self.global_offset + job_offset);
+            let job_draw_container = get_job_draw_container(assets, id, job, self.global_offset + job_offset);
             job_draw_containers.push(job_draw_container);
 
             job_offset += Vec2::new(0.0, 200.0);
@@ -146,7 +122,14 @@ impl Ui2 {
     }
 }
 
-pub fn get_job_draw_container(job_id: usize, job: &Job, offset: Vec2) -> JobDrawContainer {
+pub fn get_job_draw_container(assets: &Assets, job_id: usize, job: &Job, offset: Vec2) -> JobDrawContainer {
+
+    let chosen_image = if job.running && job.time_accumulator % 2.0 < 1.0 {
+        assets.wood_2.clone()
+    } else {
+        assets.wood_1.clone()
+    };
+
     let commands = vec![
         DrawCommand::Rectangle {
             x: offset.x,
@@ -154,6 +137,13 @@ pub fn get_job_draw_container(job_id: usize, job: &Job, offset: Vec2) -> JobDraw
             width: 500.0,
             height: 175.0,
             color: Color::from_rgba(20, 20, 20, 200),
+        },
+            DrawCommand::Image {
+            x: offset.x + 10.0,
+            y: offset.y,
+            width: 128.0,
+            height: 175.0,
+            texture: chosen_image,
         },
         DrawCommand::Text {
             content: job.name.clone(),
@@ -177,6 +167,13 @@ pub fn get_job_draw_container(job_id: usize, job: &Job, offset: Vec2) -> JobDraw
             progress: job.action_progress.get(),
             background_color: Color::from_rgba(200, 200, 200, 255),
             foreground_color: Color::from_rgba(0, 255, 0, 255),
+        },
+        DrawCommand::Text {
+            content: format!("Actions until level up: {}", job.actions_to_level_up()),
+            x: offset.x + 20.0,
+            y: offset.y + 75.0,
+            font_size: 20.0,
+            color: WHITE,
         },
         DrawCommand::Button2 {
             x: offset.x + 10.0,

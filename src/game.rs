@@ -1,7 +1,6 @@
 use crate::draw::DrawCommand;
 use crate::layout::{layout, JobLayout};
 use crate::my_lib::{Job, JobBaseValues, JobParameters};
-use crate::render::JobRenderer;
 use macroquad::color::WHITE;
 use macroquad::input::{is_mouse_button_pressed, mouse_position, MouseButton};
 use macroquad::math::Vec2;
@@ -107,8 +106,6 @@ impl GameState {
                         self.performance_flags.timeslots_changed = true;
                     }
                 }
-                Intent::ToggleJob2(job) => {
-                }
             }
         }
 
@@ -134,94 +131,4 @@ fn get_used_timeslots(jobs: &[Job]) -> i32 {
 
 pub enum Intent {
     ToggleJob(usize),
-    ToggleJob2(Job),
-}
-
-pub struct UserInterface {
-    pub global_offset: Vec2,
-    pub last_mouse_position: Vec2,
-    pub job_layouts: Vec<JobLayout>,
-}
-
-impl UserInterface {
-    pub fn new(state: &GameState) -> Self {
-        Self {
-            last_mouse_position: Vec2::new(0.0, 0.0),
-            global_offset: Vec2::new(0.0, 0.0),
-            job_layouts: layout(state, Vec2::new(0.0, 0.0)),
-        }
-    }
-
-    pub fn recreate(&mut self, state: &GameState, offset: Vec2) -> Self {
-        Self {
-            last_mouse_position: self.last_mouse_position,
-            global_offset: offset,
-            job_layouts: layout(state, offset),
-        }
-    }
-
-    pub fn process_input(&mut self) -> Vec<Intent> {
-        let mut actions = vec![];
-
-        for layout in &self.job_layouts {
-            if layout.toggle_button.is_clicked() {
-                actions.push(Intent::ToggleJob(layout.job_index));
-            }
-        }
-
-        if is_mouse_button_pressed(MouseButton::Right) {
-            self.last_mouse_position = Vec2::from(mouse_position());
-        }
-
-        actions
-    }
-
-    pub fn render(&self, state: &GameState, assets: &Assets) -> Vec<DrawCommand> {
-        let mut commands = vec![];
-
-        // Display top-level info
-        commands.push(DrawCommand::Text {
-            content: format!("Money: ${}", state.total_money),
-            x: 20.0,
-            y: 20.0,
-            font_size: 30.0,
-            color: WHITE,
-        });
-
-        // Display timeslots
-        commands.push(DrawCommand::Text {
-            content: format!("Timeslots: {} / {}", state.time_slots.get_free(), state.time_slots.total),
-            x: 20.0,
-            y: 60.0,
-            font_size: 30.0,
-            color: WHITE,
-        });
-
-        // Display FPS
-        commands.push(DrawCommand::Text {
-            content: format!("FPS: {}", state.game_meta.effective_fps),
-            x: 20.0,
-            y: 100.0,
-            font_size: 30.0,
-            color: WHITE,
-        });
-
-        // Display raw FPS
-        commands.push(DrawCommand::Text {
-            content: format!("Raw FPS: {:.2}", state.game_meta.raw_fps),
-            x: 20.0,
-            y: 140.0,
-            font_size: 30.0,
-            color: WHITE,
-        });
-
-        // Use JobRenderer for each job
-        let job_renderer = JobRenderer {};
-        for layout in &self.job_layouts {
-            let job = &state.jobs[layout.job_index];
-            commands.extend(job_renderer.render(assets, job, layout));
-        }
-
-        commands
-    }
 }
