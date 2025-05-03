@@ -19,13 +19,12 @@ impl Rectangle {
         point.1 >= self.y && point.1 <= self.y + self.height
     }
 
-    pub fn is_clicked(&self) -> bool {
-        let mouse = mouse_position();
-        self.contains_point(mouse) && is_mouse_button_pressed(MouseButton::Left)
+    pub fn is_hovered(&self) -> bool {
+        self.contains_point(mouse_position())
     }
 
-    pub fn draw(&self, color: Color) {
-        draw_rectangle(self.x, self.y, self.width, self.height, color);
+    pub fn is_clicked(&self) -> bool {
+        self.is_hovered() && is_mouse_button_pressed(MouseButton::Left)
     }
 }
 
@@ -119,7 +118,7 @@ impl Job {
                 self.level_up();
             }
 
-            return self.dollars_per_action();
+            return self.money_per_action();
         }
 
         0
@@ -131,7 +130,7 @@ impl Job {
         self.level_up_progress.reset();
     }
 
-    pub fn dollars_per_action(&self) -> i64 {
+    pub fn money_per_action(&self) -> i64 {
         let base_money_per_action = self.base_values.money_per_action;
         let growth_factor: f32 = 1.3;
 
