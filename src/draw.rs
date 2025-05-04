@@ -30,7 +30,7 @@ pub enum UiElement {
         foreground_color: Color,
     },
     Rectangle { x: f32, y: f32, width: f64, height: f64, color: Color },
-    Image { x: f32, y: f32, width: f64, height: f64, texture: Texture2D },
+    Image { x: f32, y: f32, width: f64, height: f64, texture: Texture2D, color: Color },
 }
 
 pub fn draw(command: &UiElement) {
@@ -45,12 +45,12 @@ pub fn draw(command: &UiElement) {
         UiElement::Rectangle { x, y, width, height, color } => {
             draw_rectangle(*x, *y, *width as f32, *height as f32, *color);
         }
-        UiElement::Image { x, y, width, height, texture } => {
+        UiElement::Image { x, y, width, height, texture, color } => {
             let params = DrawTextureParams {
                 dest_size: Some(Vec2::new(*width as f32, *height as f32)),
                 ..Default::default()
             };
-            draw_texture_ex(texture, *x, *y, WHITE, params);
+            draw_texture_ex(texture, *x, *y, *color, params);
         }
         UiElement::Button { rectangle: r, font_size, text, color, hover_color, .. } => {
             let current_color = if r.is_hovered() { *hover_color } else { *color };

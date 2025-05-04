@@ -16,14 +16,15 @@ async fn main() {
 
     let hut1: Texture2D = load_texture("hut1.png").await.expect("Couldn't load file");
     let hut2: Texture2D = load_texture("hut2.png").await.expect("Couldn't load file");
-    let wood_1: Texture2D = load_texture("ChopChop_1.png").await.expect("Couldn't load file");
-    let wood_2: Texture2D = load_texture("ChopChop_2.png").await.expect("Couldn't load file");
-    let textures = Textures { hut1, hut2, wood_1, wood_2 };
+    let wood_1: Texture2D = load_texture("ChopChop_1_.png").await.expect("Couldn't load file");
+    let wood_2: Texture2D = load_texture("ChopChop_2_.png").await.expect("Couldn't load file");
+    let frame1: Texture2D = load_texture("frame2.png").await.expect("Couldn't load file");
+    let textures = Textures { hut1, hut2, wood_1, wood_2, frame1 };
 
     let main_font = load_ttf_font("Menlo-Regular.ttf").await.expect("Couldn't load font");
-    let fonts    = Fonts { main: main_font };
-    let assets   = Assets { fonts, textures };
+    let fonts = Fonts { main: main_font };
 
+    let assets = Assets { fonts, textures };
     let mut state = GameState::new(assets);
 
     let mut ui = Ui2 {
@@ -94,17 +95,18 @@ impl Ui2 {
         let mut elements: Vec<UiElement> = vec![];
 
         let background_image = UiElement::Image {
-            x: 0., // does not move
-            y: 0., // does not move
+            x: 0., // fixed
+            y: 0., // fixed
             width: screen_width() as f64,
             height: screen_height() as f64,
             texture: state.assets.textures.hut1.clone(),
+            color: WHITE,
         };
 
         let top_bar_draw_commands = vec![
             UiElement::Rectangle {
-                x: self.global_offset.x + 50.0,
-                y: self.global_offset.y + 50.0,
+                x: 50.0, // fixed
+                y: 50.0, // fixed
                 width: screen_width() as f64,
                 height: 50.0,
                 color: DARKGRAY,
@@ -120,28 +122,30 @@ impl Ui2 {
 
         elements.push(background_image);
         elements.extend(top_bar_draw_commands);
-        elements.extend(self.get_job_ui_elements(state));
+        elements.extend(self.get_all_job_elements(state));
 
         elements
     }
 
-    fn get_job_ui_elements(&self, state: &GameState) -> Vec<UiElement>
+    fn get_all_job_elements(&self, state: &GameState) -> Vec<UiElement>
     {
         let mut job_draw_containers: Vec<UiElement> = vec![];
 
         let mut job_offset = Vec2::new(50.0, 150.0);
-        let card_height = 170.0;
-        let card_spacing = 10.0;
-        let card_padding = 26.0;
+        let card_height = 180.0;
+        let card_spacing = 15.0;
+        let card_padding_x = 55.0;
+        let card_padding_y = 40.0;
 
         for (id, job) in state.jobs.iter().enumerate() {
-            let job_draw_container = get_job_ui_elements(
+            let job_draw_container = get_job_elements(
                 &state.assets,
                 job,
                 id,
                 self.global_offset + job_offset,
                 card_height,
-                card_padding,
+                card_padding_x,
+                card_padding_y,
                 card_spacing,
             );
 
@@ -154,29 +158,29 @@ impl Ui2 {
     }
 }
 
-pub fn get_job_ui_elements(
+pub fn get_job_elements(
     assets: &Assets,
     job: &Job,
     job_id: usize,
     offset: Vec2,
     card_height: f64,
-    card_padding: f32,
+    card_padding_x: f32,
+    card_padding_y: f32,
     card_spacing: f32,
 ) -> Vec<UiElement>
 {
-    let color_card = Color::from_rgba(50, 50, 50, 255);
-    let color_primary = WHITE;
-    let color_secondary = LIGHTGRAY;
+    let color_primary = DARKBLUE;
+    let color_secondary = DARKGRAY;
     let color_button = DARKGRAY;
     let color_button_hover = SKYBLUE;
 
     let font_size_large = 24.0;
     let font_size_small = 20.0;
 
-    let card_width = 500.0;
-    let image_width = 100.0f32;
-    let inner_x = offset.x + card_padding + image_width + card_spacing;
-    let progress_bar_width = card_width - card_padding - image_width - card_spacing - card_padding;
+    let card_width = 550.0;
+    let image_width = 90.0f32;
+    let inner_x = offset.x + card_padding_x + image_width + card_spacing;
+    let progress_bar_width = card_width - card_padding_x - image_width - card_spacing - card_padding_x;
     let button_width = 80.0;
 
     let chosen_image = if job.running && job.time_accumulator % 2.0 < 1.0 {
@@ -187,28 +191,30 @@ pub fn get_job_ui_elements(
 
     let elements = vec![
         // Background
-        UiElement::Rectangle {
+        UiElement::Image {
             x: offset.x,
             y: offset.y,
             width: card_width as f64,
             height: card_height,
-            color: color_card
+            texture: assets.textures.frame1.clone(),
+            color: WHITE
         },
 
         // Job Animation
         UiElement::Image {
-            x: offset.x + card_padding,
-            y: offset.y,
+            x: offset.x + card_padding_x,
+            y: offset.y + card_padding_y,
             width: image_width as f64,
-            height: card_height,
+            height: card_height - card_padding_y as f64 * 2.0,
             texture: chosen_image.clone(),
+            color: if job.running { WHITE } else { Color::from_rgba(90, 90, 90, 255) },
         },
 
         // Title Bar
         UiElement::Text {
             content: job.name.clone() + " ",
             x: inner_x,
-            y: offset.y + card_padding + 15.0,
+            y: offset.y + card_padding_y + 15.0,
             font_size: font_size_large,
             color: color_primary,
         },
@@ -217,7 +223,7 @@ pub fn get_job_ui_elements(
         UiElement::Text {
             content: format!("Lvl {} | ${} | {}s | {} Slots", job.level, job.money_per_action(), job.action_duration, job.timeslot_cost),
             x: inner_x,
-            y: offset.y + 72.0,
+            y: offset.y + 80.0,
             font_size: font_size_small,
             color: color_secondary,
         },
@@ -226,7 +232,7 @@ pub fn get_job_ui_elements(
         UiElement::ProgressBar {
             x: inner_x,
             y: offset.y + 96.0,
-            width: progress_bar_width,
+            width: progress_bar_width - 120.0,
             height: 20.0,
             progress: job.action_progress.get(),
             background_color: GRAY,
@@ -246,7 +252,7 @@ pub fn get_job_ui_elements(
         UiElement::ProgressBar {
             x: inner_x,
             y: offset.y + 126.0,
-            width: progress_bar_width,
+            width: progress_bar_width - 120.0,
             height: 20.0,
             progress: job.level_up_progress.get(),
             background_color: GRAY,
@@ -265,8 +271,8 @@ pub fn get_job_ui_elements(
         // Start / Stop Button
         UiElement::Button {
             rectangle: UiRect {
-                x: offset.x + card_width - button_width - card_padding,
-                y: offset.y + card_padding,
+                x: offset.x + card_width - button_width - card_padding_x,
+                y: offset.y + card_padding_y,
                 width: button_width,
                 height: 46.0,
             },

@@ -7,6 +7,7 @@ pub struct Textures {
     pub hut2: Texture2D,
     pub wood_1: Texture2D,
     pub wood_2: Texture2D,
+    pub frame1: Texture2D,
 }
 
 pub struct Fonts {
