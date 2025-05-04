@@ -14,11 +14,13 @@ async fn main() {
     set_pc_assets_folder("assets");
     request_new_screen_size(1600.0, 900.0);
 
-    let main_font = load_ttf_font("Menlo-Regular.ttf").await.expect("Couldn't load font");
+    let hut1: Texture2D = load_texture("hut1.png").await.expect("Couldn't load file");
+    let hut2: Texture2D = load_texture("hut2.png").await.expect("Couldn't load file");
     let wood_1: Texture2D = load_texture("ChopChop_1.png").await.expect("Couldn't load file");
     let wood_2: Texture2D = load_texture("ChopChop_2.png").await.expect("Couldn't load file");
+    let textures = Textures { hut1, hut2, wood_1, wood_2 };
 
-    let textures = Textures { wood_1, wood_2 };
+    let main_font = load_ttf_font("Menlo-Regular.ttf").await.expect("Couldn't load font");
     let fonts    = Fonts { main: main_font };
     let assets   = Assets { fonts, textures };
 
@@ -91,6 +93,14 @@ impl Ui2 {
     pub fn get_ui_elements(&mut self, state: &GameState) -> Vec<UiElement> {
         let mut elements: Vec<UiElement> = vec![];
 
+        let background_image = UiElement::Image {
+            x: 0., // does not move
+            y: 0., // does not move
+            width: screen_width() as f64,
+            height: screen_height() as f64,
+            texture: state.assets.textures.hut1.clone(),
+        };
+
         let top_bar_draw_commands = vec![
             UiElement::Rectangle {
                 x: self.global_offset.x + 50.0,
@@ -108,6 +118,7 @@ impl Ui2 {
             },
         ];
 
+        elements.push(background_image);
         elements.extend(top_bar_draw_commands);
         elements.extend(self.get_job_ui_elements(state));
 

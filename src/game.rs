@@ -3,6 +3,8 @@ use macroquad::prelude::Texture2D;
 use macroquad::text::Font;
 
 pub struct Textures {
+    pub hut1: Texture2D,
+    pub hut2: Texture2D,
     pub wood_1: Texture2D,
     pub wood_2: Texture2D,
 }
