@@ -1,5 +1,6 @@
 use macroquad::prelude::*;
 use std::time::Instant;
+use macroquad::math::{f32, f64};
 
 mod draw;
 pub mod game;
@@ -128,8 +129,8 @@ impl Ui2 {
         for (id, job) in state.jobs.iter().enumerate() {
             let job_draw_container = get_job_draw_container(
                 assets,
-                id,
                 job,
+                id,
                 self.global_offset + job_offset,
                 card_height,
                 card_padding,
@@ -146,8 +147,8 @@ impl Ui2 {
 
 pub fn get_job_draw_container(
     assets: &Assets,
-    job_id: usize,
     job: &Job,
+    job_id: usize,
     offset: Vec2,
     card_height: f64,
     card_padding: f32,
