@@ -107,12 +107,31 @@ impl Ui2 {
     pub fn run(&mut self, state: &GameState, assets: &Assets) -> Vec<Intent> {
         let mut intents = vec![];
 
+        let top_bar_draw_commands = vec![
+            DrawCommand::Rectangle {
+                x: self.global_offset.x + 50.0,
+                y: self.global_offset.y + 50.0,
+                width: screen_width() as f64,
+                height: 50.0,
+                color: DARKGRAY,
+            },
+            DrawCommand::Text {
+                content: "Tiny Fields".to_string(),
+                x: self.global_offset.x + 50.0 + 10.0,
+                y: self.global_offset.y + 50.0 + 10.0,
+                font_size: 30.0,
+                color: WHITE,
+            },
+        ];
+
         let job_draw_containers: Vec<JobDrawContainer> = self.get_job_draw_containers(state, assets);
 
         for container in &job_draw_containers {
             draw_multiple(&container.draw_commands); // side effects: draw to scene
             intents.extend(container.get_intents())  // collect inputs based on screen state
         }
+
+        draw_multiple(&top_bar_draw_commands); // side effects: draw to scene
 
         intents
     }
@@ -121,7 +140,7 @@ impl Ui2 {
     {
         let mut job_draw_containers = vec![];
 
-        let mut job_offset = Vec2::new(50.0, 50.0);
+        let mut job_offset = Vec2::new(50.0, 150.0);
         let card_height = 170.0;
         let card_spacing = 10.0;
         let card_padding = 26.0;
