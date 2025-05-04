@@ -33,12 +33,6 @@ pub enum UiElement {
     Image { x: f32, y: f32, width: f64, height: f64, texture: Texture2D },
 }
 
-pub fn draw_multiple(commands: &[UiElement]) -> () {
-    for command in commands {
-        draw(command);
-    }
-}
-
 pub fn draw(command: &UiElement) {
     match command {
         UiElement::Text { content, x, y, font_size, color } => {

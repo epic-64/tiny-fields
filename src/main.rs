@@ -1,11 +1,12 @@
 use macroquad::prelude::*;
 use std::time::Instant;
 use macroquad::math::{f32, f64};
+use game::{Fonts, Textures};
 
 mod draw;
 pub mod game;
 
-use crate::draw::{draw, draw_multiple, UiElement};
+use crate::draw::{draw, UiElement};
 use crate::game::{Assets, GameState, Intent, Job, UiRect};
 
 #[macroquad::main("Tiny Fields")]
@@ -17,16 +18,9 @@ async fn main() {
     let wood_1: Texture2D = load_texture("ChopChop_1.png").await.expect("Couldn't load file");
     let wood_2: Texture2D = load_texture("ChopChop_2.png").await.expect("Couldn't load file");
 
-    let textures = game::Textures {
-        wood_1,
-        wood_2
-    };
-
-    let fonts = game::Fonts {
-        main: main_font,
-    };
-
-    let assets = Assets { fonts, textures };
+    let textures = Textures { wood_1, wood_2 };
+    let fonts    = Fonts { main: main_font };
+    let assets   = Assets { fonts, textures };
 
     let mut state = GameState::new(assets);
 
@@ -39,10 +33,19 @@ async fn main() {
         let frame_start = Instant::now();
         let dt = get_frame_time();
 
+        // The UI can be moved around.
         ui.update_offset();
 
+        // Build all the UI elements from the current game state
+        let ui_elements = ui.get_ui_elements(&state);
+
+        // Draw all the elements. Since we build them from the old
+        // game state, this should happen before state.step()
         clear_background(ORANGE);
-        let intents = ui.run(&state);
+        ui_elements.iter().for_each(draw);
+
+        // Collect all intentions from the UI
+        let intents = get_intents(ui_elements);
 
         // Update game state
         state.step(&intents, dt);
@@ -53,10 +56,6 @@ async fn main() {
 
         next_frame().await;
     }
-}
-
-pub struct JobDrawContainer {
-    draw_commands: Vec<UiElement>,
 }
 
 struct Ui2 {
@@ -89,8 +88,8 @@ impl Ui2 {
 }
 
 impl Ui2 {
-    pub fn run(&mut self, state: &GameState) -> Vec<Intent> {
-        let mut intents = vec![];
+    pub fn get_ui_elements(&mut self, state: &GameState) -> Vec<UiElement> {
+        let mut elements: Vec<UiElement> = vec![];
 
         let top_bar_draw_commands = vec![
             UiElement::Rectangle {
@@ -109,19 +108,13 @@ impl Ui2 {
             },
         ];
 
-        let job_ui_elements: Vec<UiElement> = self.get_job_draw_containers(state);
+        elements.extend(top_bar_draw_commands);
+        elements.extend(self.get_job_ui_elements(state));
 
-        for element in &job_ui_elements {
-            draw(&element); // side effects: draw to scene
-        }
-
-        draw_multiple(&top_bar_draw_commands); // side effects: draw to scene
-        intents.extend(get_intents(job_ui_elements.clone()));  // collect inputs based on screen state
-
-        intents
+        elements
     }
 
-    fn get_job_draw_containers(&self, state: &GameState) -> Vec<UiElement>
+    fn get_job_ui_elements(&self, state: &GameState) -> Vec<UiElement>
     {
         let mut job_draw_containers: Vec<UiElement> = vec![];
 
