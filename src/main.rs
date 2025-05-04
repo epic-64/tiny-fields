@@ -5,7 +5,7 @@ use macroquad::math::{f32, f64};
 mod draw;
 pub mod game;
 
-use crate::draw::{draw_multiple, DrawCommand};
+use crate::draw::{draw, draw_multiple, UiElement};
 use crate::game::{Assets, GameState, Intent, Job, UiRect};
 
 #[macroquad::main("Tiny Fields")]
@@ -17,15 +17,18 @@ async fn main() {
     let wood_1: Texture2D = load_texture("ChopChop_1.png").await.expect("Couldn't load file");
     let wood_2: Texture2D = load_texture("ChopChop_2.png").await.expect("Couldn't load file");
 
-    let assets = Assets {
-        fonts: game::Fonts {
-            main: main_font,
-        },
+    let textures = game::Textures {
         wood_1,
-        wood_2,
+        wood_2
     };
 
-    let mut state = GameState::new();
+    let fonts = game::Fonts {
+        main: main_font,
+    };
+
+    let assets = Assets { fonts, textures };
+
+    let mut state = GameState::new(assets);
 
     let mut ui = Ui2 {
         last_mouse_position: Vec2::new(0.0, 0.0),
@@ -39,7 +42,7 @@ async fn main() {
         ui.update_offset();
 
         clear_background(ORANGE);
-        let intents = ui.run(&state, &assets);
+        let intents = ui.run(&state);
 
         // Update game state
         state.step(&intents, dt);
@@ -53,29 +56,7 @@ async fn main() {
 }
 
 pub struct JobDrawContainer {
-    job: usize,
-    draw_commands: Vec<DrawCommand>,
-}
-
-impl JobDrawContainer {
-    pub fn get_intents(&self) -> Vec<Intent> {
-        let mut intents = vec![];
-
-        for command in &self.draw_commands {
-            match command {
-                DrawCommand::Button { x, y, width, height, .. } => {
-                    let rectangle = UiRect { x: *x, y: *y, width: *width, height: *height };
-
-                    if rectangle.is_clicked() {
-                        intents.push(Intent::ToggleJob(self.job));
-                    }
-                }
-                _ => {}
-            }
-        }
-
-        intents
-    }
+    draw_commands: Vec<UiElement>,
 }
 
 struct Ui2 {
@@ -108,18 +89,18 @@ impl Ui2 {
 }
 
 impl Ui2 {
-    pub fn run(&mut self, state: &GameState, assets: &Assets) -> Vec<Intent> {
+    pub fn run(&mut self, state: &GameState) -> Vec<Intent> {
         let mut intents = vec![];
 
         let top_bar_draw_commands = vec![
-            DrawCommand::Rectangle {
+            UiElement::Rectangle {
                 x: self.global_offset.x + 50.0,
                 y: self.global_offset.y + 50.0,
                 width: screen_width() as f64,
                 height: 50.0,
                 color: DARKGRAY,
             },
-            DrawCommand::Text {
+            UiElement::Text {
                 content: "Tiny Fields".to_string(),
                 x: self.global_offset.x + 50.0 + 10.0,
                 y: self.global_offset.y + 50.0 + 10.0,
@@ -128,21 +109,21 @@ impl Ui2 {
             },
         ];
 
-        let job_draw_containers: Vec<JobDrawContainer> = self.get_job_draw_containers(state, assets);
+        let job_ui_elements: Vec<UiElement> = self.get_job_draw_containers(state);
 
-        for container in &job_draw_containers {
-            draw_multiple(&container.draw_commands); // side effects: draw to scene
-            intents.extend(container.get_intents())  // collect inputs based on screen state
+        for element in &job_ui_elements {
+            draw(&element); // side effects: draw to scene
         }
 
         draw_multiple(&top_bar_draw_commands); // side effects: draw to scene
+        intents.extend(get_intents(job_ui_elements.clone()));  // collect inputs based on screen state
 
         intents
     }
 
-    fn get_job_draw_containers(&self, state: &GameState, assets: &Assets) -> Vec<JobDrawContainer>
+    fn get_job_draw_containers(&self, state: &GameState) -> Vec<UiElement>
     {
-        let mut job_draw_containers = vec![];
+        let mut job_draw_containers: Vec<UiElement> = vec![];
 
         let mut job_offset = Vec2::new(50.0, 150.0);
         let card_height = 170.0;
@@ -150,8 +131,8 @@ impl Ui2 {
         let card_padding = 26.0;
 
         for (id, job) in state.jobs.iter().enumerate() {
-            let job_draw_container = get_job_draw_container(
-                assets,
+            let job_draw_container = get_job_ui_elements(
+                &state.assets,
                 job,
                 id,
                 self.global_offset + job_offset,
@@ -159,7 +140,8 @@ impl Ui2 {
                 card_padding,
                 card_spacing,
             );
-            job_draw_containers.push(job_draw_container);
+
+            job_draw_containers.extend(job_draw_container);
 
             job_offset += Vec2::new(0.0, card_height as f32 + 15.0);
         }
@@ -168,7 +150,7 @@ impl Ui2 {
     }
 }
 
-pub fn get_job_draw_container(
+pub fn get_job_ui_elements(
     assets: &Assets,
     job: &Job,
     job_id: usize,
@@ -176,7 +158,7 @@ pub fn get_job_draw_container(
     card_height: f64,
     card_padding: f32,
     card_spacing: f32,
-) -> JobDrawContainer
+) -> Vec<UiElement>
 {
     let color_card = Color::from_rgba(50, 50, 50, 255);
     let color_primary = WHITE;
@@ -194,14 +176,14 @@ pub fn get_job_draw_container(
     let button_width = 80.0;
 
     let chosen_image = if job.running && job.time_accumulator % 2.0 < 1.0 {
-        &assets.wood_2
+        &assets.textures.wood_2
     } else {
-        &assets.wood_1
+        &assets.textures.wood_1
     };
 
-    let commands = vec![
+    let elements = vec![
         // Background
-        DrawCommand::Rectangle {
+        UiElement::Rectangle {
             x: offset.x,
             y: offset.y,
             width: card_width as f64,
@@ -210,7 +192,7 @@ pub fn get_job_draw_container(
         },
 
         // Job Animation
-        DrawCommand::Image {
+        UiElement::Image {
             x: offset.x + card_padding,
             y: offset.y,
             width: image_width as f64,
@@ -219,7 +201,7 @@ pub fn get_job_draw_container(
         },
 
         // Title Bar
-        DrawCommand::Text {
+        UiElement::Text {
             content: job.name.clone() + " ",
             x: inner_x,
             y: offset.y + card_padding + 15.0,
@@ -228,7 +210,7 @@ pub fn get_job_draw_container(
         },
 
         // Job Info
-        DrawCommand::Text {
+        UiElement::Text {
             content: format!("Lvl {} | ${} | {}s | {} Slots", job.level, job.money_per_action(), job.action_duration, job.timeslot_cost),
             x: inner_x,
             y: offset.y + 72.0,
@@ -237,7 +219,7 @@ pub fn get_job_draw_container(
         },
 
         // Action Progress Bar
-        DrawCommand::ProgressBar {
+        UiElement::ProgressBar {
             x: inner_x,
             y: offset.y + 96.0,
             width: progress_bar_width,
@@ -248,7 +230,7 @@ pub fn get_job_draw_container(
         },
 
         // Action Progress Text
-        DrawCommand::Text {
+        UiElement::Text {
             content: format!("{:.1} / {:.1}", job.time_accumulator, job.action_duration),
             x: inner_x + 10.0,
             y: offset.y + 111.0,
@@ -257,7 +239,7 @@ pub fn get_job_draw_container(
         },
 
         // Level Up Progress Bar
-        DrawCommand::ProgressBar {
+        UiElement::ProgressBar {
             x: inner_x,
             y: offset.y + 126.0,
             width: progress_bar_width,
@@ -268,7 +250,7 @@ pub fn get_job_draw_container(
         },
 
         // Level Up Progress Text
-        DrawCommand::Text {
+        UiElement::Text {
             content: format!("Level Up: {} / {}", job.actions_done, job.actions_to_level_up()),
             x: inner_x + 10.0,
             y: offset.y + 141.0,
@@ -277,17 +259,37 @@ pub fn get_job_draw_container(
         },
 
         // Start / Stop Button
-        DrawCommand::Button {
-            x: offset.x + card_width - button_width - card_padding,
-            y: offset.y + card_padding,
-            width: button_width,
+        UiElement::Button {
+            rectangle: UiRect {
+                x: offset.x + card_width - button_width - card_padding,
+                y: offset.y + card_padding,
+                width: button_width,
+                height: 46.0,
+            },
             font_size: font_size_large,
-            height: 46.0,
             text: if job.running { "Stop".to_string() } else { "Start".to_string() },
             color: color_button,
             hover_color: color_button_hover,
+            intent: Intent::ToggleJob(job_id),
         }
     ];
 
-    JobDrawContainer { job: job_id, draw_commands: commands }
+    elements
+}
+
+pub fn get_intents(elements: Vec<UiElement>) -> Vec<Intent> {
+    let mut intents: Vec<Intent> = vec![];
+
+    for element in elements {
+        match element {
+            UiElement::Button { rectangle, intent, .. } => {
+                if rectangle.is_clicked() {
+                    intents.push(intent);
+                }
+            }
+            _ => {}
+        }
+    }
+
+    intents
 }

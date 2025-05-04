@@ -2,14 +2,18 @@ use macroquad::input::{is_mouse_button_pressed, mouse_position, MouseButton};
 use macroquad::prelude::Texture2D;
 use macroquad::text::Font;
 
+pub struct Textures {
+    pub wood_1: Texture2D,
+    pub wood_2: Texture2D,
+}
+
 pub struct Fonts {
     pub main: Font
 }
 
 pub struct Assets {
     pub fonts: Fonts,
-    pub wood_1: Texture2D,
-    pub wood_2: Texture2D,
+    pub textures: Textures,
 }
 
 pub struct PerformanceFlags {
@@ -82,11 +86,13 @@ pub struct GameState {
     pub time_slots: TimeSlots,
     pub performance_flags: PerformanceFlags,
     pub game_meta: GameMeta,
+    pub assets: Assets,
 }
 
 impl GameState {
-    pub fn new() -> Self {
+    pub fn new(assets: Assets) -> Self {
         Self {
+            assets,
             jobs: define_jobs(),
             total_money: 0,
             time_slots: TimeSlots { total: 6, used: 0, },
@@ -130,6 +136,7 @@ fn get_used_timeslots(jobs: &[Job]) -> i32 {
     jobs.iter().filter(|j| j.running).map(|j| j.timeslot_cost).sum()
 }
 
+#[derive(Clone)]
 pub enum Intent {
     ToggleJob(usize),
 }
