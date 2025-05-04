@@ -1,7 +1,13 @@
 use macroquad::input::{is_mouse_button_pressed, mouse_position, MouseButton};
 use macroquad::prelude::Texture2D;
+use macroquad::text::Font;
+
+pub struct Fonts {
+    pub main: Font
+}
 
 pub struct Assets {
+    pub fonts: Fonts,
     pub wood_1: Texture2D,
     pub wood_2: Texture2D,
 }

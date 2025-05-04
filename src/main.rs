@@ -13,10 +13,14 @@ async fn main() {
     set_pc_assets_folder("assets");
     request_new_screen_size(1600.0, 900.0);
 
+    let main_font = load_ttf_font("Menlo-Regular.ttf").await.expect("Couldn't load font");
     let wood_1: Texture2D = load_texture("ChopChop_1.png").await.expect("Couldn't load file");
     let wood_2: Texture2D = load_texture("ChopChop_2.png").await.expect("Couldn't load file");
 
     let assets = Assets {
+        fonts: game::Fonts {
+            main: main_font,
+        },
         wood_1,
         wood_2,
     };
@@ -190,9 +194,9 @@ pub fn get_job_draw_container(
     let button_width = 80.0;
 
     let chosen_image = if job.running && job.time_accumulator % 2.0 < 1.0 {
-        assets.wood_2.clone()
+        &assets.wood_2
     } else {
-        assets.wood_1.clone()
+        &assets.wood_1
     };
 
     let commands = vec![
@@ -211,7 +215,7 @@ pub fn get_job_draw_container(
             y: offset.y,
             width: image_width as f64,
             height: card_height,
-            texture: chosen_image,
+            texture: chosen_image.clone(),
         },
 
         // Title Bar

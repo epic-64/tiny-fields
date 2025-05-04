@@ -2,6 +2,7 @@ use crate::game::UiRect;
 use macroquad::color::{Color, WHITE};
 use macroquad::math::Vec2;
 use macroquad::prelude::{draw_rectangle, draw_text, draw_texture_ex, measure_text, DrawTextureParams, Texture2D};
+use macroquad::text::draw_text_ex;
 
 pub enum DrawCommand {
     Text {
