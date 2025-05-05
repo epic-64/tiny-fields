@@ -25,9 +25,10 @@ async fn main() {
     let fonts = Fonts { main: Some(main_font) };
 
     let assets = Assets { fonts, textures };
-    let mut state = GameState::new(assets);
+    let mut state = GameState::new();
 
     let mut ui = Ui2 {
+        assets: &assets,
         last_mouse_position: Vec2::new(0.0, 0.0),
         global_offset: Vec2::new(0.0, 0.0),
     };
@@ -62,12 +63,13 @@ async fn main() {
     }
 }
 
-struct Ui2 {
+struct Ui2<'a> {
+    assets: &'a Assets,
     last_mouse_position: Vec2,
     global_offset: Vec2,
 }
 
-impl Ui2 {
+impl Ui2<'_> {
     pub fn update_offset(&mut self) {
         let mouse_wheel_delta = mouse_wheel().1; // Get the vertical scroll delta
         if mouse_wheel_delta.abs() > 0.0 {
@@ -101,7 +103,7 @@ impl Ui2 {
     }
 }
 
-impl Ui2 {
+impl Ui2<'_> {
     pub fn get_ui_elements(&mut self, state: &GameState) -> Vec<UiElement> {
         let mut elements: Vec<UiElement> = vec![];
 
@@ -110,7 +112,7 @@ impl Ui2 {
             y: 0., // fixed
             width: screen_width() as f64,
             height: screen_height() as f64,
-            texture: state.assets.textures.hut1.clone(),
+            texture: self.assets.textures.hut1.clone(),
             color: WHITE,
         };
 
@@ -162,7 +164,7 @@ impl Ui2 {
         for (id, job) in state.jobs.iter().enumerate() {
             let job_draw_container = get_job_elements(
                 &container_clip,
-                &state.assets,
+                &self.assets,
                 job,
                 id,
                 self.global_offset + container_offset,

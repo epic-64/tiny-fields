@@ -89,13 +89,11 @@ pub struct GameState {
     pub time_slots: TimeSlots,
     pub performance_flags: PerformanceFlags,
     pub game_meta: GameMeta,
-    pub assets: Assets,
 }
 
 impl GameState {
-    pub fn new(assets: Assets) -> Self {
+    pub fn new() -> Self {
         Self {
-            assets,
             jobs: define_jobs(),
             total_money: 0,
             time_slots: TimeSlots { total: 6, used: 0, },
