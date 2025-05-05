@@ -35,7 +35,7 @@ pub enum UiElement {
 }
 
 pub fn draw(command: &UiElement) {
-    let mut gl: &mut QuadGl = unsafe { get_internal_gl().quad_gl };
+    let gl: &mut QuadGl = unsafe { get_internal_gl() }.quad_gl ;
 
     match command {
         UiElement::Text { content, x, y, font_size, color } => {

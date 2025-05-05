@@ -69,6 +69,16 @@ struct Ui2 {
 
 impl Ui2 {
     pub fn update_offset(&mut self) {
+        let mouse_wheel_delta = mouse_wheel().1; // Get the vertical scroll delta
+        if mouse_wheel_delta.abs() > 0.0 {
+            let new_offset = {self.global_offset + Vec2::new(0.0, mouse_wheel_delta * 30.0)}.clamp(
+                Vec2::new(-200.0, -600.0),
+                Vec2::new(1000.0, 600.0),
+            );
+
+            self.global_offset = new_offset;
+        }
+
         if is_mouse_button_pressed(MouseButton::Right) {
             self.last_mouse_position = Vec2::from(mouse_position());
         }
@@ -123,16 +133,17 @@ impl Ui2 {
 
         elements.push(background_image);
         elements.extend(top_bar_draw_commands);
-        elements.extend(self.get_all_job_elements(state));
+        elements.extend(self.get_all_job_elements(state, Vec2::new(50.0, 100.0)));
+        elements.extend(self.get_all_job_elements(state, Vec2::new(650.0, 100.0)));
 
         elements
     }
 
-    fn get_all_job_elements(&self, state: &GameState) -> Vec<UiElement>
+    fn get_all_job_elements(&self, state: &GameState, relative_offset: Vec2) -> Vec<UiElement>
     {
         let mut elements: Vec<UiElement> = vec![];
 
-        let mut container_offset = Vec2::new(50.0, 150.0);
+        let mut container_offset = relative_offset;
         let card_height = 180.0;
         let card_width = 550.0;
         let card_spacing = 15.0;
