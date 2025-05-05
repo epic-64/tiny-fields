@@ -318,6 +318,8 @@ pub fn get_intents(elements: Vec<UiElement>) -> Vec<Intent> {
     for element in elements {
         match element {
             UiElement::Button { rectangle, intent, scissor, .. } => {
+                // First, check if the hovered position is within the clipping area.
+                // (if there is no clipping area, we skip this check)
                 if let Some(area) = scissor {
                     let (x, y, width, height) = area;
                     let scissor_rect = UiRect {
@@ -328,7 +330,7 @@ pub fn get_intents(elements: Vec<UiElement>) -> Vec<Intent> {
                     };
 
                     if !scissor_rect.is_hovered() {
-                        continue;
+                        continue; // if mouse is outside the clipping area, skip intents
                     }
                 }
 
