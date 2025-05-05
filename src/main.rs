@@ -20,7 +20,13 @@ async fn main() {
     let mut ui = Ui2 {
         assets: &assets,
         last_mouse_position: Vec2::new(0.0, 0.0),
-        global_offset: Vec2::new(0.0, 0.0),
+        offset: Vec2::new(0.0, 0.0),
+    };
+
+    let mut job_ui = Ui2 {
+        assets: &assets,
+        last_mouse_position: Vec2::new(0.0, 0.0),
+        offset: Vec2::new(0.0, 0.0),
     };
 
     loop {
@@ -70,7 +76,7 @@ async fn load_assets() -> Assets {
 struct Ui2<'a> {
     assets: &'a Assets,
     last_mouse_position: Vec2,
-    global_offset: Vec2,
+    offset: Vec2,
 }
 
 impl Ui2<'_> {
@@ -78,12 +84,12 @@ impl Ui2<'_> {
         let mouse_wheel_delta = clamp(mouse_wheel().1, -1.0, 1.0);
 
         if mouse_wheel_delta.abs() > 0.0 {
-            let new_offset = {self.global_offset + Vec2::new(0.0, mouse_wheel_delta * 40.0)}.clamp(
+            let new_offset = {self.offset + Vec2::new(0.0, mouse_wheel_delta * 40.0)}.clamp(
                 Vec2::new(-200.0, -600.0),
                 Vec2::new(1000.0, 600.0),
             );
 
-            self.global_offset = new_offset;
+            self.offset = new_offset;
         }
 
         if is_mouse_button_pressed(MouseButton::Right) {
@@ -95,12 +101,12 @@ impl Ui2<'_> {
             let delta = current_mouse_pos - self.last_mouse_position;
 
             if delta.length_squared() > 0.0 {
-                let new_offset = {self.global_offset + delta}.clamp(
+                let new_offset = {self.offset + delta}.clamp(
                     Vec2::new(-200.0, -600.0),
                     Vec2::new(1000.0, 600.0),
                 );
 
-                self.global_offset = new_offset;
+                self.offset = new_offset;
             }
 
             self.last_mouse_position = current_mouse_pos;
@@ -172,7 +178,7 @@ impl Ui2<'_> {
                 &self.assets,
                 job,
                 id,
-                self.global_offset + container_offset,
+                self.offset + container_offset,
                 card_height,
                 card_padding_x,
                 card_padding_y,
