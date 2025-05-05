@@ -15,10 +15,9 @@ fn it_works() {
 fn toggle_job() {
     let mut game_state = GameState::new();
 
-    let intents = vec![ToggleJob(0)];
-
     assert_eq!(game_state.jobs[0].running, false);
 
+    let intents = vec![ToggleJob(0)];
     game_state.step(intents.as_slice(), 0.016);
 
     assert_eq!(game_state.jobs[0].running, true);
