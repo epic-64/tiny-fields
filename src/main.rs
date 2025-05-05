@@ -75,9 +75,10 @@ struct Ui2<'a> {
 
 impl Ui2<'_> {
     pub fn update_offset(&mut self) {
-        let mouse_wheel_delta = mouse_wheel().1; // Get the vertical scroll delta
+        let mouse_wheel_delta = clamp(mouse_wheel().1, -1.0, 1.0);
+
         if mouse_wheel_delta.abs() > 0.0 {
-            let new_offset = {self.global_offset + Vec2::new(0.0, mouse_wheel_delta * 30.0)}.clamp(
+            let new_offset = {self.global_offset + Vec2::new(0.0, mouse_wheel_delta * 40.0)}.clamp(
                 Vec2::new(-200.0, -600.0),
                 Vec2::new(1000.0, 600.0),
             );
