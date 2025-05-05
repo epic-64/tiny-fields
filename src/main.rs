@@ -122,16 +122,16 @@ impl Ui2<'_> {
 
         let top_bar_draw_commands = vec![
             UiElement::Rectangle {
-                x: 50.0, // fixed
-                y: 50.0, // fixed
+                x: 0.0, // fixed
+                y: 0.0, // fixed
                 width: screen_width() as f64,
-                height: 50.0,
+                height: 100.0,
                 color: DARKGRAY,
             },
             UiElement::Text {
                 content: "Tiny Fields".to_string(),
-                x: self.global_offset.x + 50.0 + 10.0,
-                y: self.global_offset.y + 50.0 + 10.0,
+                x: 50.0 + 10.0,
+                y: 50.0 + 10.0,
                 font_size: 30.0,
                 color: WHITE,
             },
