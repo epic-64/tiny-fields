@@ -45,6 +45,7 @@ async fn main() {
         // Draw all the elements. Since we build them from the old
         // game state, this should happen before state.step()
         clear_background(ORANGE);
+
         ui_elements.iter().for_each(draw);
 
         // Collect all intentions from the UI
@@ -133,9 +134,19 @@ impl Ui2 {
 
         let mut job_offset = Vec2::new(50.0, 150.0);
         let card_height = 180.0;
+        let card_width = 550.0;
         let card_spacing = 15.0;
         let card_padding_x = 55.0;
         let card_padding_y = 40.0;
+
+        job_draw_containers.push(UiElement::Scissor {
+            clip: Some((
+                job_offset.x as i32,
+                job_offset.y as i32,
+                card_width as i32,
+                card_height as i32 * 4 + 15 * 3,
+            )),
+        });
 
         for (id, job) in state.jobs.iter().enumerate() {
             let job_draw_container = get_job_elements(

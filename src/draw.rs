@@ -1,7 +1,7 @@
 use crate::game::{Intent, UiRect};
 use macroquad::color::{Color, WHITE};
 use macroquad::math::Vec2;
-use macroquad::prelude::{draw_rectangle, draw_text, draw_texture_ex, measure_text, DrawTextureParams, Texture2D};
+use macroquad::prelude::{draw_rectangle, draw_text, draw_texture_ex, get_internal_gl, measure_text, DrawTextureParams, QuadGl, Texture2D};
 
 #[derive(Clone)]
 pub enum UiElement {
@@ -31,9 +31,12 @@ pub enum UiElement {
     },
     Rectangle { x: f32, y: f32, width: f64, height: f64, color: Color },
     Image { x: f32, y: f32, width: f64, height: f64, texture: Texture2D, color: Color },
+    Scissor { clip: Option<(i32, i32, i32, i32)> },
 }
 
 pub fn draw(command: &UiElement) {
+    let mut gl: &mut QuadGl = unsafe { get_internal_gl().quad_gl };
+
     match command {
         UiElement::Text { content, x, y, font_size, color } => {
             draw_text(content, *x, *y, *font_size, *color);
@@ -61,6 +64,9 @@ pub fn draw(command: &UiElement) {
             let text_y = r.y + (r.height - text_measure.height) / 2.0 + font_size / 2.0;
 
             draw_text(text, text_x, text_y, *font_size, WHITE);
+        }
+        UiElement::Scissor { clip } => {
+            gl.scissor(*clip)
         }
     }
 }
