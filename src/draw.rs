@@ -18,7 +18,8 @@ pub enum UiElement {
         text: String,
         color: Color,
         hover_color: Color,
-        intent: Intent
+        intent: Intent,
+        scissor: Option<(i32, i32, i32, i32)>,
     },
     ProgressBar {
         x: f32,

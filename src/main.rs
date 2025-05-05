@@ -300,6 +300,7 @@ pub fn get_job_elements(
                 width: button_width,
                 height: 46.0,
             },
+            scissor: None, // todo: add scissor from parent container
             font_size: font_size_large,
             text: if job.running { "Stop".to_string() } else { "Start".to_string() },
             color: color_button,
