@@ -317,7 +317,21 @@ pub fn get_intents(elements: Vec<UiElement>) -> Vec<Intent> {
 
     for element in elements {
         match element {
-            UiElement::Button { rectangle, intent, .. } => {
+            UiElement::Button { rectangle, intent, scissor, .. } => {
+                if let Some(area) = scissor {
+                    let (x, y, width, height) = area;
+                    let scissor_rect = UiRect {
+                        x: x as f32,
+                        y: y as f32,
+                        width: width as f32,
+                        height: height as f32,
+                    };
+
+                    if !scissor_rect.is_hovered() {
+                        continue;
+                    }
+                }
+
                 if rectangle.is_clicked() {
                     intents.push(intent);
                 }
