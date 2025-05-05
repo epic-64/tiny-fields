@@ -22,7 +22,7 @@ async fn main() {
     let textures = Textures { hut1, hut2, wood_1, wood_2, frame1 };
 
     let main_font = load_ttf_font("Menlo-Regular.ttf").await.expect("Couldn't load font");
-    let fonts = Fonts { main: main_font };
+    let fonts = Fonts { main: Some(main_font) };
 
     let assets = Assets { fonts, textures };
     let mut state = GameState::new(assets);

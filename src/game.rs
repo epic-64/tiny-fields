@@ -11,7 +11,7 @@ pub struct Textures {
 }
 
 pub struct Fonts {
-    pub main: Font
+    pub main: Option<Font>
 }
 
 pub struct Assets {
