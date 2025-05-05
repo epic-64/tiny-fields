@@ -130,19 +130,19 @@ impl Ui2 {
 
     fn get_all_job_elements(&self, state: &GameState) -> Vec<UiElement>
     {
-        let mut job_draw_containers: Vec<UiElement> = vec![];
+        let mut elements: Vec<UiElement> = vec![];
 
-        let mut job_offset = Vec2::new(50.0, 150.0);
+        let mut container_offset = Vec2::new(50.0, 150.0);
         let card_height = 180.0;
         let card_width = 550.0;
         let card_spacing = 15.0;
         let card_padding_x = 55.0;
         let card_padding_y = 40.0;
 
-        job_draw_containers.push(UiElement::Scissor {
+        elements.push(UiElement::Scissor {
             clip: Some((
-                job_offset.x as i32,
-                job_offset.y as i32,
+                container_offset.x as i32,
+                container_offset.y as i32,
                 card_width as i32,
                 card_height as i32 * 4 + 15 * 3,
             )),
@@ -153,19 +153,21 @@ impl Ui2 {
                 &state.assets,
                 job,
                 id,
-                self.global_offset + job_offset,
+                self.global_offset + container_offset,
                 card_height,
                 card_padding_x,
                 card_padding_y,
                 card_spacing,
             );
 
-            job_draw_containers.extend(job_draw_container);
+            elements.extend(job_draw_container);
 
-            job_offset += Vec2::new(0.0, card_height as f32 + 15.0);
+            container_offset += Vec2::new(0.0, card_height as f32 + 15.0);
         }
 
-        job_draw_containers
+        elements.push(UiElement::Scissor { clip: None });
+
+        elements
     }
 }
 
