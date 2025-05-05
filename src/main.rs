@@ -14,17 +14,8 @@ async fn main() {
     set_pc_assets_folder("assets");
     request_new_screen_size(1600.0, 900.0);
 
-    let hut1: Texture2D = load_texture("hut1.png").await.expect("Couldn't load file");
-    let hut2: Texture2D = load_texture("hut2.png").await.expect("Couldn't load file");
-    let wood_1: Texture2D = load_texture("ChopChop_1_.png").await.expect("Couldn't load file");
-    let wood_2: Texture2D = load_texture("ChopChop_2_.png").await.expect("Couldn't load file");
-    let frame1: Texture2D = load_texture("frame2.png").await.expect("Couldn't load file");
-    let textures = Textures { hut1, hut2, wood_1, wood_2, frame1 };
+    let assets: Assets = load_assets().await;
 
-    let main_font = load_ttf_font("Menlo-Regular.ttf").await.expect("Couldn't load font");
-    let fonts = Fonts { main: Some(main_font) };
-
-    let assets = Assets { fonts, textures };
     let mut state = GameState::new();
 
     let mut ui = Ui2 {
@@ -61,6 +52,20 @@ async fn main() {
 
         next_frame().await;
     }
+}
+
+async fn load_assets() -> Assets {
+    let hut1: Texture2D = load_texture("hut1.png").await.expect("Couldn't load file");
+    let hut2: Texture2D = load_texture("hut2.png").await.expect("Couldn't load file");
+    let wood_1: Texture2D = load_texture("ChopChop_1_.png").await.expect("Couldn't load file");
+    let wood_2: Texture2D = load_texture("ChopChop_2_.png").await.expect("Couldn't load file");
+    let frame1: Texture2D = load_texture("frame2.png").await.expect("Couldn't load file");
+    let textures = Textures { hut1, hut2, wood_1, wood_2, frame1 };
+
+    let main_font = load_ttf_font("Menlo-Regular.ttf").await.expect("Couldn't load font");
+    let fonts = Fonts { main: Some(main_font) };
+
+    Assets { fonts, textures }
 }
 
 struct Ui2<'a> {
