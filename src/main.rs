@@ -1,7 +1,7 @@
+use game::{Fonts, Textures};
+use macroquad::math::{f32, f64};
 use macroquad::prelude::*;
 use std::time::Instant;
-use macroquad::math::{f32, f64};
-use game::{Fonts, Textures};
 
 mod draw;
 pub mod game;
@@ -14,9 +14,8 @@ async fn main() {
     set_pc_assets_folder("assets");
     request_new_screen_size(1600.0, 900.0);
 
-    let assets: Assets = load_assets().await;
-
     let mut state = GameState::new();
+    let assets: Assets = load_assets().await;
 
     let mut ui = Ui2 {
         assets: &assets,
