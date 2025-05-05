@@ -150,17 +150,18 @@ impl Ui2 {
         let card_padding_x = 55.0;
         let card_padding_y = 40.0;
 
-        elements.push(UiElement::Scissor {
-            clip: Some((
-                container_offset.x as i32,
-                container_offset.y as i32,
-                card_width as i32,
-                card_height as i32 * 4 + 15 * 3,
-            )),
-        });
+        let container_clip = Some((
+            container_offset.x as i32,
+            container_offset.y as i32,
+            card_width as i32,
+            card_height as i32 * 4 + 15 * 3,
+        ));
+
+        elements.push(UiElement::Scissor { clip: container_clip });
 
         for (id, job) in state.jobs.iter().enumerate() {
             let job_draw_container = get_job_elements(
+                &container_clip,
                 &state.assets,
                 job,
                 id,
@@ -183,6 +184,7 @@ impl Ui2 {
 }
 
 pub fn get_job_elements(
+    clip: &Option<(i32, i32, i32, i32)>,
     assets: &Assets,
     job: &Job,
     job_id: usize,
@@ -300,7 +302,7 @@ pub fn get_job_elements(
                 width: button_width,
                 height: 46.0,
             },
-            scissor: None, // todo: add scissor from parent container
+            parent_clip: clip.clone(),
             font_size: font_size_large,
             text: if job.running { "Stop".to_string() } else { "Start".to_string() },
             color: color_button,
@@ -317,7 +319,7 @@ pub fn get_intents(elements: Vec<UiElement>) -> Vec<Intent> {
 
     for element in elements {
         match element {
-            UiElement::Button { rectangle, intent, scissor, .. } => {
+            UiElement::Button { rectangle, intent, parent_clip: scissor, .. } => {
                 // First, check if the hovered position is within the clipping area.
                 // (if there is no clipping area, we skip this check)
                 if let Some(area) = scissor {

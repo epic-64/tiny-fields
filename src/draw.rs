@@ -19,7 +19,7 @@ pub enum UiElement {
         color: Color,
         hover_color: Color,
         intent: Intent,
-        scissor: Option<(i32, i32, i32, i32)>,
+        parent_clip: Option<(i32, i32, i32, i32)>,
     },
     ProgressBar {
         x: f32,
@@ -56,8 +56,25 @@ pub fn draw(command: &UiElement) {
             };
             draw_texture_ex(texture, *x, *y, *color, params);
         }
-        UiElement::Button { rectangle: r, font_size, text, color, hover_color, .. } => {
-            let current_color = if r.is_hovered() { *hover_color } else { *color };
+        UiElement::Button { rectangle: r, font_size, text, color, hover_color, parent_clip, .. } => {
+            let clip_is_hovered = if let Some(clip) = parent_clip {
+                let (x, y, w, h) = clip;
+                UiRect {
+                    x: *x as f32,
+                    y: *y as f32,
+                    width: *w as f32,
+                    height: *h as f32
+                }.is_hovered()
+            } else {
+                true
+            };
+
+            let current_color = if r.is_hovered() && clip_is_hovered {
+                *hover_color
+            } else {
+                *color
+            };
+
             draw_rectangle(r.x, r.y, r.width, r.height, current_color);
 
             let text_measure = measure_text(text, None, *font_size as u16, 1.);
