@@ -117,22 +117,22 @@ impl Ui2<'_> {
     }
 }
 
-fn get_all_job_elements(state: &GameState, assets: &Assets, offset: Vec2) -> Vec<UiElement>
+fn get_all_job_elements(state: &GameState, assets: &Assets, clip_rect: &UiRect, offset: Vec2) -> Vec<UiElement>
 {
     let mut elements: Vec<UiElement> = vec![];
 
     let mut container_offset = offset;
     let card_height = 180.0;
-    let card_width = 550.0;
+    let card_width = clip_rect.w;
     let card_spacing = 15.0;
     let card_padding_x = 55.0;
     let card_padding_y = 40.0;
 
     let container_clip = Some((
-        container_offset.x as i32,
-        container_offset.y as i32,
-        card_width as i32,
-        (state.jobs.len() as f32 * (card_height + card_spacing) + card_padding_y * 2.0) as i32,
+        clip_rect.x as i32,
+        clip_rect.y as i32,
+        clip_rect.w as i32,
+        clip_rect.h as i32,
     ));
 
     for (id, job) in state.jobs.iter().enumerate() {
@@ -340,7 +340,7 @@ impl ScrollContainer {
         &self,
         state: &GameState,
         assets: &Assets,
-        build_ui_elements: fn(&GameState, &Assets, Vec2) -> Vec<UiElement>
+        build_ui_elements: fn(&GameState, &Assets, &UiRect, Vec2) -> Vec<UiElement>
     ) -> Vec<UiElement>
     {
         let mut elements: Vec<UiElement> = vec![];
@@ -357,7 +357,7 @@ impl ScrollContainer {
         elements.push(UiElement::Scissor { clip });
 
         let scrollable_pos = Vec2::new(self.rect.x, self.rect.y) + self.scroll_offset;
-        elements.extend(build_ui_elements(state, assets, scrollable_pos));
+        elements.extend(build_ui_elements(state, assets, &self.rect, scrollable_pos));
 
         // Remove the clipping area
         elements.push(UiElement::Scissor { clip: None });
