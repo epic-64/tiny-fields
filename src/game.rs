@@ -8,6 +8,9 @@ pub struct Textures {
     pub wood_1: Texture2D,
     pub wood_2: Texture2D,
     pub frame1: Texture2D,
+    pub coin: Texture2D,
+    pub time: Texture2D,
+    pub affection: Texture2D,
 }
 
 pub struct Fonts {

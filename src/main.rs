@@ -32,8 +32,8 @@ async fn main() {
     let mut state = GameState::new();
     let assets: Assets = load_assets().await;
 
-    let mut job_ui = ScrollContainer::new(UiRect { x: 50.0, y: 50.0, w: 500.0, h: 600.0 });
-    let mut job_ui_2 = ScrollContainer::new(UiRect { x: 600.0, y: 50.0, w: 500.0, h: 600.0 });
+    let mut job_ui = ScrollContainer::new(UiRect { x: 50.0, y: 100.0, w: 500.0, h: 600.0 });
+    let mut job_ui_2 = ScrollContainer::new(UiRect { x: 600.0, y: 100.0, w: 500.0, h: 600.0 });
 
     loop {
         let frame_start = Instant::now();
@@ -86,7 +86,10 @@ async fn load_assets() -> Assets {
     let wood_1: Texture2D = load_texture("ChopChop_1_.png").await.expect("Couldn't load file");
     let wood_2: Texture2D = load_texture("ChopChop_2_.png").await.expect("Couldn't load file");
     let frame1: Texture2D = load_texture("frame2.png").await.expect("Couldn't load file");
-    let textures = Textures { hut1, hut2, wood_1, wood_2, frame1 };
+    let coin: Texture2D = load_texture("coin.png").await.expect("Couldn't load file");
+    let affection: Texture2D = load_texture("rune_heart.png").await.expect("Couldn't load file");
+    let time: Texture2D = load_texture("rune_time.png").await.expect("Couldn't load file");
+    let textures = Textures { hut1, hut2, wood_1, wood_2, frame1, coin, affection, time };
 
     let main_font = load_ttf_font("Menlo-Regular.ttf").await.expect("Couldn't load font");
     let fonts = Fonts { main: Some(main_font) };
@@ -111,6 +114,15 @@ fn get_all_job_elements(state: &GameState, assets: &Assets, clip_rect: &UiRect, 
         clip_rect.w as i32,
         clip_rect.h as i32,
     ));
+
+    // background
+    elements.push(UiElement::Rectangle {
+        x: clip_rect.x,
+        y: clip_rect.y,
+        width: clip_rect.w as f64 + 10.0,
+        height: clip_rect.h as f64 + 10.0,
+        color: Color::from_rgba(0, 0, 0, 100),
+    });
 
     for (id, job) in state.jobs.iter().enumerate() {
         let job_draw_container = build_job_card(
