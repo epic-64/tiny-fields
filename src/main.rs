@@ -143,6 +143,7 @@ fn get_all_job_elements(state: &GameState, assets: &Assets, clip_rect: &UiRect, 
             id,
             container_offset,
             card_height as f64,
+            card_width as f64,
             card_padding_x,
             card_padding_y,
             card_spacing,
@@ -163,6 +164,7 @@ pub fn get_job_elements(
     job_id: usize,
     offset: Vec2,
     card_height: f64,
+    card_width: f64,
     card_padding_x: f32,
     card_padding_y: f32,
     card_spacing: f32,
@@ -176,10 +178,9 @@ pub fn get_job_elements(
     let font_size_large = 24.0;
     let font_size_small = 20.0;
 
-    let card_width = 550.0;
     let image_width = 90.0f32;
     let inner_x = offset.x + card_padding_x + image_width + card_spacing;
-    let progress_bar_width = card_width - card_padding_x - image_width - card_spacing - card_padding_x;
+    let progress_bar_width = card_width as f32 - card_padding_x - image_width - card_spacing - card_padding_x;
     let button_width = 80.0;
 
     let chosen_image = if job.running && job.time_accumulator % 2.0 < 1.0 {
@@ -270,7 +271,7 @@ pub fn get_job_elements(
         // Start / Stop Button
         UiElement::Button {
             rectangle: UiRect {
-                x: offset.x + card_width - button_width - card_padding_x,
+                x: offset.x + card_width as f32 - button_width - card_padding_x,
                 y: offset.y + card_padding_y,
                 w: button_width,
                 h: 46.0,
