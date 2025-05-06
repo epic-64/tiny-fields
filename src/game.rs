@@ -19,10 +19,12 @@ pub struct Assets {
     pub textures: Textures,
 }
 
+#[derive(Clone)]
 pub struct PerformanceFlags {
     pub timeslots_changed: bool,
 }
 
+#[derive(Clone)]
 pub struct TimeSlots {
     pub total: i32,
     pub used: i32,
@@ -34,6 +36,7 @@ impl TimeSlots {
     }
 }
 
+#[derive(Clone)]
 pub struct GameMeta {
     pub effective_fps: f32,
     pub raw_fps: f32,
@@ -83,6 +86,7 @@ fn define_jobs() -> Vec<Job> {
     ]
 }
 
+#[derive(Clone)]
 pub struct GameState {
     pub jobs: Vec<Job>,
     pub total_money: i64,
@@ -146,14 +150,14 @@ pub enum Intent {
 pub struct UiRect {
     pub x: f32,
     pub y: f32,
-    pub width: f32,
-    pub height: f32,
+    pub w: f32,
+    pub h: f32,
 }
 
 impl UiRect {
     pub fn contains_point(&self, point: (f32, f32)) -> bool {
-        point.0 >= self.x && point.0 <= self.x + self.width &&
-            point.1 >= self.y && point.1 <= self.y + self.height
+        point.0 >= self.x && point.0 <= self.x + self.w &&
+            point.1 >= self.y && point.1 <= self.y + self.h
     }
 
     pub fn is_hovered(&self) -> bool {

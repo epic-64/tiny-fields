@@ -23,10 +23,9 @@ async fn main() {
         offset: Vec2::new(0.0, 0.0),
     };
 
-    let mut job_ui = Ui2 {
-        assets: &assets,
-        last_mouse_position: Vec2::new(0.0, 0.0),
-        offset: Vec2::new(0.0, 0.0),
+    let mut job_ui = ScrollContainer {
+        rect: UiRect { x: 50.0, y: 50.0, w: 500.0, h: 600.0 },
+        scroll_offset: Vec2::new(0.0, 0.0),
     };
 
     loop {
@@ -34,19 +33,23 @@ async fn main() {
         let dt = get_frame_time();
 
         // The UI can be moved around.
-        ui.update_offset();
+        // ui.update_offset();
+        job_ui.update();
 
         // Build all the UI elements from the current game state
-        let ui_elements = ui.get_ui_elements(&state);
+        // let ui_elements = ui.get_ui_elements(&state);
+        let job_elements = job_ui.build(&state, &assets, get_all_job_elements);
 
         // Draw all the elements. Since we build them from the old
         // game state, this should happen before state.step()
         clear_background(ORANGE);
 
-        ui_elements.iter().for_each(draw);
+        // ui_elements.iter().for_each(draw);
+        job_elements.iter().for_each(draw);
 
         // Collect all intentions from the UI
-        let intents = get_intents(ui_elements);
+        // let intents = get_intents(ui_elements);
+        let intents = get_intents(job_elements);
 
         // Update game state
         state.step(&intents, dt);
@@ -114,86 +117,43 @@ impl Ui2<'_> {
     }
 }
 
-impl Ui2<'_> {
-    pub fn get_ui_elements(&mut self, state: &GameState) -> Vec<UiElement> {
-        let mut elements: Vec<UiElement> = vec![];
+fn get_all_job_elements(state: &GameState, assets: &Assets, offset: Vec2) -> Vec<UiElement>
+{
+    let mut elements: Vec<UiElement> = vec![];
 
-        let background_image = UiElement::Image {
-            x: 0., // fixed
-            y: 0., // fixed
-            width: screen_width() as f64,
-            height: screen_height() as f64,
-            texture: self.assets.textures.hut1.clone(),
-            color: WHITE,
-        };
+    let mut container_offset = offset;
+    let card_height = 180.0;
+    let card_width = 550.0;
+    let card_spacing = 15.0;
+    let card_padding_x = 55.0;
+    let card_padding_y = 40.0;
 
-        let top_bar_draw_commands = vec![
-            UiElement::Rectangle {
-                x: 0.0, // fixed
-                y: 0.0, // fixed
-                width: screen_width() as f64,
-                height: 100.0,
-                color: DARKGRAY,
-            },
-            UiElement::Text {
-                content: "Tiny Fields".to_string(),
-                x: 50.0 + 10.0,
-                y: 50.0 + 10.0,
-                font_size: 30.0,
-                color: WHITE,
-            },
-        ];
+    let container_clip = Some((
+        container_offset.x as i32,
+        container_offset.y as i32,
+        card_width as i32,
+        (state.jobs.len() as f32 * (card_height + card_spacing) + card_padding_y * 2.0) as i32,
+    ));
 
-        elements.push(background_image);
-        elements.extend(top_bar_draw_commands);
-        elements.extend(self.get_all_job_elements(state, Vec2::new(50.0, 100.0)));
-        elements.extend(self.get_all_job_elements(state, Vec2::new(650.0, 100.0)));
+    for (id, job) in state.jobs.iter().enumerate() {
+        let job_draw_container = get_job_elements(
+            &container_clip,
+            assets,
+            job,
+            id,
+            container_offset,
+            card_height as f64,
+            card_padding_x,
+            card_padding_y,
+            card_spacing,
+        );
 
-        elements
+        elements.extend(job_draw_container);
+
+        container_offset += Vec2::new(0.0, card_height as f32 + 15.0);
     }
 
-    fn get_all_job_elements(&self, state: &GameState, relative_offset: Vec2) -> Vec<UiElement>
-    {
-        let mut elements: Vec<UiElement> = vec![];
-
-        let mut container_offset = relative_offset;
-        let card_height = 180.0;
-        let card_width = 550.0;
-        let card_spacing = 15.0;
-        let card_padding_x = 55.0;
-        let card_padding_y = 40.0;
-
-        let container_clip = Some((
-            container_offset.x as i32,
-            container_offset.y as i32,
-            card_width as i32,
-            card_height as i32 * 4 + 15 * 3,
-        ));
-
-        elements.push(UiElement::Scissor { clip: container_clip });
-
-        for (id, job) in state.jobs.iter().enumerate() {
-            let job_draw_container = get_job_elements(
-                &container_clip,
-                &self.assets,
-                job,
-                id,
-                self.offset + container_offset,
-                card_height,
-                card_padding_x,
-                card_padding_y,
-                card_spacing,
-            );
-
-            elements.extend(job_draw_container);
-
-            container_offset += Vec2::new(0.0, card_height as f32 + 15.0);
-        }
-
-        elements.push(UiElement::Scissor { clip: None });
-
-        elements
-    }
+    elements
 }
 
 pub fn get_job_elements(
@@ -312,8 +272,8 @@ pub fn get_job_elements(
             rectangle: UiRect {
                 x: offset.x + card_width - button_width - card_padding_x,
                 y: offset.y + card_padding_y,
-                width: button_width,
-                height: 46.0,
+                w: button_width,
+                h: 46.0,
             },
             parent_clip: clip.clone(),
             font_size: font_size_large,
@@ -340,8 +300,8 @@ pub fn get_intents(elements: Vec<UiElement>) -> Vec<Intent> {
                     let scissor_rect = UiRect {
                         x: x as f32,
                         y: y as f32,
-                        width: width as f32,
-                        height: height as f32,
+                        w: width as f32,
+                        h: height as f32,
                     };
 
                     if !scissor_rect.is_hovered() {
@@ -358,4 +318,50 @@ pub fn get_intents(elements: Vec<UiElement>) -> Vec<Intent> {
     }
 
     intents
+}
+
+pub struct ScrollContainer {
+    rect: UiRect,
+    scroll_offset: Vec2,
+}
+
+impl ScrollContainer {
+    pub fn update(&mut self) {
+        if self.rect.is_hovered() {
+            let mouse_wheel_delta = clamp(mouse_wheel().1, -1.0, 1.0);
+
+            if mouse_wheel_delta.abs() > 0.0 {
+                self.scroll_offset.y += mouse_wheel_delta * 40.0;
+            }
+        }
+    }
+
+    pub fn build(
+        &self,
+        state: &GameState,
+        assets: &Assets,
+        build_ui_elements: fn(&GameState, &Assets, Vec2) -> Vec<UiElement>
+    ) -> Vec<UiElement>
+    {
+        let mut elements: Vec<UiElement> = vec![];
+
+        // Create a clipping area for the scroll container
+        let clip = Some((
+            self.rect.x as i32,
+            self.rect.y as i32,
+            self.rect.w as i32,
+            self.rect.h as i32,
+        ));
+
+        // Create a scissor rectangle for the clipping area
+        elements.push(UiElement::Scissor { clip });
+
+        let scrollable_pos = Vec2::new(self.rect.x, self.rect.y) + self.scroll_offset;
+        elements.extend(build_ui_elements(state, assets, scrollable_pos));
+
+        // Remove the clipping area
+        elements.push(UiElement::Scissor { clip: None });
+
+        elements
+    }
 }

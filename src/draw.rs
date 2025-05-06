@@ -62,8 +62,8 @@ pub fn draw(command: &UiElement) {
                 UiRect {
                     x: *x as f32,
                     y: *y as f32,
-                    width: *w as f32,
-                    height: *h as f32
+                    w: *w as f32,
+                    h: *h as f32
                 }.is_hovered()
             } else {
                 true
@@ -75,11 +75,11 @@ pub fn draw(command: &UiElement) {
                 *color
             };
 
-            draw_rectangle(r.x, r.y, r.width, r.height, current_color);
+            draw_rectangle(r.x, r.y, r.w, r.h, current_color);
 
             let text_measure = measure_text(text, None, *font_size as u16, 1.);
-            let text_x = r.x + (r.width - text_measure.width) / 2.0;
-            let text_y = r.y + (r.height - text_measure.height) / 2.0 + font_size / 2.0;
+            let text_x = r.x + (r.w - text_measure.width) / 2.0;
+            let text_y = r.y + (r.h - text_measure.height) / 2.0 + font_size / 2.0;
 
             draw_text(text, text_x, text_y, *font_size, WHITE);
         }
