@@ -89,7 +89,7 @@ fn get_all_job_elements(state: &GameState, assets: &Assets, clip_rect: &UiRect, 
     ));
 
     for (id, job) in state.jobs.iter().enumerate() {
-        let job_draw_container = get_job_elements(
+        let job_draw_container = build_job_card(
             &container_clip,
             assets,
             job,
@@ -110,7 +110,7 @@ fn get_all_job_elements(state: &GameState, assets: &Assets, clip_rect: &UiRect, 
     elements
 }
 
-pub fn get_job_elements(
+pub fn build_job_card(
     clip: &Option<(i32, i32, i32, i32)>,
     assets: &Assets,
     job: &Job,
