@@ -9,6 +9,13 @@ pub mod game;
 use crate::draw::{draw, UiElement};
 use crate::game::{Assets, GameState, Intent, Job, UiRect};
 
+pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
+    vec![MouseButton::Left, MouseButton::Right, MouseButton::Middle]
+        .into_iter()
+        .filter(|&button| check(button))
+        .collect()
+}
+
 #[macroquad::main("Tiny Fields")]
 async fn main() {
     set_pc_assets_folder("assets");
@@ -21,6 +28,12 @@ async fn main() {
     let mut job_ui_2 = ScrollContainer::new(UiRect { x: 600.0, y: 50.0, w: 500.0, h: 600.0 });
 
     loop {
+        let pressed_buttons = get_mouse_buttons(is_mouse_button_pressed);
+        let released_buttons = get_mouse_buttons(is_mouse_button_released);
+        let down_buttons = get_mouse_buttons(is_mouse_button_down);
+
+        println!("Pressed: {:?}", pressed_buttons);
+
         let frame_start = Instant::now();
         let dt = get_frame_time();
 
