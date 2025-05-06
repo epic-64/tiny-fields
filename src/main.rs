@@ -17,12 +17,6 @@ async fn main() {
     let mut state = GameState::new();
     let assets: Assets = load_assets().await;
 
-    let mut ui = Ui2 {
-        assets: &assets,
-        last_mouse_position: Vec2::new(0.0, 0.0),
-        offset: Vec2::new(0.0, 0.0),
-    };
-
     let mut job_ui = ScrollContainer::new(UiRect { x: 50.0, y: 50.0, w: 500.0, h: 600.0 });
     let mut job_ui_2 = ScrollContainer::new(UiRect { x: 600.0, y: 50.0, w: 500.0, h: 600.0 });
 
@@ -31,12 +25,10 @@ async fn main() {
         let dt = get_frame_time();
 
         // The UI can be moved around.
-        // ui.update_offset();
         job_ui.update();
         job_ui_2.update();
 
         // Build all the UI elements from the current game state
-        // let ui_elements = ui.get_ui_elements(&state);
         let job_elements = job_ui.build(&state, &assets, get_all_job_elements);
         let job_elements_2 = job_ui_2.build(&state, &assets, get_all_job_elements);
 
@@ -44,12 +36,10 @@ async fn main() {
         // game state, this should happen before state.step()
         clear_background(ORANGE);
 
-        // ui_elements.iter().for_each(draw);
         job_elements.iter().for_each(draw);
         job_elements_2.iter().for_each(draw);
 
         // Collect all intentions from the UI
-        // let intents = get_intents(ui_elements);
         let intents = get_intents(job_elements);
         let intents_2 = get_intents(job_elements_2);
 
@@ -78,47 +68,6 @@ async fn load_assets() -> Assets {
     let fonts = Fonts { main: Some(main_font) };
 
     Assets { fonts, textures }
-}
-
-struct Ui2<'a> {
-    assets: &'a Assets,
-    last_mouse_position: Vec2,
-    offset: Vec2,
-}
-
-impl Ui2<'_> {
-    pub fn update_offset(&mut self) {
-        let mouse_wheel_delta = clamp(mouse_wheel().1, -1.0, 1.0);
-
-        if mouse_wheel_delta.abs() > 0.0 {
-            let new_offset = {self.offset + Vec2::new(0.0, mouse_wheel_delta * 40.0)}.clamp(
-                Vec2::new(-200.0, -600.0),
-                Vec2::new(1000.0, 600.0),
-            );
-
-            self.offset = new_offset;
-        }
-
-        if is_mouse_button_pressed(MouseButton::Right) {
-            self.last_mouse_position = Vec2::from(mouse_position());
-        }
-
-        if is_mouse_button_down(MouseButton::Right) {
-            let current_mouse_pos = Vec2::from(mouse_position());
-            let delta = current_mouse_pos - self.last_mouse_position;
-
-            if delta.length_squared() > 0.0 {
-                let new_offset = {self.offset + delta}.clamp(
-                    Vec2::new(-200.0, -600.0),
-                    Vec2::new(1000.0, 600.0),
-                );
-
-                self.offset = new_offset;
-            }
-
-            self.last_mouse_position = current_mouse_pos;
-        }
-    }
 }
 
 fn get_all_job_elements(state: &GameState, assets: &Assets, clip_rect: &UiRect, offset: Vec2) -> Vec<UiElement>
