@@ -23,10 +23,8 @@ async fn main() {
         offset: Vec2::new(0.0, 0.0),
     };
 
-    let mut job_ui = ScrollContainer {
-        rect: UiRect { x: 50.0, y: 50.0, w: 500.0, h: 600.0 },
-        scroll_offset: Vec2::new(0.0, 0.0),
-    };
+    let mut job_ui = ScrollContainer::new(UiRect { x: 50.0, y: 50.0, w: 500.0, h: 600.0 });
+    let mut job_ui_2 = ScrollContainer::new(UiRect { x: 600.0, y: 50.0, w: 500.0, h: 600.0 });
 
     loop {
         let frame_start = Instant::now();
@@ -35,10 +33,12 @@ async fn main() {
         // The UI can be moved around.
         // ui.update_offset();
         job_ui.update();
+        job_ui_2.update();
 
         // Build all the UI elements from the current game state
         // let ui_elements = ui.get_ui_elements(&state);
         let job_elements = job_ui.build(&state, &assets, get_all_job_elements);
+        let job_elements_2 = job_ui_2.build(&state, &assets, get_all_job_elements);
 
         // Draw all the elements. Since we build them from the old
         // game state, this should happen before state.step()
@@ -46,13 +46,17 @@ async fn main() {
 
         // ui_elements.iter().for_each(draw);
         job_elements.iter().for_each(draw);
+        job_elements_2.iter().for_each(draw);
 
         // Collect all intentions from the UI
         // let intents = get_intents(ui_elements);
         let intents = get_intents(job_elements);
+        let intents_2 = get_intents(job_elements_2);
+
+        let merged_intents = intents.into_iter().chain(intents_2).collect::<Vec<_>>();
 
         // Update game state
-        state.step(&intents, dt);
+        state.step(&merged_intents, dt);
 
         // Keep track of FPS
         state.game_meta.raw_fps = 1.0 / frame_start.elapsed().as_secs_f32();
@@ -324,16 +328,46 @@ pub fn get_intents(elements: Vec<UiElement>) -> Vec<Intent> {
 pub struct ScrollContainer {
     rect: UiRect,
     scroll_offset: Vec2,
+    last_mouse_position: Vec2,
 }
 
 impl ScrollContainer {
+    pub fn new(rect: UiRect) -> Self {
+        Self {
+            rect,
+            scroll_offset: Vec2::new(0.0, 0.0),
+            last_mouse_position: Vec2::new(0.0, 0.0),
+        }
+    }
+
     pub fn update(&mut self) {
         if self.rect.is_hovered() {
-            let mouse_wheel_delta = clamp(mouse_wheel().1, -1.0, 1.0);
+            self.handle_scroll()
+        }
+    }
 
-            if mouse_wheel_delta.abs() > 0.0 {
-                self.scroll_offset.y += mouse_wheel_delta * 40.0;
+    fn handle_scroll(&mut self) {
+        let mouse_wheel_delta = clamp(mouse_wheel().1, -1.0, 1.0);
+
+        if mouse_wheel_delta.abs() > 0.0 {
+            self.scroll_offset.y += mouse_wheel_delta * 40.0;
+        }
+
+        if is_mouse_button_pressed(MouseButton::Right) {
+            self.last_mouse_position = Vec2::from(mouse_position());
+        }
+
+        if is_mouse_button_down(MouseButton::Right) {
+            let current_mouse_pos = Vec2::from(mouse_position());
+            let delta = current_mouse_pos - self.last_mouse_position;
+
+            if delta.length_squared() > 0.0 {
+                let new_offset = self.scroll_offset + Vec2::new(0.0, delta.y);
+
+                self.scroll_offset = new_offset;
             }
+
+            self.last_mouse_position = current_mouse_pos;
         }
     }
 
