@@ -16,6 +16,14 @@ pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
         .collect()
 }
 
+pub struct MouseInput {
+    pub pressed: Vec<MouseButton>,
+    pub released: Vec<MouseButton>,
+    pub down: Vec<MouseButton>,
+    pub position: Vec2,
+    pub scroll_y: f32,
+}
+
 #[macroquad::main("Tiny Fields")]
 async fn main() {
     set_pc_assets_folder("assets");
@@ -28,14 +36,17 @@ async fn main() {
     let mut job_ui_2 = ScrollContainer::new(UiRect { x: 600.0, y: 50.0, w: 500.0, h: 600.0 });
 
     loop {
-        let pressed_buttons = get_mouse_buttons(is_mouse_button_pressed);
-        let released_buttons = get_mouse_buttons(is_mouse_button_released);
-        let down_buttons = get_mouse_buttons(is_mouse_button_down);
-
-        println!("Pressed: {:?}", pressed_buttons);
-
         let frame_start = Instant::now();
         let dt = get_frame_time();
+
+        // collect inputs (IO)
+        let mouse_input = MouseInput {
+            pressed: get_mouse_buttons(is_mouse_button_pressed),
+            released: get_mouse_buttons(is_mouse_button_released),
+            down: get_mouse_buttons(is_mouse_button_down),
+            position: Vec2::from(mouse_position()),
+            scroll_y: mouse_wheel().1,
+        };
 
         // The UI can be moved around.
         job_ui.update();
