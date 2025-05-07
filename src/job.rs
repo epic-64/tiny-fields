@@ -1,5 +1,5 @@
 use crate::draw::UiElement;
-use crate::game::{Assets, GameState, Intent, Job, UiRect};
+use crate::game::{Assets, GameState, Intent, Job, MouseInput, UiRect};
 use crate::ui::ScrollContainer;
 use macroquad::color::{Color, BLUE, DARKBLUE, DARKGRAY, GRAY, GREEN, SKYBLUE, WHITE};
 use macroquad::math::Vec2;
@@ -15,11 +15,11 @@ impl JobUi {
         }
     }
 
-    pub fn update(&mut self) {
-        self.scroll_container.update();
+    pub fn update(&mut self, mouse_input: &MouseInput) {
+        self.scroll_container.update(mouse_input);
     }
 
-    pub fn build(&self, state: &GameState, assets: &Assets) -> Vec<UiElement> {
+    pub fn build(&self, state: &GameState, assets: &Assets, mouse_input: &MouseInput) -> Vec<UiElement> {
         let mut elements: Vec<UiElement> = vec![];
 
         // add decorations
@@ -32,13 +32,19 @@ impl JobUi {
             color: Color::from_rgba(0, 0, 0, 100),
         });
 
-        elements.extend(self.scroll_container.build(state, assets, build_job_cards));
+        elements.extend(self.scroll_container.build(state, assets, mouse_input, build_job_cards));
 
         elements
     }
 }
 
-fn build_job_cards(state: &GameState, assets: &Assets, clip_rect: &UiRect, offset: Vec2) -> Vec<UiElement>
+fn build_job_cards(
+    state: &GameState,
+    assets: &Assets,
+    mouse_input: &MouseInput,
+    clip_rect: &UiRect,
+    offset: Vec2
+) -> Vec<UiElement>
 {
     let mut elements: Vec<UiElement> = vec![];
 
@@ -67,13 +73,14 @@ fn build_job_cards(state: &GameState, assets: &Assets, clip_rect: &UiRect, offse
 
     for (id, job) in state.jobs.iter().enumerate() {
         let job_draw_container = build_job_card(
+            mouse_input,
             &container_clip,
             assets,
             job,
             id,
             container_offset,
-            card_height as f64,
-            card_width as f64,
+            card_height,
+            card_width,
             card_padding_x,
             card_padding_y,
             card_spacing,
@@ -81,20 +88,21 @@ fn build_job_cards(state: &GameState, assets: &Assets, clip_rect: &UiRect, offse
 
         elements.extend(job_draw_container);
 
-        container_offset += Vec2::new(0.0, card_height as f32 + 15.0);
+        container_offset += Vec2::new(0.0, card_height + 15.0);
     }
 
     elements
 }
 
 pub fn build_job_card(
+    mouse_input: &MouseInput,
     clip: &Option<(i32, i32, i32, i32)>,
     assets: &Assets,
     job: &Job,
     job_id: usize,
     offset: Vec2,
-    card_height: f64,
-    card_width: f64,
+    card_height: f32,
+    card_width: f32,
     card_padding_x: f32,
     card_padding_y: f32,
     card_spacing: f32,
@@ -110,7 +118,7 @@ pub fn build_job_card(
 
     let image_width = 90.0f32;
     let inner_x = offset.x + card_padding_x + image_width + card_spacing;
-    let progress_bar_width = card_width as f32 - card_padding_x - image_width - card_spacing - card_padding_x;
+    let progress_bar_width = card_width - card_padding_x - image_width - card_spacing - card_padding_x;
     let button_width = 80.0;
 
     let chosen_image = if job.running && job.time_accumulator % 2.0 < 1.0 {
@@ -125,7 +133,7 @@ pub fn build_job_card(
     elements.push(UiElement::Image {
         x: offset.x,
         y: offset.y,
-        width: card_width as f64,
+        width: card_width,
         height: card_height,
         texture: assets.textures.frame1.clone(),
         color: WHITE
@@ -135,8 +143,8 @@ pub fn build_job_card(
     elements.push(UiElement::Image {
         x: offset.x + card_padding_x,
         y: offset.y + card_padding_y,
-        width: image_width as f64,
-        height: card_height - card_padding_y as f64 * 2.0,
+        width: image_width,
+        height: card_height - card_padding_y * 2.0,
         texture: chosen_image.clone(),
         color: if job.running { WHITE } else { Color::from_rgba(90, 90, 90, 255) },
     });
@@ -215,12 +223,12 @@ pub fn build_job_card(
             y: *y as f32,
             w: *w as f32,
             h: *h as f32
-        }.is_hovered()
+        }.is_hovered(mouse_input)
     } else {
         true
     };
 
-    let button_is_hovered = button_rect.is_hovered() && clip_is_hovered;
+    let button_is_hovered = button_rect.is_hovered(mouse_input) && clip_is_hovered;
 
     elements.push(UiElement::Button {
         rectangle: button_rect,

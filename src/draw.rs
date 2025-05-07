@@ -32,7 +32,7 @@ pub enum UiElement {
         foreground_color: Color,
     },
     Rectangle { x: f32, y: f32, width: f64, height: f64, color: Color },
-    Image { x: f32, y: f32, width: f64, height: f64, texture: Texture2D, color: Color },
+    Image { x: f32, y: f32, width: f32, height: f32, texture: Texture2D, color: Color },
     Scissor { clip: Option<(i32, i32, i32, i32)> },
 }
 

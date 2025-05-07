@@ -1,6 +1,14 @@
-use macroquad::input::{is_mouse_button_pressed, mouse_position, MouseButton};
+use macroquad::input::{is_mouse_button_pressed, MouseButton};
 use macroquad::prelude::Texture2D;
 use macroquad::text::Font;
+
+pub struct MouseInput {
+    pub pressed: Vec<MouseButton>,
+    pub released: Vec<MouseButton>,
+    pub down: Vec<MouseButton>,
+    pub position: (f32, f32),
+    pub scroll_y: f32,
+}
 
 pub struct Textures {
     pub hut1: Texture2D,
@@ -159,12 +167,12 @@ impl UiRect {
             point.1 >= self.y && point.1 <= self.y + self.h
     }
 
-    pub fn is_hovered(&self) -> bool {
-        self.contains_point(mouse_position())
+    pub fn is_hovered(&self, mouse_input: &MouseInput) -> bool {
+        self.contains_point(mouse_input.position)
     }
 
-    pub fn is_clicked(&self) -> bool {
-        self.is_hovered() && is_mouse_button_pressed(MouseButton::Left)
+    pub fn is_clicked(&self, mouse_input: &MouseInput) -> bool {
+        self.is_hovered(mouse_input) && is_mouse_button_pressed(MouseButton::Left)
     }
 }
 
