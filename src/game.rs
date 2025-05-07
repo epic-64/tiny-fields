@@ -1,4 +1,4 @@
-use macroquad::input::{is_mouse_button_pressed, MouseButton};
+use macroquad::input::{MouseButton};
 use macroquad::prelude::Texture2D;
 use macroquad::text::Font;
 
@@ -172,7 +172,7 @@ impl UiRect {
     }
 
     pub fn is_clicked(&self, mouse_input: &MouseInput) -> bool {
-        self.is_hovered(mouse_input) && is_mouse_button_pressed(MouseButton::Left)
+        self.is_hovered(mouse_input) && mouse_input.pressed.contains(&MouseButton::Left)
     }
 }
 
