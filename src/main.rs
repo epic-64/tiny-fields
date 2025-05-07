@@ -26,8 +26,8 @@ async fn main() {
     let mut state = GameState::new();
     let assets: Assets = load_assets().await;
 
-    let mut job_ui = JobUi::new(UiRect{ x: 50.0, y: 100.0, w: 500.0, h: 600.0 });
-    let mut job_ui_2 = JobUi::new(UiRect{ x: 600.0, y: 100.0, w: 500.0, h: 600.0 });
+    let mut job_ui = JobUi::new(UiRect{ x: 50.0, y: 160.0, w: 500.0, h: 600.0 });
+    let mut job_ui_2 = JobUi::new(UiRect{ x: 600.0, y: 160.0, w: 500.0, h: 600.0 });
 
     loop {
         let frame_start = now();
@@ -155,8 +155,8 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
     // Free Time Slots
     for i in 0..state.time_slots.get_free() {
         elements.push(UiElement::Image {
-            x: rect.x + 200.0 + i as f32 * (icon_size + 5.0),
-            y: rect.y,
+            x: rect.x + i as f32 * (icon_size + 5.0),
+            y: rect.y + icon_size + 5.0,
             width: icon_size,
             height: icon_size,
             texture: assets.textures.time.clone(),
@@ -167,8 +167,8 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
     // Used Time Slots
     for i in 0..state.time_slots.used {
         elements.push(UiElement::Image {
-            x: rect.x + 200.0 + (state.time_slots.get_free() + i) as f32 * (icon_size + 5.0),
-            y: rect.y,
+            x: rect.x + (state.time_slots.get_free() + i) as f32 * (icon_size + 5.0),
+            y: rect.y + icon_size + 5.0,
             width: icon_size,
             height: icon_size,
             texture: assets.textures.time.clone(),
@@ -179,7 +179,7 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
     // Button for buying time slots
     elements.push(UiElement::Button {
         rectangle: UiRect {
-            x: rect.x + 200.0 + (state.time_slots.total as f32) * (icon_size + 5.0),
+            x: rect.x + 200.0,
             y: rect.y,
             w: 200.0,
             h: icon_size,
@@ -195,7 +195,7 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
     // Button for skipping 5 minutes
     elements.push(UiElement::Button {
         rectangle: UiRect {
-            x: rect.x + 200.0 + (state.time_slots.total as f32) * (icon_size + 5.0) + 220.0,
+            x: rect.x + 200.0 + 220.0,
             y: rect.y,
             w: 200.0,
             h: icon_size,
@@ -211,7 +211,7 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
     // Button for skipping 1 year
     elements.push(UiElement::Button {
         rectangle: UiRect {
-            x: rect.x + 200.0 + (state.time_slots.total as f32) * (icon_size + 5.0) + 220.0 + 220.0,
+            x: rect.x + 200.0 + 220.0 + 220.0,
             y: rect.y,
             w: 200.0,
             h: icon_size,

@@ -119,7 +119,7 @@ pub fn build_job_card(
     let image_width = 90.0f32;
     let inner_x = offset.x + card_padding_x + image_width + card_spacing;
     let progress_bar_width = card_width - card_padding_x - image_width - card_spacing - card_padding_x;
-    let button_width = 80.0;
+    let button_width = 90.0;
 
     let chosen_image = if job.running && job.time_accumulator % 2.0 < 1.0 {
         &assets.textures.wood_2
@@ -158,9 +158,20 @@ pub fn build_job_card(
         color: color_primary,
     });
 
+    for i in 0..job.timeslot_cost {
+        elements.push(UiElement::Image {
+            x: inner_x +  i as f32 * (20.0 + 5.0) + 100.0,
+            y: offset.y + card_padding_y,
+            width: 20.0,
+            height: 20.0,
+            texture: assets.textures.time.clone(),
+            color: if job.running { WHITE } else { GRAY },
+        });
+    }
+
     // Job Info
     elements.push(UiElement::Text {
-        content: format!("Lvl {} | ${} | {}s | {} Slots", job.level, job.money_per_action(), job.action_duration, job.timeslot_cost),
+        content: format!("Lvl {} | ${} | {}s", job.level, job.money_per_action(), job.action_duration),
         x: inner_x,
         y: offset.y + 80.0,
         font_size: font_size_small,
@@ -209,10 +220,10 @@ pub fn build_job_card(
 
     // Start / Stop Button
     let button_rect = UiRect {
-        x: offset.x + card_width as f32 - button_width - card_padding_x,
-        y: offset.y + card_padding_y,
+        x: offset.x + card_width - button_width - 30.0,
+        y: offset.y + 25.0,
         w: button_width,
-        h: 46.0,
+        h: 132.0,
     };
 
     // Check if the clip area of the scroll container is hovered
