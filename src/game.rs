@@ -134,6 +134,11 @@ impl GameState {
                         self.time_slots.total += 1;
                         self.performance_flags.timeslots_changed = true;
                     }
+                },
+                Intent::SkipSeconds(seconds) => {
+                    for _ in 0..*seconds {
+                        self.update_progress(1.0);
+                    }
                 }
             }
         }
@@ -162,6 +167,7 @@ fn get_used_timeslots(jobs: &[Job]) -> i32 {
 pub enum Intent {
     ToggleJob(usize),
     BuyTimeSlot,
+    SkipSeconds(i32),
 }
 
 #[derive(Clone)]

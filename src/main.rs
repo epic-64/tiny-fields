@@ -155,7 +155,7 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
     // Free Time Slots
     for i in 0..state.time_slots.get_free() {
         elements.push(UiElement::Image {
-            x: rect.x + 120.0 + i as f32 * (icon_size + 5.0),
+            x: rect.x + 200.0 + i as f32 * (icon_size + 5.0),
             y: rect.y,
             width: icon_size,
             height: icon_size,
@@ -167,7 +167,7 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
     // Used Time Slots
     for i in 0..state.time_slots.used {
         elements.push(UiElement::Image {
-            x: rect.x + 120.0 + (state.time_slots.get_free() + i) as f32 * (icon_size + 5.0),
+            x: rect.x + 200.0 + (state.time_slots.get_free() + i) as f32 * (icon_size + 5.0),
             y: rect.y,
             width: icon_size,
             height: icon_size,
@@ -179,7 +179,7 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
     // Button for buying time slots
     elements.push(UiElement::Button {
         rectangle: UiRect {
-            x: rect.x + 120.0 + (state.time_slots.total as f32) * (icon_size + 5.0),
+            x: rect.x + 200.0 + (state.time_slots.total as f32) * (icon_size + 5.0),
             y: rect.y,
             w: 200.0,
             h: icon_size,
@@ -191,6 +191,39 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
         parent_clip: None,
         is_hovered: false,
     });
+
+    // Button for skipping 5 minutes
+    elements.push(UiElement::Button {
+        rectangle: UiRect {
+            x: rect.x + 200.0 + (state.time_slots.total as f32) * (icon_size + 5.0) + 220.0,
+            y: rect.y,
+            w: 200.0,
+            h: icon_size,
+        },
+        intent: Intent::SkipSeconds(300),
+        text: "Skip 5 min".to_string(),
+        font_size: 20.0,
+        color: DARKGRAY,
+        parent_clip: None,
+        is_hovered: false,
+    });
+
+    // Button for skipping 1 year
+    elements.push(UiElement::Button {
+        rectangle: UiRect {
+            x: rect.x + 200.0 + (state.time_slots.total as f32) * (icon_size + 5.0) + 220.0 + 220.0,
+            y: rect.y,
+            w: 200.0,
+            h: icon_size,
+        },
+        intent: Intent::SkipSeconds(31_536_000),
+        text: "Skip 1 year".to_string(),
+        font_size: 20.0,
+        color: DARKGRAY,
+        parent_clip: None,
+        is_hovered: false,
+    });
+
 
     elements
 }
