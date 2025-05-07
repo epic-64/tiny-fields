@@ -84,10 +84,11 @@ async fn load_assets() -> Assets {
     let frame1: Texture2D = load_texture("frame2.png").await.expect("Couldn't load file");
     let coin: Texture2D = load_texture("coin.png").await.expect("Couldn't load file");
     let affection: Texture2D = load_texture("rune_heart.png").await.expect("Couldn't load file");
-    let time: Texture2D = load_texture("rune_time.png").await.expect("Couldn't load file");
-    let textures = Textures { hut1, hut2, wood_1, wood_2, frame1, coin, affection, time };
+    let time: Texture2D = load_texture("rune_time2.png").await.expect("Couldn't load file");
 
     let main_font = load_ttf_font("Menlo-Regular.ttf").await.expect("Couldn't load font");
+
+    let textures = Textures { hut1, hut2, wood_1, wood_2, frame1, coin, affection, time };
     let fonts = Fonts { main: Some(main_font) };
 
     Assets { fonts, textures }
@@ -150,6 +151,30 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
         font_size,
         color: WHITE,
     });
+
+    // Free Time Slots
+    for i in 0..state.time_slots.get_free() {
+        elements.push(UiElement::Image {
+            x: rect.x + 120.0 + i as f32 * (icon_size + 5.0),
+            y: rect.y,
+            width: icon_size,
+            height: icon_size,
+            texture: assets.textures.time.clone(),
+            color: WHITE,
+        });
+    }
+
+    // Used Time Slots
+    for i in 0..state.time_slots.used {
+        elements.push(UiElement::Image {
+            x: rect.x + 120.0 + (state.time_slots.get_free() + i) as f32 * (icon_size + 5.0),
+            y: rect.y,
+            width: icon_size,
+            height: icon_size,
+            texture: assets.textures.time.clone(),
+            color: GRAY,
+        });
+    }
 
     elements
 }
