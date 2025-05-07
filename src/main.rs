@@ -178,101 +178,118 @@ pub fn build_job_card(
         &assets.textures.wood_1
     };
 
-    let elements = vec![
-        // Background
-        UiElement::Image {
-            x: offset.x,
-            y: offset.y,
-            width: card_width as f64,
-            height: card_height,
-            texture: assets.textures.frame1.clone(),
-            color: WHITE
-        },
+    let mut elements = vec![];
 
-        // Job Animation
-        UiElement::Image {
-            x: offset.x + card_padding_x,
-            y: offset.y + card_padding_y,
-            width: image_width as f64,
-            height: card_height - card_padding_y as f64 * 2.0,
-            texture: chosen_image.clone(),
-            color: if job.running { WHITE } else { Color::from_rgba(90, 90, 90, 255) },
-        },
+    // Background
+    elements.push(UiElement::Image {
+        x: offset.x,
+        y: offset.y,
+        width: card_width as f64,
+        height: card_height,
+        texture: assets.textures.frame1.clone(),
+        color: WHITE
+    });
 
-        // Title Bar
-        UiElement::Text {
-            content: job.name.clone() + " ",
-            x: inner_x,
-            y: offset.y + card_padding_y + 15.0,
-            font_size: font_size_large,
-            color: color_primary,
-        },
+    // Job Animation
+    elements.push(UiElement::Image {
+        x: offset.x + card_padding_x,
+        y: offset.y + card_padding_y,
+        width: image_width as f64,
+        height: card_height - card_padding_y as f64 * 2.0,
+        texture: chosen_image.clone(),
+        color: if job.running { WHITE } else { Color::from_rgba(90, 90, 90, 255) },
+    });
 
-        // Job Info
-        UiElement::Text {
-            content: format!("Lvl {} | ${} | {}s | {} Slots", job.level, job.money_per_action(), job.action_duration, job.timeslot_cost),
-            x: inner_x,
-            y: offset.y + 80.0,
-            font_size: font_size_small,
-            color: color_secondary,
-        },
+    // Title Bar
+    elements.push(UiElement::Text {
+        content: job.name.clone() + " ",
+        x: inner_x,
+        y: offset.y + card_padding_y + 15.0,
+        font_size: font_size_large,
+        color: color_primary,
+    });
 
-        // Action Progress Bar
-        UiElement::ProgressBar {
-            x: inner_x,
-            y: offset.y + 96.0,
-            width: progress_bar_width - 120.0,
-            height: 20.0,
-            progress: job.action_progress.get(),
-            background_color: GRAY,
-            foreground_color: GREEN,
-        },
+    // Job Info
+    elements.push(UiElement::Text {
+        content: format!("Lvl {} | ${} | {}s | {} Slots", job.level, job.money_per_action(), job.action_duration, job.timeslot_cost),
+        x: inner_x,
+        y: offset.y + 80.0,
+        font_size: font_size_small,
+        color: color_secondary,
+    });
 
-        // Action Progress Text
-        UiElement::Text {
-            content: format!("{:.1} / {:.1}", job.time_accumulator, job.action_duration),
-            x: inner_x + 10.0,
-            y: offset.y + 111.0,
-            font_size: 20.0,
-            color: WHITE,
-        },
+    // Action Progress Bar
+    elements.push(UiElement::ProgressBar {
+        x: inner_x,
+        y: offset.y + 96.0,
+        width: progress_bar_width - 120.0,
+        height: 20.0,
+        progress: job.action_progress.get(),
+        background_color: GRAY,
+        foreground_color: GREEN,
+    });
 
-        // Level Up Progress Bar
-        UiElement::ProgressBar {
-            x: inner_x,
-            y: offset.y + 126.0,
-            width: progress_bar_width - 120.0,
-            height: 20.0,
-            progress: job.level_up_progress.get(),
-            background_color: GRAY,
-            foreground_color: BLUE,
-        },
+    // Action Progress Text
+    elements.push(UiElement::Text {
+        content: format!("{:.1} / {:.1}", job.time_accumulator, job.action_duration),
+        x: inner_x + 10.0,
+        y: offset.y + 111.0,
+        font_size: 20.0,
+        color: WHITE,
+    });
 
-        // Level Up Progress Text
-        UiElement::Text {
-            content: format!("Level Up: {} / {}", job.actions_done, job.actions_to_level_up()),
-            x: inner_x + 10.0,
-            y: offset.y + 141.0,
-            font_size: 20.0,
-            color: WHITE,
-        },
+    // Level Up Progress Bar
+    elements.push(UiElement::ProgressBar {
+        x: inner_x,
+        y: offset.y + 126.0,
+        width: progress_bar_width - 120.0,
+        height: 20.0,
+        progress: job.level_up_progress.get(),
+        background_color: GRAY,
+        foreground_color: BLUE,
+    });
 
-        // Start / Stop Button
-        UiElement::Button {
-            rectangle: UiRect {
-                x: offset.x + card_width as f32 - button_width - card_padding_x,
-                y: offset.y + card_padding_y,
-                w: button_width,
-                h: 46.0,
-            },
-            parent_clip: clip.clone(),
-            font_size: font_size_large,
-            text: if job.running { "Stop".to_string() } else { "Start".to_string() },
-            color: color_button,
-            hover_color: color_button_hover,
-            intent: Intent::ToggleJob(job_id),
-        }
-    ];
+    // Level Up Progress Text
+    elements.push(UiElement::Text {
+        content: format!("Level Up: {} / {}", job.actions_done, job.actions_to_level_up()),
+        x: inner_x + 10.0,
+        y: offset.y + 141.0,
+        font_size: 20.0,
+        color: WHITE,
+    });
+
+    // Start / Stop Button
+    let button_rect = UiRect {
+        x: offset.x + card_width as f32 - button_width - card_padding_x,
+        y: offset.y + card_padding_y,
+        w: button_width,
+        h: 46.0,
+    };
+
+    let clip_is_hovered = if let Some(clip) = clip {
+        let (x, y, w, h) = clip;
+        UiRect {
+            x: *x as f32,
+            y: *y as f32,
+            w: *w as f32,
+            h: *h as f32
+        }.is_hovered()
+    } else {
+        true
+    };
+
+    let button_is_hovered = button_rect.is_hovered() && clip_is_hovered;
+
+    elements.push(UiElement::Button {
+        rectangle: button_rect,
+        parent_clip: clip.clone(),
+        font_size: font_size_large,
+        text: if job.running { "Stop".to_string() } else { "Start".to_string() },
+        color: color_button,
+        hover_color: color_button_hover,
+        intent: Intent::ToggleJob(job_id),
+        is_hovered: button_is_hovered,
+    });
 
     elements
 }

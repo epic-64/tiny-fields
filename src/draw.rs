@@ -18,6 +18,7 @@ pub enum UiElement {
         text: String,
         color: Color,
         hover_color: Color,
+        is_hovered: bool,
         intent: Intent,
         parent_clip: Option<(i32, i32, i32, i32)>,
     },
@@ -56,26 +57,12 @@ pub fn draw(command: &UiElement) {
             };
             draw_texture_ex(texture, *x, *y, *color, params);
         }
-        UiElement::Button { rectangle: r, font_size, text, color, hover_color, parent_clip, .. } => {
-            let clip_is_hovered = if let Some(clip) = parent_clip {
-                let (x, y, w, h) = clip;
-                UiRect {
-                    x: *x as f32,
-                    y: *y as f32,
-                    w: *w as f32,
-                    h: *h as f32
-                }.is_hovered()
-            } else {
-                true
-            };
+        UiElement::Button { rectangle: r, font_size, text, color, is_hovered, .. } => {
+            if *is_hovered {
+                draw_rectangle(r.x - 2.0, r.y - 2.0, r.w + 4.0, r.h + 4.0, WHITE);
+            }
 
-            let current_color = if r.is_hovered() && clip_is_hovered {
-                *hover_color
-            } else {
-                *color
-            };
-
-            draw_rectangle(r.x, r.y, r.w, r.h, current_color);
+            draw_rectangle(r.x, r.y, r.w, r.h, *color);
 
             let text_measure = measure_text(text, None, *font_size as u16, 1.);
             let text_x = r.x + (r.w - text_measure.width) / 2.0;
