@@ -22,12 +22,10 @@ pub struct Assets {
     pub textures: Textures,
 }
 
-#[derive(Clone)]
 pub struct PerformanceFlags {
     pub timeslots_changed: bool,
 }
 
-#[derive(Clone)]
 pub struct TimeSlots {
     pub total: i32,
     pub used: i32,
@@ -39,7 +37,6 @@ impl TimeSlots {
     }
 }
 
-#[derive(Clone)]
 pub struct GameMeta {
     pub effective_fps: f32,
     pub raw_fps: f32,
@@ -89,7 +86,6 @@ fn define_jobs() -> Vec<Job> {
     ]
 }
 
-#[derive(Clone)]
 pub struct GameState {
     pub jobs: Vec<Job>,
     pub total_money: i64,
