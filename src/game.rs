@@ -43,6 +43,7 @@ impl TimeSlots {
     pub fn get_free(&self) -> i32 {
         self.total - self.used
     }
+    pub fn get_upgrade_cost(&self) -> i64 { 10_i64.pow(self.total as u32 - 1) }
 }
 
 pub struct GameMeta {
@@ -107,7 +108,7 @@ impl GameState {
         Self {
             jobs: define_jobs(),
             total_money: 0,
-            time_slots: TimeSlots { total: 6, used: 0, },
+            time_slots: TimeSlots { total: 3, used: 0, },
             performance_flags: PerformanceFlags { timeslots_changed: false, },
             game_meta: GameMeta { effective_fps: 0.0, raw_fps: 0.0, },
         }
@@ -122,6 +123,15 @@ impl GameState {
                 Intent::ToggleJob(index) => {
                     if let Some(job) = self.jobs.get_mut(*index) {
                         job.toggle_running(free_timeslots);
+                        self.performance_flags.timeslots_changed = true;
+                    }
+                }
+                Intent::BuyTimeSlot => {
+                    let upgrade_cost = self.time_slots.get_upgrade_cost();
+
+                    if self.total_money >= upgrade_cost {
+                        self.total_money -= upgrade_cost;
+                        self.time_slots.total += 1;
                         self.performance_flags.timeslots_changed = true;
                     }
                 }
@@ -151,6 +161,7 @@ fn get_used_timeslots(jobs: &[Job]) -> i32 {
 #[derive(Clone)]
 pub enum Intent {
     ToggleJob(usize),
+    BuyTimeSlot,
 }
 
 #[derive(Clone)]

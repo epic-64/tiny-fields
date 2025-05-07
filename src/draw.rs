@@ -17,7 +17,6 @@ pub enum UiElement {
         font_size: f32,
         text: String,
         color: Color,
-        hover_color: Color,
         is_hovered: bool,
         intent: Intent,
         parent_clip: Option<(i32, i32, i32, i32)>,

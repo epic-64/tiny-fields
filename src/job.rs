@@ -236,7 +236,6 @@ pub fn build_job_card(
         font_size: font_size_large,
         text: if job.running { "Stop".to_string() } else { "Start".to_string() },
         color: color_button,
-        hover_color: color_button_hover,
         intent: Intent::ToggleJob(job_id),
         is_hovered: button_is_hovered,
     });

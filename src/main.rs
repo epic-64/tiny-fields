@@ -176,5 +176,21 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
         });
     }
 
+    // Button for buying time slots
+    elements.push(UiElement::Button {
+        rectangle: UiRect {
+            x: rect.x + 120.0 + (state.time_slots.total as f32) * (icon_size + 5.0),
+            y: rect.y,
+            w: 200.0,
+            h: icon_size,
+        },
+        intent: Intent::BuyTimeSlot,
+        text: format!("Buy ({})", state.time_slots.get_upgrade_cost()),
+        font_size: 20.0,
+        color: DARKGRAY,
+        parent_clip: None,
+        is_hovered: false,
+    });
+
     elements
 }
