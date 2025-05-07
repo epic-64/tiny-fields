@@ -49,10 +49,10 @@ async fn main() {
         // build all ui elements (draw commands)
         let job_elements = job_ui.build(&state, &assets, &mouse_input);
         let job_elements_2 = job_ui_2.build(&state, &assets, &mouse_input);
-        let top_hud_elements = get_top_hud(&state, &assets, UiRect { x: 0.0, y: 0.0, w: screen_width(), h: 50.0 });
+        let top_hud_elements = get_top_hud(&state, &assets, UiRect { x: 50.0, y: 15.0, w: screen_width(), h: 50.0 });
 
-        // Draw all the elements. Since we build them from the old
-        // game state, this should happen before state.step()
+        // Draw all the elements. Since we build them from the
+        // old game state, this should happen before state.step()
         clear_background(ORANGE);
         job_elements.iter().for_each(draw);
         job_elements_2.iter().for_each(draw);
@@ -129,12 +129,15 @@ pub fn get_intents(elements: Vec<UiElement>, mouse_input: &MouseInput) -> Vec<In
 pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiElement> {
     let mut elements = vec![];
 
+    let icon_size = 60.0;
+    let font_size = 40.0;
+
     // Money Image
     elements.push(UiElement::Image {
         x: rect.x,
         y: rect.y,
-        width: 40.0,
-        height: 40.0,
+        width: icon_size,
+        height: icon_size,
         texture: assets.textures.coin.clone(),
         color: WHITE,
     });
@@ -142,9 +145,9 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
     // Money Text
     elements.push(UiElement::Text {
         content: state.total_money.to_string(),
-        x: rect.x + 50.0,
-        y: rect.y + 10.0,
-        font_size: 30.0,
+        x: rect.x + 60.0,
+        y: rect.y + font_size,
+        font_size,
         color: WHITE,
     });
 
