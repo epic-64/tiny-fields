@@ -19,12 +19,7 @@ impl JobUi {
         self.scroll_container.update();
     }
 
-    pub fn build(
-        &self,
-        state: &GameState,
-        assets: &Assets,
-    ) -> Vec<UiElement>
-    {
+    pub fn build(&self, state: &GameState, assets: &Assets) -> Vec<UiElement> {
         let mut elements: Vec<UiElement> = vec![];
 
         // add decorations
@@ -37,13 +32,13 @@ impl JobUi {
             color: Color::from_rgba(0, 0, 0, 100),
         });
 
-        elements.extend(self.scroll_container.build(state, assets, get_all_job_elements));
+        elements.extend(self.scroll_container.build(state, assets, build_job_cards));
 
         elements
     }
 }
 
-fn get_all_job_elements(state: &GameState, assets: &Assets, clip_rect: &UiRect, offset: Vec2) -> Vec<UiElement>
+fn build_job_cards(state: &GameState, assets: &Assets, clip_rect: &UiRect, offset: Vec2) -> Vec<UiElement>
 {
     let mut elements: Vec<UiElement> = vec![];
 
@@ -212,6 +207,7 @@ pub fn build_job_card(
         h: 46.0,
     };
 
+    // Check if the clip area of the scroll container is hovered
     let clip_is_hovered = if let Some(clip) = clip {
         let (x, y, w, h) = clip;
         UiRect {
