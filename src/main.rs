@@ -1,5 +1,4 @@
 use game::{Fonts, Textures};
-use macroquad::math::f32;
 use macroquad::miniquad::date::now;
 use macroquad::prelude::*;
 
