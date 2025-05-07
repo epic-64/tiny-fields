@@ -1,7 +1,7 @@
 use crate::draw::UiElement;
 use crate::game::{Assets, GameState, Intent, Job, MouseInput, UiRect};
 use crate::ui::ScrollContainer;
-use macroquad::color::{Color, BLUE, DARKBLUE, DARKGRAY, GRAY, GREEN, SKYBLUE, WHITE};
+use macroquad::color::{Color, BLUE, DARKBLUE, DARKGRAY, GRAY, GREEN, WHITE};
 use macroquad::math::Vec2;
 
 pub struct JobUi {
@@ -111,7 +111,6 @@ pub fn build_job_card(
     let color_primary = DARKBLUE;
     let color_secondary = DARKGRAY;
     let color_button = DARKGRAY;
-    let color_button_hover = SKYBLUE;
 
     let font_size_large = 24.0;
     let font_size_small = 20.0;
