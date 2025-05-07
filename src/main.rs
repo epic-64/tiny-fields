@@ -32,8 +32,8 @@ async fn main() {
     let mut state = GameState::new();
     let assets: Assets = load_assets().await;
 
-    let mut job_ui = ScrollContainer::new(UiRect { x: 50.0, y: 100.0, w: 500.0, h: 600.0 });
-    let mut job_ui_2 = ScrollContainer::new(UiRect { x: 600.0, y: 100.0, w: 500.0, h: 600.0 });
+    let mut job_ui = JobUi::new(UiRect{ x: 50.0, y: 100.0, w: 500.0, h: 600.0 });
+    let mut job_ui_2 = JobUi::new(UiRect{ x: 600.0, y: 100.0, w: 500.0, h: 600.0 });
 
     loop {
         let frame_start = Instant::now();
@@ -53,8 +53,8 @@ async fn main() {
         job_ui_2.update();
 
         // Build all the UI elements from the current game state
-        let job_elements = job_ui.build(&state, &assets, get_all_job_elements);
-        let job_elements_2 = job_ui_2.build(&state, &assets, get_all_job_elements);
+        let job_elements = job_ui.build(&state, &assets);
+        let job_elements_2 = job_ui_2.build(&state, &assets);
 
         // Draw all the elements. Since we build them from the old
         // game state, this should happen before state.step()
@@ -398,6 +398,45 @@ impl ScrollContainer {
 
         // Remove the clipping area
         elements.push(UiElement::Scissor { clip: None });
+
+        elements
+    }
+}
+
+pub struct JobUi {
+    scroll_container: ScrollContainer,
+}
+
+impl JobUi {
+    pub fn new(rect: UiRect) -> Self {
+        Self {
+            scroll_container: ScrollContainer::new(rect),
+        }
+    }
+
+    pub fn update(&mut self) {
+        self.scroll_container.update();
+    }
+
+    pub fn build(
+        &self,
+        state: &GameState,
+        assets: &Assets,
+    ) -> Vec<UiElement>
+    {
+        let mut elements: Vec<UiElement> = vec![];
+
+        // add decorations
+        let padding = 5.0;
+        elements.push(UiElement::Rectangle {
+            x: self.scroll_container.rect.x - padding,
+            y: self.scroll_container.rect.y - padding,
+            width: self.scroll_container.rect.w as f64 + padding as f64 * 2.0,
+            height: self.scroll_container.rect.h as f64 + padding as f64 * 2.0,
+            color: Color::from_rgba(0, 0, 0, 100),
+        });
+
+        elements.extend(self.scroll_container.build(state, assets, get_all_job_elements));
 
         elements
     }
