@@ -1,7 +1,7 @@
 use game::{Fonts, Textures};
 use macroquad::math::f32;
+use macroquad::miniquad::date::now;
 use macroquad::prelude::*;
-use std::time::Instant;
 
 pub mod draw;
 pub mod game;
@@ -39,7 +39,7 @@ async fn main() {
     let mut job_ui_2 = JobUi::new(UiRect{ x: 600.0, y: 100.0, w: 500.0, h: 600.0 });
 
     loop {
-        let frame_start = Instant::now();
+        let frame_start = now();
         let dt = get_frame_time();
 
         // collect inputs (IO)
@@ -76,7 +76,8 @@ async fn main() {
         state.step(&merged_intents, dt);
 
         // Keep track of FPS
-        state.game_meta.raw_fps = 1.0 / frame_start.elapsed().as_secs_f32();
+        let elapsed = now() - frame_start;
+        state.game_meta.raw_fps = 1.0 / elapsed as f32;
         state.game_meta.effective_fps = get_fps() as f32;
 
         next_frame().await;
