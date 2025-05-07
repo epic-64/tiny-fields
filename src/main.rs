@@ -43,7 +43,7 @@ async fn main() {
         let dt = get_frame_time();
 
         // collect inputs (IO)
-        let mouse_input = MouseInput {
+        let _mouse_input = MouseInput {
             pressed: get_mouse_buttons(is_mouse_button_pressed),
             released: get_mouse_buttons(is_mouse_button_released),
             down: get_mouse_buttons(is_mouse_button_down),
