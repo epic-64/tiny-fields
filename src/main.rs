@@ -82,7 +82,7 @@ async fn load_assets() -> Assets {
     let frame1: Texture2D = load_texture("frame2.png").await.expect("Couldn't load file");
     let coin: Texture2D = load_texture("coin.png").await.expect("Couldn't load file");
     let affection: Texture2D = load_texture("rune_heart.png").await.expect("Couldn't load file");
-    let time: Texture2D = load_texture("rune_time2.png").await.expect("Couldn't load file");
+    let time: Texture2D = load_texture("rune_time2_cropped.png").await.expect("Couldn't load file");
 
     let main_font = load_ttf_font("Menlo-Regular.ttf").await.expect("Couldn't load font");
 
