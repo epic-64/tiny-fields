@@ -211,17 +211,16 @@ pub fn build_job_card(
     });
 
     // Start / Stop Button
-    let button_rect = UiRect {
-        x: offset.x + card_width - button_width - 30.0,
-        y: offset.y + 25.0,
-        w: button_width,
-        h: 132.0,
-    };
-
     elements.push(UiElement::Button {
-        rectangle: button_rect,
+        rectangle: UiRect {
+            x: offset.x + card_width - button_width - 30.0,
+            y: offset.y + 25.0,
+            w: button_width,
+            h: 132.0,
+        },
+        font: assets.fonts.main.clone(),
         parent_clip: clip.clone(),
-        font_size: font_size_large,
+        font_size: font_size_small,
         text: if job.running { "Stop".to_string() } else { "Start".to_string() },
         color: color_button,
         intent: Intent::ToggleJob(job_id),

@@ -17,6 +17,7 @@ pub enum UiElement {
     Button {
         rectangle: UiRect,
         font_size: f32,
+        font: Option<Font>,
         text: String,
         color: Color,
         intent: Intent,
@@ -83,18 +84,24 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
             };
             draw_texture_ex(texture, *x, *y, *color, params);
         }
-        UiElement::Button { rectangle: r, font_size, text, color, .. } => {
+        UiElement::Button { rectangle: r, font_size, text, color, font, .. } => {
             if is_hovered(command, mouse_input) {
                 draw_rectangle(r.x - 2.0, r.y - 2.0, r.w + 4.0, r.h + 4.0, SKYBLUE);
             }
 
             draw_rectangle(r.x, r.y, r.w, r.h, *color);
 
-            let text_measure = measure_text(text, None, *font_size as u16, 1.);
-            let text_x = r.x + (r.w - text_measure.width) / 2.0;
-            let text_y = r.y + (r.h - text_measure.height) / 2.0 + font_size / 2.0;
+            let the_font = if let Some(f) = font { Some(f) } else { None };
+            let text_measure = measure_text(text, the_font, *font_size as u16, 1.);
+            let text_x = (r.x + (r.w - text_measure.width) / 2.0).round();
+            let text_y = (r.y + (r.h + text_measure.height / 2.0) / 2.0).round();
 
-            draw_text(text, text_x, text_y, *font_size, WHITE);
+            draw_text_ex(text, text_x, text_y, TextParams {
+                font: the_font,
+                font_size: *font_size as u16,
+                color: WHITE,
+                ..Default::default()
+            });
         }
         UiElement::Scissor { clip } => {
             gl.scissor(*clip)

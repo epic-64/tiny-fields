@@ -312,3 +312,14 @@ impl Job {
         (base_actions as f32 * growth_factor.powi(self.level - 1)) as i32
     }
 }
+
+pub fn pretty_number(num: i64) -> String {
+    let (num, suffix) = match num {
+        n if n >= 1_000_000_000 => (n as f64 / 1_000_000_000.0, "b"),
+        n if n >= 1_000_000 => (n as f64 / 1_000_000.0, "m"),
+        n if n >= 10_000 => (n as f64 / 1_000.0, "k"),
+        _ => return num.to_string(),
+    };
+
+    format!("{:.2}{suffix}", num)
+}

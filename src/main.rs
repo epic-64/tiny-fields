@@ -8,7 +8,7 @@ pub mod job;
 pub mod ui;
 
 use crate::draw::{draw, UiElement};
-use crate::game::{Assets, GameState, Intent, MouseInput, UiRect};
+use crate::game::{pretty_number, Assets, GameState, Intent, MouseInput, UiRect};
 use crate::job::JobUi;
 
 pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
@@ -47,17 +47,20 @@ async fn main() {
         // build all ui elements (draw commands)
         let job_elements = job_ui.build(&state, &assets);
         let top_hud_elements = get_top_hud(&state, &assets, UiRect { x: 50.0, y: 15.0, w: screen_width(), h: 50.0 });
+        let cheat_buttons = get_cheat_buttons(&assets, UiRect { x: 50.0, y: 800.0, w: 200.0, h: 40.0 });
 
         // Draw all the elements. Since we build them from the
         // old game state, this should happen before state.step()
         clear_background(ORANGE);
         job_elements.iter().for_each(|el|draw(el, &mouse_input));
         top_hud_elements.iter().for_each(|el|draw(el, &mouse_input));
+        cheat_buttons.iter().for_each(|el|draw(el, &mouse_input));
 
         // collect all intents from UI interactions
         let mut all_intents: Vec<Intent> = vec![];
         all_intents.extend(get_intents(job_elements, &mouse_input));
         all_intents.extend(get_intents(top_hud_elements, &mouse_input));
+        all_intents.extend(get_intents(cheat_buttons, &mouse_input));
 
         // Update game state
         state.step(&all_intents, dt);
@@ -140,7 +143,7 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
 
     // Money Text
     elements.push(UiElement::Text {
-        content: state.total_money.to_string(),
+        content: pretty_number(state.total_money),
         font: assets.fonts.main.clone(),
         x: rect.x + 60.0,
         y: rect.y + font_size,
@@ -180,38 +183,48 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
             w: 200.0,
             h: icon_size,
         },
+        font: assets.fonts.main.clone(),
         intent: Intent::BuyTimeSlot,
         text: format!("Buy ({})", state.time_slots.get_upgrade_cost()),
-        font_size: 20.0,
+        font_size: 14.0,
         color: DARKGRAY,
         parent_clip: None,
     });
+
+    elements
+}
+
+pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
+    let mut elements = vec![];
 
     // Button for skipping 5 minutes
     elements.push(UiElement::Button {
         rectangle: UiRect {
-            x: rect.x + 200.0 + 220.0,
+            x: rect.x,
             y: rect.y,
             w: 200.0,
-            h: icon_size,
+            h: 40.0,
         },
+        font: assets.fonts.main.clone(),
         intent: Intent::SkipSeconds(300),
         text: "Skip 5 min".to_string(),
-        font_size: 20.0,
+        font_size: 14.0,
         color: DARKGRAY,
         parent_clip: None,
     });
 
+    // Button for skipping 1 week
     elements.push(UiElement::Button {
         rectangle: UiRect {
-            x: rect.x + 200.0 + 220.0 + 220.0,
+            x: rect.x + 210.0,
             y: rect.y,
             w: 200.0,
-            h: icon_size,
+            h: 40.0,
         },
-        intent: Intent::SkipSeconds(31_536_000),
-        text: "Skip 1 year".to_string(),
-        font_size: 20.0,
+        font: assets.fonts.main.clone(),
+        intent: Intent::SkipSeconds(604_800),
+        text: "Skip 1 week".to_string(),
+        font_size: 14.0,
         color: DARKGRAY,
         parent_clip: None,
     });
