@@ -19,7 +19,7 @@ impl JobUi {
         self.scroll_container.update(mouse_input);
     }
 
-    pub fn build(&self, state: &GameState, assets: &Assets, mouse_input: &MouseInput) -> Vec<UiElement> {
+    pub fn build(&self, state: &GameState, assets: &Assets) -> Vec<UiElement> {
         let mut elements: Vec<UiElement> = vec![];
 
         // add decorations
@@ -32,7 +32,7 @@ impl JobUi {
             color: Color::from_rgba(0, 0, 0, 100),
         });
 
-        elements.extend(self.scroll_container.build(state, assets, mouse_input, build_job_cards));
+        elements.extend(self.scroll_container.build(state, assets, build_job_cards));
 
         elements
     }
@@ -41,7 +41,6 @@ impl JobUi {
 fn build_job_cards(
     state: &GameState,
     assets: &Assets,
-    mouse_input: &MouseInput,
     clip_rect: &UiRect,
     offset: Vec2
 ) -> Vec<UiElement>
@@ -64,7 +63,6 @@ fn build_job_cards(
 
     for (id, job) in state.jobs.iter().enumerate() {
         let job_draw_container = build_job_card(
-            mouse_input,
             &container_clip,
             assets,
             job,
@@ -86,7 +84,6 @@ fn build_job_cards(
 }
 
 pub fn build_job_card(
-    mouse_input: &MouseInput,
     clip: &Option<(i32, i32, i32, i32)>,
     assets: &Assets,
     job: &Job,
@@ -221,21 +218,6 @@ pub fn build_job_card(
         h: 132.0,
     };
 
-    // Check if the clip area of the scroll container is hovered
-    let clip_is_hovered = if let Some(clip) = clip {
-        let (x, y, w, h) = clip;
-        UiRect {
-            x: *x as f32,
-            y: *y as f32,
-            w: *w as f32,
-            h: *h as f32
-        }.is_hovered(mouse_input)
-    } else {
-        true
-    };
-
-    let button_is_hovered = button_rect.is_hovered(mouse_input) && clip_is_hovered;
-
     elements.push(UiElement::Button {
         rectangle: button_rect,
         parent_clip: clip.clone(),
@@ -243,7 +225,6 @@ pub fn build_job_card(
         text: if job.running { "Stop".to_string() } else { "Start".to_string() },
         color: color_button,
         intent: Intent::ToggleJob(job_id),
-        is_hovered: button_is_hovered,
     });
 
     elements

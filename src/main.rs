@@ -45,14 +45,14 @@ async fn main() {
         job_ui.update(&mouse_input);
 
         // build all ui elements (draw commands)
-        let job_elements = job_ui.build(&state, &assets, &mouse_input);
+        let job_elements = job_ui.build(&state, &assets);
         let top_hud_elements = get_top_hud(&state, &assets, UiRect { x: 50.0, y: 15.0, w: screen_width(), h: 50.0 });
 
         // Draw all the elements. Since we build them from the
         // old game state, this should happen before state.step()
         clear_background(ORANGE);
-        job_elements.iter().for_each(draw);
-        top_hud_elements.iter().for_each(draw);
+        job_elements.iter().for_each(|el|draw(el, &mouse_input));
+        top_hud_elements.iter().for_each(|el|draw(el, &mouse_input));
 
         // collect all intents from UI interactions
         let mut all_intents: Vec<Intent> = vec![];
@@ -94,10 +94,10 @@ pub fn get_intents(elements: Vec<UiElement>, mouse_input: &MouseInput) -> Vec<In
 
     for element in elements {
         match element {
-            UiElement::Button { rectangle, intent, parent_clip: scissor, .. } => {
+            UiElement::Button { rectangle, intent, parent_clip, .. } => {
                 // First, check if the hovered position is within the clipping area.
                 // (if there is no clipping area, we skip this check)
-                if let Some(area) = scissor {
+                if let Some(area) = parent_clip {
                     let (x, y, w, h) = area;
                     let scissor_rect = UiRect {
                         x: x as f32,
@@ -175,8 +175,8 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
     // Button for buying time slots
     elements.push(UiElement::Button {
         rectangle: UiRect {
-            x: rect.x + 200.0,
-            y: rect.y,
+            x: rect.x + state.time_slots.total as f32 * (icon_size + 5.0),
+            y: rect.y + icon_size + 5.0,
             w: 200.0,
             h: icon_size,
         },
@@ -185,7 +185,6 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
         font_size: 20.0,
         color: DARKGRAY,
         parent_clip: None,
-        is_hovered: false,
     });
 
     // Button for skipping 5 minutes
@@ -201,10 +200,8 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
         font_size: 20.0,
         color: DARKGRAY,
         parent_clip: None,
-        is_hovered: false,
     });
 
-    // Button for skipping 1 year
     elements.push(UiElement::Button {
         rectangle: UiRect {
             x: rect.x + 200.0 + 220.0 + 220.0,
@@ -217,9 +214,7 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
         font_size: 20.0,
         color: DARKGRAY,
         parent_clip: None,
-        is_hovered: false,
     });
-
 
     elements
 }

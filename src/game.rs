@@ -1,4 +1,4 @@
-use macroquad::input::{MouseButton};
+use macroquad::input::MouseButton;
 use macroquad::prelude::Texture2D;
 use macroquad::text::Font;
 

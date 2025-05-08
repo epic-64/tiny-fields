@@ -1,6 +1,6 @@
-use macroquad::prelude::*;
 use crate::draw::UiElement;
 use crate::game::{Assets, GameState, MouseInput, UiRect};
+use macroquad::prelude::*;
 
 pub struct ScrollContainer {
     pub rect: UiRect,
@@ -52,8 +52,7 @@ impl ScrollContainer {
         &self,
         state: &GameState,
         assets: &Assets,
-        mouse_input: &MouseInput,
-        build_ui_elements: fn(&GameState, &Assets, &MouseInput, &UiRect, Vec2) -> Vec<UiElement>
+        build_ui_elements: fn(&GameState, &Assets, &UiRect, Vec2) -> Vec<UiElement>
     ) -> Vec<UiElement>
     {
         let mut elements: Vec<UiElement> = vec![];
@@ -70,7 +69,7 @@ impl ScrollContainer {
         elements.push(UiElement::Scissor { clip });
 
         let scrollable_pos = Vec2::new(self.rect.x, self.rect.y) + self.scroll_offset;
-        elements.extend(build_ui_elements(state, assets, mouse_input, &self.rect, scrollable_pos));
+        elements.extend(build_ui_elements(state, assets, &self.rect, scrollable_pos));
 
         // Remove the clipping area
         elements.push(UiElement::Scissor { clip: None });

@@ -1,5 +1,5 @@
-use crate::game::{Intent, UiRect};
-use macroquad::color::{Color, WHITE};
+use crate::game::{Intent, MouseInput, UiRect};
+use macroquad::color::{Color, SKYBLUE, WHITE};
 use macroquad::math::Vec2;
 use macroquad::prelude::{draw_rectangle, draw_text, draw_text_ex, draw_texture_ex, get_internal_gl, measure_text, DrawTextureParams, QuadGl, Texture2D};
 use macroquad::text::{Font, TextParams};
@@ -19,7 +19,6 @@ pub enum UiElement {
         font_size: f32,
         text: String,
         color: Color,
-        is_hovered: bool,
         intent: Intent,
         parent_clip: Option<(i32, i32, i32, i32)>,
     },
@@ -37,7 +36,28 @@ pub enum UiElement {
     Scissor { clip: Option<(i32, i32, i32, i32)> },
 }
 
-pub fn draw(command: &UiElement) {
+pub fn is_hovered(command: &UiElement, mouse_input: &MouseInput) -> bool {
+    match command {
+        UiElement::Button { rectangle, parent_clip, .. } => {
+            let clip_is_hovered = if let Some(clip) = parent_clip {
+                let (x, y, w, h) = clip;
+                UiRect {
+                    x: *x as f32,
+                    y: *y as f32,
+                    w: *w as f32,
+                    h: *h as f32
+                }.is_hovered(mouse_input)
+            } else {
+                true
+            };
+
+            rectangle.is_hovered(mouse_input) && clip_is_hovered
+        }
+        _ => false,
+    }
+}
+
+pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
     let gl: &mut QuadGl = unsafe { get_internal_gl() }.quad_gl ;
 
     match command {
@@ -63,9 +83,9 @@ pub fn draw(command: &UiElement) {
             };
             draw_texture_ex(texture, *x, *y, *color, params);
         }
-        UiElement::Button { rectangle: r, font_size, text, color, is_hovered, .. } => {
-            if *is_hovered {
-                draw_rectangle(r.x - 2.0, r.y - 2.0, r.w + 4.0, r.h + 4.0, WHITE);
+        UiElement::Button { rectangle: r, font_size, text, color, .. } => {
+            if is_hovered(command, mouse_input) {
+                draw_rectangle(r.x - 2.0, r.y - 2.0, r.w + 4.0, r.h + 4.0, SKYBLUE);
             }
 
             draw_rectangle(r.x, r.y, r.w, r.h, *color);
