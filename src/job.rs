@@ -62,15 +62,6 @@ fn build_job_cards(
         clip_rect.h as i32,
     ));
 
-    // background
-    elements.push(UiElement::Rectangle {
-        x: clip_rect.x,
-        y: clip_rect.y,
-        width: clip_rect.w + 10.0,
-        height: clip_rect.h + 10.0,
-        color: Color::from_rgba(0, 0, 0, 100),
-    });
-
     for (id, job) in state.jobs.iter().enumerate() {
         let job_draw_container = build_job_card(
             mouse_input,
@@ -88,7 +79,7 @@ fn build_job_cards(
 
         elements.extend(job_draw_container);
 
-        container_offset += Vec2::new(0.0, card_height + 15.0);
+        container_offset += Vec2::new(0.0, card_height + 5.0);
     }
 
     elements
@@ -136,15 +127,6 @@ pub fn build_job_card(
         height: card_height,
         color: Color::from_rgba(240, 240, 230, 255),
     });
-
-    // elements.push(UiElement::Image {
-    //     x: offset.x,
-    //     y: offset.y,
-    //     width: card_width,
-    //     height: card_height,
-    //     texture: assets.textures.frame1.clone(),
-    //     color: WHITE
-    // });
 
     // Job Animation
     elements.push(UiElement::Image {

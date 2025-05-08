@@ -27,7 +27,6 @@ async fn main() {
     let assets: Assets = load_assets().await;
 
     let mut job_ui = JobUi::new(UiRect{ x: 50.0, y: 160.0, w: 500.0, h: 600.0 });
-    let mut job_ui_2 = JobUi::new(UiRect{ x: 600.0, y: 160.0, w: 500.0, h: 600.0 });
 
     loop {
         let frame_start = now();
@@ -44,24 +43,20 @@ async fn main() {
 
         // Some UIs can be moved around based on inputs
         job_ui.update(&mouse_input);
-        job_ui_2.update(&mouse_input);
 
         // build all ui elements (draw commands)
         let job_elements = job_ui.build(&state, &assets, &mouse_input);
-        let job_elements_2 = job_ui_2.build(&state, &assets, &mouse_input);
         let top_hud_elements = get_top_hud(&state, &assets, UiRect { x: 50.0, y: 15.0, w: screen_width(), h: 50.0 });
 
         // Draw all the elements. Since we build them from the
         // old game state, this should happen before state.step()
         clear_background(ORANGE);
         job_elements.iter().for_each(draw);
-        job_elements_2.iter().for_each(draw);
         top_hud_elements.iter().for_each(draw);
 
         // collect all intents from UI interactions
         let mut all_intents: Vec<Intent> = vec![];
         all_intents.extend(get_intents(job_elements, &mouse_input));
-        all_intents.extend(get_intents(job_elements_2, &mouse_input));
         all_intents.extend(get_intents(top_hud_elements, &mouse_input));
 
         // Update game state
