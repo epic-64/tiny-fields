@@ -1,7 +1,7 @@
 use crate::game::{Intent, MouseInput, UiRect};
 use macroquad::color::{Color, SKYBLUE, WHITE};
 use macroquad::math::Vec2;
-use macroquad::prelude::{draw_rectangle, draw_text, draw_text_ex, draw_texture_ex, get_internal_gl, measure_text, DrawTextureParams, QuadGl, Texture2D};
+use macroquad::prelude::{draw_rectangle, draw_text_ex, draw_texture_ex, get_internal_gl, measure_text, DrawTextureParams, QuadGl, Texture2D};
 use macroquad::text::{Font, TextParams};
 
 #[derive(Clone)]
