@@ -131,7 +131,7 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
     let mut elements = vec![];
 
     let icon_size = 60.0;
-    let font_size = 40.0;
+    let font_size = 30.0;
 
     // Money Image
     elements.push(UiElement::Image {
@@ -146,6 +146,7 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
     // Money Text
     elements.push(UiElement::Text {
         content: state.total_money.to_string(),
+        font: assets.fonts.main.clone(),
         x: rect.x + 60.0,
         y: rect.y + font_size,
         font_size,

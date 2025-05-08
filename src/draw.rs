@@ -1,7 +1,8 @@
 use crate::game::{Intent, UiRect};
 use macroquad::color::{Color, WHITE};
 use macroquad::math::Vec2;
-use macroquad::prelude::{draw_rectangle, draw_text, draw_texture_ex, get_internal_gl, measure_text, DrawTextureParams, QuadGl, Texture2D};
+use macroquad::prelude::{draw_rectangle, draw_text, draw_text_ex, draw_texture_ex, get_internal_gl, measure_text, DrawTextureParams, QuadGl, Texture2D};
+use macroquad::text::{Font, TextParams};
 
 #[derive(Clone)]
 pub enum UiElement {
@@ -11,6 +12,7 @@ pub enum UiElement {
         y: f32,
         font_size: f32,
         color: Color,
+        font: Option<Font>,
     },
     Button {
         rectangle: UiRect,
@@ -30,7 +32,7 @@ pub enum UiElement {
         background_color: Color,
         foreground_color: Color,
     },
-    Rectangle { x: f32, y: f32, width: f64, height: f64, color: Color },
+    Rectangle { x: f32, y: f32, width: f32, height: f32, color: Color },
     Image { x: f32, y: f32, width: f32, height: f32, texture: Texture2D, color: Color },
     Scissor { clip: Option<(i32, i32, i32, i32)> },
 }
@@ -39,8 +41,13 @@ pub fn draw(command: &UiElement) {
     let gl: &mut QuadGl = unsafe { get_internal_gl() }.quad_gl ;
 
     match command {
-        UiElement::Text { content, x, y, font_size, color } => {
-            draw_text(content, *x, *y, *font_size, *color);
+        UiElement::Text { content, x, y, font_size, color, font } => {
+            draw_text_ex(content, *x, *y, TextParams{
+                font: if let Some(f) = font { Some(f) } else { None },
+                font_size: *font_size as u16,
+                color: *color,
+                ..Default::default()
+            });
         }
         UiElement::ProgressBar { x, y, width, height, progress, background_color, foreground_color } => {
             draw_rectangle(*x, *y, *width, *height, *background_color);

@@ -27,8 +27,8 @@ impl JobUi {
         elements.push(UiElement::Rectangle {
             x: self.scroll_container.rect.x - padding,
             y: self.scroll_container.rect.y - padding,
-            width: self.scroll_container.rect.w as f64 + padding as f64 * 2.0,
-            height: self.scroll_container.rect.h as f64 + padding as f64 * 2.0,
+            width: self.scroll_container.rect.w + padding * 2.0,
+            height: self.scroll_container.rect.h + padding * 2.0,
             color: Color::from_rgba(0, 0, 0, 100),
         });
 
@@ -49,11 +49,11 @@ fn build_job_cards(
     let mut elements: Vec<UiElement> = vec![];
 
     let mut container_offset = offset;
-    let card_height = 180.0;
+    let card_height = 160.0;
     let card_width = clip_rect.w;
     let card_spacing = 15.0;
-    let card_padding_x = 55.0;
-    let card_padding_y = 40.0;
+    let card_padding_x = 30.0;
+    let card_padding_y = 30.0;
 
     let container_clip = Some((
         clip_rect.x as i32,
@@ -66,8 +66,8 @@ fn build_job_cards(
     elements.push(UiElement::Rectangle {
         x: clip_rect.x,
         y: clip_rect.y,
-        width: clip_rect.w as f64 + 10.0,
-        height: clip_rect.h as f64 + 10.0,
+        width: clip_rect.w + 10.0,
+        height: clip_rect.h + 10.0,
         color: Color::from_rgba(0, 0, 0, 100),
     });
 
@@ -112,8 +112,8 @@ pub fn build_job_card(
     let color_secondary = DARKGRAY;
     let color_button = DARKGRAY;
 
-    let font_size_large = 24.0;
-    let font_size_small = 20.0;
+    let font_size_large = 20.0;
+    let font_size_small = 14.0;
 
     let image_width = 90.0f32;
     let inner_x = offset.x + card_padding_x + image_width + card_spacing;
@@ -129,14 +129,22 @@ pub fn build_job_card(
     let mut elements = vec![];
 
     // Background
-    elements.push(UiElement::Image {
+    elements.push(UiElement::Rectangle {
         x: offset.x,
         y: offset.y,
         width: card_width,
         height: card_height,
-        texture: assets.textures.frame1.clone(),
-        color: WHITE
+        color: Color::from_rgba(240, 240, 230, 255),
     });
+
+    // elements.push(UiElement::Image {
+    //     x: offset.x,
+    //     y: offset.y,
+    //     width: card_width,
+    //     height: card_height,
+    //     texture: assets.textures.frame1.clone(),
+    //     color: WHITE
+    // });
 
     // Job Animation
     elements.push(UiElement::Image {
@@ -151,18 +159,21 @@ pub fn build_job_card(
     // Title Bar
     elements.push(UiElement::Text {
         content: job.name.clone() + " ",
+        font: assets.fonts.main.clone(),
         x: inner_x,
         y: offset.y + card_padding_y + 15.0,
         font_size: font_size_large,
         color: color_primary,
     });
 
+    let icon_size = 25.0;
+    let icon_spacing = 2.0;
     for i in 0..job.timeslot_cost {
         elements.push(UiElement::Image {
-            x: inner_x +  i as f32 * (20.0 + 5.0) + 100.0,
+            x: inner_x + i as f32 * (icon_size + icon_spacing) + 100.0,
             y: offset.y + card_padding_y,
-            width: 20.0,
-            height: 20.0,
+            width: icon_size,
+            height: icon_size,
             texture: assets.textures.time.clone(),
             color: if job.running { WHITE } else { GRAY },
         });
@@ -171,6 +182,7 @@ pub fn build_job_card(
     // Job Info
     elements.push(UiElement::Text {
         content: format!("Lvl {} | ${} | {}s", job.level, job.money_per_action(), job.action_duration),
+        font: assets.fonts.main.clone(),
         x: inner_x,
         y: offset.y + 80.0,
         font_size: font_size_small,
@@ -191,9 +203,10 @@ pub fn build_job_card(
     // Action Progress Text
     elements.push(UiElement::Text {
         content: format!("{:.1} / {:.1}", job.time_accumulator, job.action_duration),
+        font: assets.fonts.main.clone(),
         x: inner_x + 10.0,
         y: offset.y + 111.0,
-        font_size: 20.0,
+        font_size: font_size_small,
         color: WHITE,
     });
 
@@ -211,9 +224,10 @@ pub fn build_job_card(
     // Level Up Progress Text
     elements.push(UiElement::Text {
         content: format!("Level Up: {} / {}", job.actions_done, job.actions_to_level_up()),
+        font: assets.fonts.main.clone(),
         x: inner_x + 10.0,
         y: offset.y + 141.0,
-        font_size: 20.0,
+        font_size: font_size_small,
         color: WHITE,
     });
 
