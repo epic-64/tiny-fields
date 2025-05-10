@@ -48,11 +48,11 @@ fn build_job_cards(
     let mut elements: Vec<UiElement> = vec![];
 
     let mut container_offset = offset;
-    let card_height = 160.0;
+    let card_height = 150.0;
     let card_width = clip_rect.w;
     let card_spacing = 15.0;
-    let card_padding_x = 30.0;
-    let card_padding_y = 30.0;
+    let card_padding_x = 20.0;
+    let card_padding_y = 20.0;
 
     let container_clip = Some((
         clip_rect.x as i32,
@@ -104,9 +104,8 @@ pub fn build_job_card(
     let font_size_small = 14.0;
 
     let image_width = 90.0f32;
-    let inner_x = offset.x + card_padding_x + image_width + card_spacing;
-    let progress_bar_width = card_width - card_padding_x - image_width - card_spacing - card_padding_x;
     let button_width = 90.0;
+    let inner_x = offset.x + card_padding_x + image_width + card_spacing;
 
     let chosen_image = if job.running && job.time_accumulator % 2.0 < 1.0 {
         &assets.textures.wood_2
@@ -140,7 +139,7 @@ pub fn build_job_card(
         content: job.name.clone() + " ",
         font: assets.fonts.main.clone(),
         x: inner_x,
-        y: offset.y + card_padding_y + 15.0,
+        y: offset.y + card_padding_y + font_size_large,
         font_size: font_size_large,
         color: color_primary,
     });
@@ -150,17 +149,22 @@ pub fn build_job_card(
         content: format!("Lvl {} | ${} | {}s", job.level, job.money_per_action(), job.action_duration),
         font: assets.fonts.main.clone(),
         x: inner_x,
-        y: offset.y + 80.0,
+        y: offset.y + card_padding_y + font_size_large + 28.0,
         font_size: font_size_small,
         color: color_secondary,
     });
 
+
+    let progress_bar_width = card_width - card_padding_x - image_width - card_spacing
+        - button_width - card_spacing - card_padding_x;
+    let progress_bar_height = 20.0;
+    let progress_bar_action_y = offset.y + 85.0;
     // Action Progress Bar
     elements.push(UiElement::ProgressBar {
         x: inner_x,
-        y: offset.y + 96.0,
-        width: progress_bar_width - 120.0,
-        height: 20.0,
+        y: progress_bar_action_y,
+        width: progress_bar_width,
+        height: progress_bar_height,
         progress: job.action_progress.get(),
         background_color: GRAY,
         foreground_color: GREEN,
@@ -171,17 +175,19 @@ pub fn build_job_card(
         content: format!("{:.1} / {:.1}", job.time_accumulator, job.action_duration),
         font: assets.fonts.main.clone(),
         x: inner_x + 10.0,
-        y: offset.y + 111.0,
+        y: progress_bar_action_y + 15.0,
         font_size: font_size_small,
         color: WHITE,
     });
 
+    let progress_bar_level_y = progress_bar_action_y + progress_bar_height + 5.0;
+
     // Level Up Progress Bar
     elements.push(UiElement::ProgressBar {
         x: inner_x,
-        y: offset.y + 126.0,
-        width: progress_bar_width - 120.0,
-        height: 20.0,
+        y: progress_bar_level_y,
+        width: progress_bar_width,
+        height: progress_bar_height,
         progress: job.level_up_progress.get(),
         background_color: GRAY,
         foreground_color: BLUE,
@@ -192,7 +198,7 @@ pub fn build_job_card(
         content: format!("Level Up: {} / {}", job.actions_done, job.actions_to_level_up()),
         font: assets.fonts.main.clone(),
         x: inner_x + 10.0,
-        y: offset.y + 141.0,
+        y: progress_bar_level_y + 15.0,
         font_size: font_size_small,
         color: WHITE,
     });
@@ -200,10 +206,10 @@ pub fn build_job_card(
     // Start / Stop Button
     elements.push(UiElement::Button {
         rectangle: UiRect {
-            x: offset.x + card_width - button_width - 30.0,
-            y: offset.y + 25.0,
+            x: offset.x + card_width - button_width - card_padding_x,
+            y: offset.y + card_padding_y,
             w: button_width,
-            h: 132.0,
+            h: 50.0,
         },
         font: assets.fonts.main.clone(),
         parent_clip: clip.clone(),

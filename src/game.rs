@@ -1,3 +1,4 @@
+use std::iter::Map;
 use macroquad::input::MouseButton;
 use macroquad::prelude::Texture2D;
 use macroquad::text::Font;
@@ -28,6 +29,12 @@ pub struct PerformanceFlags {
     pub timeslots_changed: bool,
 }
 
+impl PerformanceFlags {
+    pub fn new() -> Self {
+        Self { timeslots_changed: false }
+    }
+}
+
 pub struct TimeSlots {
     pub total: i32,
     pub used: i32,
@@ -46,6 +53,16 @@ pub struct GameMeta {
     pub frame_time: f64,
 }
 
+impl GameMeta {
+    pub fn new() -> Self {
+        Self {
+            effective_fps: 0.0,
+            raw_fps: 0.0,
+            frame_time: 0.0,
+        }
+    }
+}
+
 fn define_jobs() -> Vec<Job> {
     vec![
         Job::new(JobParameters {
@@ -55,6 +72,10 @@ fn define_jobs() -> Vec<Job> {
             base_values: JobBaseValues {
                 money_per_action: 3,
                 actions_until_level_up: 10,
+            },
+            completion_effect: Effect::AddItem {
+                item: "wood".to_string(),
+                amount: 1,
             },
         }),
 
@@ -66,6 +87,10 @@ fn define_jobs() -> Vec<Job> {
                 money_per_action: 30,
                 actions_until_level_up: 10,
             },
+            completion_effect: Effect::AddItem {
+                item: "iron".to_string(),
+                amount: 1,
+            },
         }),
 
         Job::new(JobParameters {
@@ -75,6 +100,10 @@ fn define_jobs() -> Vec<Job> {
             base_values: JobBaseValues {
                 money_per_action: 100,
                 actions_until_level_up: 10,
+            },
+            completion_effect: Effect::AddItem {
+                item: "herb".to_string(),
+                amount: 1,
             },
         }),
 
@@ -86,6 +115,10 @@ fn define_jobs() -> Vec<Job> {
                 money_per_action: 500,
                 actions_until_level_up: 10,
             },
+            completion_effect: Effect::AddItem {
+                item: "meat".to_string(),
+                amount: 1,
+            },
         }),
         Job::new(JobParameters {
             name: "Foraging".to_string(),
@@ -94,6 +127,10 @@ fn define_jobs() -> Vec<Job> {
             base_values: JobBaseValues {
                 money_per_action: 500,
                 actions_until_level_up: 10,
+            },
+            completion_effect: Effect::AddItem {
+                item: "berry".to_string(),
+                amount: 1,
             },
         }),
     ]
@@ -105,6 +142,7 @@ pub struct GameState {
     pub time_slots: TimeSlots,
     pub performance_flags: PerformanceFlags,
     pub game_meta: GameMeta,
+    pub inventory: Inventory,
 }
 
 impl GameState {
@@ -113,8 +151,9 @@ impl GameState {
             jobs: define_jobs(),
             total_money: 0,
             time_slots: TimeSlots { total: 3, used: 0, },
-            performance_flags: PerformanceFlags { timeslots_changed: false, },
-            game_meta: GameMeta { effective_fps: 0.0, raw_fps: 0.0, frame_time: 0.0},
+            performance_flags: PerformanceFlags::new(),
+            game_meta: GameMeta::new(),
+            inventory: Inventory::new(),
         }
     }
 
@@ -154,12 +193,18 @@ impl GameState {
         }
     }
 
-    fn update_progress(&mut self, dt: f32) {
+    fn update_progress(&mut self, dt: f32) -> Vec<Effect> {
+        let mut effects = vec![];
+        
         for job in &mut self.jobs {
             if job.running {
-                self.total_money += job.update_progress(dt);
+                if let Some(effect) = job.update_progress(dt) {
+                    effects.push(effect);
+                }
             }
         }
+        
+        effects
     }
 }
 
@@ -227,6 +272,11 @@ pub struct JobBaseValues {
 }
 
 #[derive(Clone)]
+pub enum Effect {
+    AddItem { item: String, amount: i64 },
+}
+
+#[derive(Clone)]
 pub struct Job {
     pub name: String,
     pub action_progress: Progress,
@@ -238,6 +288,7 @@ pub struct Job {
     pub actions_done: i32,
     pub timeslot_cost: i32,
     pub base_values: JobBaseValues,
+    pub completion_effect: Effect,
 }
 
 pub struct JobParameters {
@@ -245,6 +296,7 @@ pub struct JobParameters {
     pub action_duration: f32,
     pub timeslot_cost: i32,
     pub base_values: JobBaseValues,
+    pub completion_effect: Effect,
 }
 
 impl Job {
@@ -264,6 +316,7 @@ impl Job {
             timeslot_cost: p.timeslot_cost,
             base_values: p.base_values,
             action_duration: p.action_duration,
+            completion_effect: p.completion_effect,
         }
     }
 
@@ -275,25 +328,28 @@ impl Job {
         }
     }
 
-    pub fn update_progress(&mut self, dt: f32) -> i64 {
+    pub fn update_progress(&mut self, dt: f32) -> Option<Effect> {
         self.time_accumulator += dt;
         self.action_progress.set(self.time_accumulator / self.action_duration);
 
         if self.time_accumulator >= self.action_duration {
             self.time_accumulator -= self.action_duration;
             self.actions_done += 1;
+
+            // update level up progress bar
             self.level_up_progress.set(
                 self.actions_done as f32 / self.actions_to_level_up() as f32
             );
 
+            // level up if enough actions done
             if self.actions_done >= self.actions_to_level_up() {
                 self.level_up();
             }
 
-            return self.money_per_action();
+            Some(self.completion_effect.clone())
+        } else {
+            None
         }
-
-        0
     }
 
     fn level_up(&mut self) {
@@ -326,4 +382,26 @@ pub fn pretty_number(num: i64) -> String {
     };
 
     format!("{:.2}{suffix}", num)
+}
+
+pub struct Inventory {
+    pub wood: i64,
+    pub iron: i64,
+}
+
+impl Inventory {
+    pub fn new() -> Self {
+        Self {
+            wood: 0,
+            iron: 0,
+        }
+    }
+
+    pub fn add_item(&mut self, item: &str, amount: i64) -> () {
+        match item {
+            "wood" => self.wood += amount,
+            "iron" => self.iron += amount,
+            _ => {}
+        }
+    }
 }
