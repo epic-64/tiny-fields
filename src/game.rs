@@ -41,9 +41,9 @@ impl TimeSlots {
 }
 
 pub struct GameMeta {
-    pub effective_fps: f32,
-    pub raw_fps: f32,
-    pub frame_time: f32,
+    pub effective_fps: f64,
+    pub raw_fps: f64,
+    pub frame_time: f64,
 }
 
 fn define_jobs() -> Vec<Job> {

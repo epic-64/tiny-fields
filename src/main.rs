@@ -71,9 +71,9 @@ async fn main() {
 
         // Keep track of FPS
         let elapsed = now() - frame_start;
-        state.game_meta.frame_time = elapsed as f32;
-        state.game_meta.raw_fps = 1.0 / elapsed as f32;
-        state.game_meta.effective_fps = get_fps() as f32;
+        state.game_meta.frame_time = elapsed;
+        state.game_meta.raw_fps = 1.0 / elapsed;
+        state.game_meta.effective_fps = get_fps() as f64;
 
         next_frame().await;
     }
