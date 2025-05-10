@@ -392,6 +392,7 @@ pub fn pretty_number(num: i64) -> String {
 
 #[derive(Hash, Eq, PartialEq, Clone, Copy, Debug)]
 pub enum Item {
+    Coin,
     Wood,
     Iron,
     Herb,
@@ -402,6 +403,7 @@ pub enum Item {
 impl Item {
     pub fn to_string(&self) -> String {
         match self {
+            Item::Coin => "Coin".to_string(),
             Item::Wood => "Wood".to_string(),
             Item::Iron => "Iron".to_string(),
             Item::Herb => "Herb".to_string(),
@@ -419,11 +421,7 @@ impl Inventory {
     pub fn new() -> Self {
         Self {
             items: HashMap::from([
-                (Item::Wood, 0),
-                (Item::Iron, 0),
-                (Item::Herb, 0),
-                (Item::Meat, 0),
-                (Item::Berry, 0),
+                (Item::Coin, 0),
             ]),
         }
     }
