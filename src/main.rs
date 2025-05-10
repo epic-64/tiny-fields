@@ -80,12 +80,10 @@ async fn main() {
 async fn load_assets() -> Assets {
     let wood_1: Texture2D = load_texture("ChopChop_1_.png").await.expect("Couldn't load file");
     let wood_2: Texture2D = load_texture("ChopChop_2_.png").await.expect("Couldn't load file");
-    let coin: Texture2D = load_texture("coin.png").await.expect("Couldn't load file");
-    let time: Texture2D = load_texture("rune_time2_cropped.png").await.expect("Couldn't load file");
 
     let main_font = load_ttf_font("Menlo-Regular.ttf").await.expect("Couldn't load font");
 
-    let textures = Textures { wood_1, wood_2, coin, time };
+    let textures = Textures { wood_1, wood_2 };
     let fonts = Fonts { main: Some(main_font) };
 
     Assets { fonts, textures }

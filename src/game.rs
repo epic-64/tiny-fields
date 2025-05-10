@@ -13,8 +13,6 @@ pub struct MouseInput {
 pub struct Textures {
     pub wood_1: Texture2D,
     pub wood_2: Texture2D,
-    pub coin: Texture2D,
-    pub time: Texture2D,
 }
 
 pub struct Fonts {
