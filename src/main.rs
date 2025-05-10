@@ -54,6 +54,8 @@ async fn main() {
         // build all ui elements (draw commands)
         let job_elements = job_ui.build(&state, &assets);
         let top_hud_elements = get_top_hud(&state, &assets, UiRect { x: 50.0, y: 15.0, w: screen_width(), h: 50.0 });
+        let inventory_elements = build_inventory_elements(&state, &assets, UiRect { x: 600.0, y: 15.0, w: 200.0, h: 80.0 });
+
         let cheat_buttons = get_cheat_buttons(&assets, UiRect { x: 50.0, y: 790.0, w: 200.0, h: 40.0 });
         let debug_elements = build_debug_elements(&state, &assets, UiRect { x: 50.0, y: 850.0, w: 200.0, h: 40.0 });
 
@@ -62,14 +64,16 @@ async fn main() {
         all_intents.extend(get_intents(&job_elements, &mouse_input));
         all_intents.extend(get_intents(&top_hud_elements, &mouse_input));
         all_intents.extend(get_intents(&cheat_buttons, &mouse_input));
+        all_intents.extend(get_intents(&inventory_elements, &mouse_input));
 
         // Update game state
         state.step(&all_intents, dt);
 
         // Draw everything
         clear_background(ORANGE);
-        job_elements.iter().for_each(|el|draw(el, &mouse_input));
         top_hud_elements.iter().for_each(|el|draw(el, &mouse_input));
+        job_elements.iter().for_each(|el|draw(el, &mouse_input));
+        inventory_elements.iter().for_each(|el|draw(el, &mouse_input));
         cheat_buttons.iter().for_each(|el|draw(el, &mouse_input));
         debug_elements.iter().for_each(|el|draw(el, &mouse_input));
 
@@ -259,6 +263,63 @@ pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
         color: DARKGRAY,
         parent_clip: None,
     });
+
+    elements
+}
+
+pub fn build_inventory_elements(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiElement> {
+    let mut elements = vec![];
+
+    // Inventory Rect
+    elements.push(UiElement::Rectangle {
+        x: rect.x,
+        y: rect.y,
+        width: rect.w,
+        height: rect.h,
+        color: DARKGRAY,
+    });
+
+    // draw all items in the inventory
+    // pub struct Inventory {
+    //     pub wood: i64,
+    //     pub iron: i64,
+    // }
+
+    let inventory = &state.inventory;
+    let item_size = 40.0;
+
+    let items = vec![
+        ("wood", inventory.wood),
+        ("iron", inventory.iron)
+    ];
+
+    for (index, (item_name, item_count)) in items.iter().enumerate() {
+        elements.push(UiElement::Rectangle {
+            x: rect.x + index as f32 * (item_size + 5.0),
+            y: rect.y,
+            width: item_size,
+            height: item_size,
+            color: GRAY,
+        });
+
+        elements.push(UiElement::Text {
+            content: format!("{}", item_name),
+            font: assets.fonts.main.clone(),
+            x: rect.x + index as f32 * (item_size + 5.0),
+            y: rect.y + item_size / 2.0,
+            font_size: 14.0,
+            color: WHITE,
+        });
+
+        elements.push(UiElement::Text {
+            content: format!("{}", item_count),
+            font: assets.fonts.main.clone(),
+            x: rect.x + index as f32 * (item_size + 5.0),
+            y: rect.y + item_size,
+            font_size: 14.0,
+            color: WHITE,
+        });
+    }
 
     elements
 }

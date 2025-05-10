@@ -186,16 +186,16 @@ impl GameState {
             }
         }
 
-        self.update_progress(dt);
+        let effects = self.update_progress(dt);
 
         if self.performance_flags.timeslots_changed {
             self.time_slots.used = get_used_timeslots(&self.jobs);
         }
     }
 
-    fn update_progress(&mut self, dt: f32) -> Vec<Effect> {
+    fn update_progress(&mut self, dt: f32) -> () {
         let mut effects = vec![];
-        
+
         for job in &mut self.jobs {
             if job.running {
                 if let Some(effect) = job.update_progress(dt) {
@@ -203,8 +203,14 @@ impl GameState {
                 }
             }
         }
-        
-        effects
+
+        for effect in effects {
+            match effect {
+                Effect::AddItem { item, amount } => {
+                    self.inventory.add_item(&item, amount);
+                }
+            }
+        }
     }
 }
 
