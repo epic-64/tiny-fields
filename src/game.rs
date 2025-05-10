@@ -1,4 +1,4 @@
-use std::iter::Map;
+use std::collections::HashMap;
 use macroquad::input::MouseButton;
 use macroquad::prelude::Texture2D;
 use macroquad::text::Font;
@@ -74,7 +74,7 @@ fn define_jobs() -> Vec<Job> {
                 actions_until_level_up: 10,
             },
             completion_effect: Effect::AddItem {
-                item: "wood".to_string(),
+                item: Item::Wood,
                 amount: 1,
             },
         }),
@@ -88,7 +88,7 @@ fn define_jobs() -> Vec<Job> {
                 actions_until_level_up: 10,
             },
             completion_effect: Effect::AddItem {
-                item: "iron".to_string(),
+                item: Item::Iron,
                 amount: 1,
             },
         }),
@@ -102,7 +102,7 @@ fn define_jobs() -> Vec<Job> {
                 actions_until_level_up: 10,
             },
             completion_effect: Effect::AddItem {
-                item: "herb".to_string(),
+                item: Item::Herb,
                 amount: 1,
             },
         }),
@@ -116,7 +116,7 @@ fn define_jobs() -> Vec<Job> {
                 actions_until_level_up: 10,
             },
             completion_effect: Effect::AddItem {
-                item: "meat".to_string(),
+                item: Item::Meat,
                 amount: 1,
             },
         }),
@@ -129,7 +129,7 @@ fn define_jobs() -> Vec<Job> {
                 actions_until_level_up: 10,
             },
             completion_effect: Effect::AddItem {
-                item: "berry".to_string(),
+                item: Item::Berry,
                 amount: 1,
             },
         }),
@@ -186,7 +186,7 @@ impl GameState {
             }
         }
 
-        let effects = self.update_progress(dt);
+        self.update_progress(dt);
 
         if self.performance_flags.timeslots_changed {
             self.time_slots.used = get_used_timeslots(&self.jobs);
@@ -207,7 +207,7 @@ impl GameState {
         for effect in effects {
             match effect {
                 Effect::AddItem { item, amount } => {
-                    self.inventory.add_item(&item, amount);
+                    self.inventory.add_item(item, amount);
                 }
             }
         }
@@ -279,7 +279,7 @@ pub struct JobBaseValues {
 
 #[derive(Clone)]
 pub enum Effect {
-    AddItem { item: String, amount: i64 },
+    AddItem { item: Item, amount: i64 },
 }
 
 #[derive(Clone)]
@@ -390,24 +390,49 @@ pub fn pretty_number(num: i64) -> String {
     format!("{:.2}{suffix}", num)
 }
 
+#[derive(Hash, Eq, PartialEq, Clone, Copy, Debug)]
+pub enum Item {
+    Wood,
+    Iron,
+    Herb,
+    Meat,
+    Berry,
+}
+
+impl Item {
+    pub fn to_string(&self) -> String {
+        match self {
+            Item::Wood => "Wood".to_string(),
+            Item::Iron => "Iron".to_string(),
+            Item::Herb => "Herb".to_string(),
+            Item::Meat => "Meat".to_string(),
+            Item::Berry => "Berry".to_string(),
+        }
+    }
+}
+
 pub struct Inventory {
-    pub wood: i64,
-    pub iron: i64,
+    pub items: HashMap<Item, i32>,
 }
 
 impl Inventory {
     pub fn new() -> Self {
         Self {
-            wood: 0,
-            iron: 0,
+            items: HashMap::from([
+                (Item::Wood, 0),
+                (Item::Iron, 0),
+                (Item::Herb, 0),
+                (Item::Meat, 0),
+                (Item::Berry, 0),
+            ]),
         }
     }
 
-    pub fn add_item(&mut self, item: &str, amount: i64) -> () {
-        match item {
-            "wood" => self.wood += amount,
-            "iron" => self.iron += amount,
-            _ => {}
+    pub fn add_item(&mut self, item: Item, amount: i64) -> () {
+        if let Some(count) = self.items.get_mut(&item) {
+            *count += amount as i32;
+        } else {
+            self.items.insert(item, amount as i32);
         }
     }
 }

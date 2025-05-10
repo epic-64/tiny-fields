@@ -20,8 +20,6 @@ pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
 
 #[macroquad::main("Tiny Fields")]
 async fn main() {
-    let mut time_accumulator = 0.0;
-
     set_pc_assets_folder("assets");
     request_new_screen_size(1600.0, 900.0);
 
@@ -30,14 +28,14 @@ async fn main() {
 
     let mut job_ui = JobUi::new(UiRect{ x: 50.0, y: 160.0, w: 500.0, h: 600.0 });
 
-    let storage = &mut quad_storage::STORAGE.lock().unwrap();
-    storage.set("test", &format!("{}", now()));
-    let value = storage.get("test").unwrap();
+    // Example for using quad-storage
+    // let storage = &mut quad_storage::STORAGE.lock().unwrap();
+    // storage.set("test", &format!("{}", now()));
+    // let value = storage.get("test").unwrap();
 
     loop {
         let frame_start = now();
         let dt = get_frame_time();
-        time_accumulator += dt;
 
         // collect inputs (IO)
         let mouse_input = MouseInput {
@@ -288,10 +286,7 @@ pub fn build_inventory_elements(state: &GameState, assets: &Assets, rect: UiRect
     let inventory = &state.inventory;
     let item_size = 40.0;
 
-    let items = vec![
-        ("wood", inventory.wood),
-        ("iron", inventory.iron)
-    ];
+    let items = inventory.items.clone();
 
     for (index, (item_name, item_count)) in items.iter().enumerate() {
         elements.push(UiElement::Rectangle {
@@ -303,7 +298,7 @@ pub fn build_inventory_elements(state: &GameState, assets: &Assets, rect: UiRect
         });
 
         elements.push(UiElement::Text {
-            content: format!("{}", item_name),
+            content: format!("{}", item_name.to_string()),
             font: assets.fonts.main.clone(),
             x: rect.x + index as f32 * (item_size + 5.0),
             y: rect.y + item_size / 2.0,
