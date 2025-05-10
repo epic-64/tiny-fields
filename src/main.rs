@@ -20,6 +20,8 @@ pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
 
 #[macroquad::main("Tiny Fields")]
 async fn main() {
+    let mut time_accumulator = 0.0;
+
     set_pc_assets_folder("assets");
     request_new_screen_size(1600.0, 900.0);
 
@@ -31,6 +33,7 @@ async fn main() {
     loop {
         let frame_start = now();
         let dt = get_frame_time();
+        time_accumulator += dt;
 
         // collect inputs (IO)
         let mouse_input = MouseInput {
