@@ -128,14 +128,13 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
     let icon_size = 60.0;
     let font_size = 30.0;
 
-    // Money Image
-    elements.push(UiElement::Image {
+    // Money Rect
+    elements.push(UiElement::Rectangle {
         x: rect.x,
         y: rect.y,
         width: icon_size,
         height: icon_size,
-        texture: assets.textures.coin.clone(),
-        color: WHITE,
+        color: GREEN,
     });
 
     // Money Text
@@ -150,24 +149,22 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
 
     // Free Time Slots
     for i in 0..state.time_slots.get_free() {
-        elements.push(UiElement::Image {
+        elements.push(UiElement::Rectangle {
             x: rect.x + i as f32 * (icon_size + 5.0),
             y: rect.y + icon_size + 5.0,
             width: icon_size,
             height: icon_size,
-            texture: assets.textures.time.clone(),
-            color: WHITE,
+            color: YELLOW,
         });
     }
 
     // Used Time Slots
     for i in 0..state.time_slots.used {
-        elements.push(UiElement::Image {
+        elements.push(UiElement::Rectangle {
             x: rect.x + (state.time_slots.get_free() + i) as f32 * (icon_size + 5.0),
             y: rect.y + icon_size + 5.0,
             width: icon_size,
             height: icon_size,
-            texture: assets.textures.time.clone(),
             color: GRAY,
         });
     }
