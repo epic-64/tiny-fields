@@ -54,8 +54,8 @@ pub struct GameMeta {
 fn define_jobs() -> Vec<Job> {
     vec![
         Job::new(JobParameters {
-            name: "Pine".to_string(),
-            action_duration: 2.0,
+            name: "Woodcutting".to_string(),
+            action_duration: 4.0,
             timeslot_cost: 1,
             base_values: JobBaseValues {
                 money_per_action: 3,
@@ -64,9 +64,9 @@ fn define_jobs() -> Vec<Job> {
         }),
 
         Job::new(JobParameters {
-            name: "Spruce".to_string(),
-            action_duration: 10.0,
-            timeslot_cost: 2,
+            name: "Mining".to_string(),
+            action_duration: 4.0,
+            timeslot_cost: 1,
             base_values: JobBaseValues {
                 money_per_action: 30,
                 actions_until_level_up: 10,
@@ -74,9 +74,9 @@ fn define_jobs() -> Vec<Job> {
         }),
 
         Job::new(JobParameters {
-            name: "Rosewood".to_string(),
-            action_duration: 20.0,
-            timeslot_cost: 3,
+            name: "Herbalism".to_string(),
+            action_duration: 4.0,
+            timeslot_cost: 1,
             base_values: JobBaseValues {
                 money_per_action: 100,
                 actions_until_level_up: 10,
@@ -84,9 +84,18 @@ fn define_jobs() -> Vec<Job> {
         }),
 
         Job::new(JobParameters {
-            name: "Oak".to_string(),
-            action_duration: 24.0,
-            timeslot_cost: 3,
+            name: "Hunting".to_string(),
+            action_duration: 4.0,
+            timeslot_cost: 1,
+            base_values: JobBaseValues {
+                money_per_action: 500,
+                actions_until_level_up: 10,
+            },
+        }),
+        Job::new(JobParameters {
+            name: "Foraging".to_string(),
+            action_duration: 4.0,
+            timeslot_cost: 1,
             base_values: JobBaseValues {
                 money_per_action: 500,
                 actions_until_level_up: 10,

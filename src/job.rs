@@ -145,19 +145,6 @@ pub fn build_job_card(
         color: color_primary,
     });
 
-    let icon_size = 25.0;
-    let icon_spacing = 2.0;
-    for i in 0..job.timeslot_cost {
-        elements.push(UiElement::Image {
-            x: inner_x + i as f32 * (icon_size + icon_spacing) + 100.0,
-            y: offset.y + card_padding_y,
-            width: icon_size,
-            height: icon_size,
-            texture: assets.textures.time.clone(),
-            color: if job.running { WHITE } else { GRAY },
-        });
-    }
-
     // Job Info
     elements.push(UiElement::Text {
         content: format!("Lvl {} | ${} | {}s", job.level, job.money_per_action(), job.action_duration),
