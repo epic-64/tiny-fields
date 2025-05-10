@@ -30,6 +30,11 @@ async fn main() {
 
     let mut job_ui = JobUi::new(UiRect{ x: 50.0, y: 160.0, w: 500.0, h: 600.0 });
 
+    let storage = &mut quad_storage::STORAGE.lock().unwrap();
+    storage.set("test", &format!("{}", now()));
+    let value = storage.get("test").unwrap();
+    dbg!(value);
+
     loop {
         let frame_start = now();
         let dt = get_frame_time();
