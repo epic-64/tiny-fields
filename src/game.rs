@@ -43,6 +43,7 @@ impl TimeSlots {
 pub struct GameMeta {
     pub effective_fps: f32,
     pub raw_fps: f32,
+    pub frame_time: f32,
 }
 
 fn define_jobs() -> Vec<Job> {
@@ -113,7 +114,7 @@ impl GameState {
             total_money: 0,
             time_slots: TimeSlots { total: 3, used: 0, },
             performance_flags: PerformanceFlags { timeslots_changed: false, },
-            game_meta: GameMeta { effective_fps: 0.0, raw_fps: 0.0, },
+            game_meta: GameMeta { effective_fps: 0.0, raw_fps: 0.0, frame_time: 0.0},
         }
     }
 

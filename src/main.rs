@@ -50,31 +50,64 @@ async fn main() {
         // build all ui elements (draw commands)
         let job_elements = job_ui.build(&state, &assets);
         let top_hud_elements = get_top_hud(&state, &assets, UiRect { x: 50.0, y: 15.0, w: screen_width(), h: 50.0 });
-        let cheat_buttons = get_cheat_buttons(&assets, UiRect { x: 50.0, y: 800.0, w: 200.0, h: 40.0 });
-
-        // Draw all the elements. Since we build them from the
-        // old game state, this should happen before state.step()
-        clear_background(ORANGE);
-        job_elements.iter().for_each(|el|draw(el, &mouse_input));
-        top_hud_elements.iter().for_each(|el|draw(el, &mouse_input));
-        cheat_buttons.iter().for_each(|el|draw(el, &mouse_input));
+        let cheat_buttons = get_cheat_buttons(&assets, UiRect { x: 50.0, y: 790.0, w: 200.0, h: 40.0 });
+        let debug_elements = build_debug_elements(&state, &assets, UiRect { x: 50.0, y: 850.0, w: 200.0, h: 40.0 });
 
         // collect all intents from UI interactions
         let mut all_intents: Vec<Intent> = vec![];
-        all_intents.extend(get_intents(job_elements, &mouse_input));
-        all_intents.extend(get_intents(top_hud_elements, &mouse_input));
-        all_intents.extend(get_intents(cheat_buttons, &mouse_input));
+        all_intents.extend(get_intents(&job_elements, &mouse_input));
+        all_intents.extend(get_intents(&top_hud_elements, &mouse_input));
+        all_intents.extend(get_intents(&cheat_buttons, &mouse_input));
 
         // Update game state
         state.step(&all_intents, dt);
 
+        // Draw everything
+        clear_background(ORANGE);
+        job_elements.iter().for_each(|el|draw(el, &mouse_input));
+        top_hud_elements.iter().for_each(|el|draw(el, &mouse_input));
+        cheat_buttons.iter().for_each(|el|draw(el, &mouse_input));
+        debug_elements.iter().for_each(|el|draw(el, &mouse_input));
+
         // Keep track of FPS
         let elapsed = now() - frame_start;
+        state.game_meta.frame_time = elapsed as f32;
         state.game_meta.raw_fps = 1.0 / elapsed as f32;
         state.game_meta.effective_fps = get_fps() as f32;
 
         next_frame().await;
     }
+}
+
+fn build_debug_elements(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiElement> {
+    let mut elements = vec![];
+    let font_size = 20.0;
+
+    // FPS Text
+    elements.push(UiElement::Text {
+        content: format!("FPS: {:.2}", state.game_meta.effective_fps),
+        font: assets.fonts.main.clone(),
+        x: rect.x,
+        y: rect.y,
+        font_size,
+        color: WHITE,
+    });
+
+    // Add Frame Time and Raw FPS Text
+    elements.push(UiElement::Text {
+        content: format!(
+            "Frame Time: {:.2} ms | Raw FPS: {:.2}",
+            state.game_meta.frame_time * 1000.0,
+            state.game_meta.raw_fps
+        ),
+        font: assets.fonts.main.clone(),
+        x: rect.x,
+        y: rect.y + font_size,
+        font_size,
+        color: WHITE,
+    });
+
+    elements
 }
 
 async fn load_assets() -> Assets {
@@ -89,7 +122,7 @@ async fn load_assets() -> Assets {
     Assets { fonts, textures }
 }
 
-pub fn get_intents(elements: Vec<UiElement>, mouse_input: &MouseInput) -> Vec<Intent> {
+pub fn get_intents(elements: &Vec<UiElement>, mouse_input: &MouseInput) -> Vec<Intent> {
     let mut intents: Vec<Intent> = vec![];
 
     for element in elements {
@@ -97,7 +130,7 @@ pub fn get_intents(elements: Vec<UiElement>, mouse_input: &MouseInput) -> Vec<In
             UiElement::Button { rectangle, intent, parent_clip, .. } => {
                 // First, check if the hovered position is within the clipping area.
                 // (if there is no clipping area, we skip this check)
-                if let Some(area) = parent_clip {
+                if let Some(area) = *parent_clip {
                     let (x, y, w, h) = area;
                     let scissor_rect = UiRect {
                         x: x as f32,
@@ -112,7 +145,7 @@ pub fn get_intents(elements: Vec<UiElement>, mouse_input: &MouseInput) -> Vec<In
                 }
 
                 if rectangle.is_clicked(mouse_input) {
-                    intents.push(intent);
+                    intents.push(intent.clone());
                 }
             }
             _ => {}
