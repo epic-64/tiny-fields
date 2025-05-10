@@ -98,7 +98,7 @@ pub fn build_job_card(
 {
     let color_primary = DARKBLUE;
     let color_secondary = DARKGRAY;
-    let color_button = DARKGRAY;
+    let color_button = GRAY;
 
     let font_size_large = 20.0;
     let font_size_small = 14.0;
