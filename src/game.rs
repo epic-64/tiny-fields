@@ -64,10 +64,12 @@ impl GameMeta {
 }
 
 fn define_jobs() -> Vec<Job> {
+    let duration = 10.0;
+
     vec![
         Job::new(JobParameters {
             name: "Woodcutting".to_string(),
-            action_duration: 4.0,
+            action_duration: duration,
             timeslot_cost: 1,
             base_values: JobBaseValues {
                 money_per_action: 3,
@@ -81,7 +83,7 @@ fn define_jobs() -> Vec<Job> {
 
         Job::new(JobParameters {
             name: "Mining".to_string(),
-            action_duration: 4.0,
+            action_duration: duration,
             timeslot_cost: 1,
             base_values: JobBaseValues {
                 money_per_action: 30,
@@ -95,7 +97,7 @@ fn define_jobs() -> Vec<Job> {
 
         Job::new(JobParameters {
             name: "Herbalism".to_string(),
-            action_duration: 4.0,
+            action_duration: duration,
             timeslot_cost: 1,
             base_values: JobBaseValues {
                 money_per_action: 100,
@@ -109,7 +111,7 @@ fn define_jobs() -> Vec<Job> {
 
         Job::new(JobParameters {
             name: "Hunting".to_string(),
-            action_duration: 4.0,
+            action_duration: duration,
             timeslot_cost: 1,
             base_values: JobBaseValues {
                 money_per_action: 500,
@@ -122,7 +124,7 @@ fn define_jobs() -> Vec<Job> {
         }),
         Job::new(JobParameters {
             name: "Foraging".to_string(),
-            action_duration: 4.0,
+            action_duration: duration,
             timeslot_cost: 1,
             base_values: JobBaseValues {
                 money_per_action: 500,
