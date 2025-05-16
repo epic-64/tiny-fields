@@ -78,6 +78,12 @@ fn define_jobs() -> Vec<Job> {
         }),
 
         Job::new(JobParameters {
+            job_type: JobType::Woodcutting,
+            name: "Woodcutting".to_string(),
+            completion_effect: Effect::AddItem { item: Item::Wood, amount: 1, },
+        }),
+
+        Job::new(JobParameters {
             job_type: JobType::Mining,
             name: "Mining".to_string(),
             completion_effect: Effect::AddItem { item: Item::Iron, amount: 1, },
