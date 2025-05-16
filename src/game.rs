@@ -150,7 +150,7 @@ impl GameState {
                 Intent::BuyTimeSlot => {
                     let upgrade_cost = self.time_slots.get_upgrade_cost();
 
-                    if self.inventory.get_item(Item::Coin) >= upgrade_cost as i32 {
+                    if self.inventory.get_item(Item::Coin) >= upgrade_cost {
                         self.inventory.add_item(Item::Coin, -upgrade_cost);
                         self.time_slots.total += 1;
                         self.performance_flags.timeslots_changed = true;
@@ -422,7 +422,7 @@ impl Item {
 }
 
 pub struct Inventory {
-    pub items: HashMap<Item, i32>,
+    pub items: HashMap<Item, i64>,
 }
 
 impl Inventory {
@@ -436,13 +436,13 @@ impl Inventory {
 
     pub fn add_item(&mut self, item: Item, amount: i64) -> () {
         if let Some(count) = self.items.get_mut(&item) {
-            *count += amount as i32;
+            *count += amount;
         } else {
-            self.items.insert(item, amount as i32);
+            self.items.insert(item, amount);
         }
     }
 
-    pub fn get_item(&self, item: Item) -> i32 {
+    pub fn get_item(&self, item: Item) -> i64 {
         *self.items.get(&item).unwrap_or(&0)
     }
 }
