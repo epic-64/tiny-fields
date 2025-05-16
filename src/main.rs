@@ -26,7 +26,7 @@ async fn main() {
     let mut state = GameState::new();
     let assets: Assets = load_assets().await;
 
-    let mut job_ui = JobUi::new(UiRect{ x: 50.0, y: 160.0, w: 500.0, h: 600.0 });
+    let mut job_ui = JobUi::new(UiRect{ x: 25.0, y: 100.0, w: 500.0, h: 600.0 });
 
     // Example for using quad-storage
     // let storage = &mut quad_storage::STORAGE.lock().unwrap();
@@ -52,7 +52,7 @@ async fn main() {
         // build all ui elements (draw commands)
         let job_elements = job_ui.build(&state, &assets);
 
-        let top_hud_elements = get_top_hud(&state, &assets, UiRect { x: 50.0, y: 15.0, w: screen_width(), h: 50.0 });
+        let top_hud_elements = get_top_hud(&state, &assets, UiRect { x: 25.0, y: 25.0, w: screen_width(), h: 50.0 });
         let inventory_elements = build_inventory_elements(&state, &assets, UiRect { x: 600.0, y: 15.0, w: 200.0, h: 80.0 });
 
         let cheat_buttons = get_cheat_buttons(&assets, UiRect { x: 50.0, y: 790.0, w: 200.0, h: 40.0 });
@@ -171,34 +171,34 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
 
     let icon_size = 60.0;
 
-    // Free Time Slots
-    for i in 0..state.time_slots.get_free() {
+    // Draw Rectangle for each Time Slot (used and free)
+    for i in 0..state.time_slots.total {
         elements.push(UiElement::Rectangle {
             x: rect.x + i as f32 * (icon_size + 5.0),
-            y: rect.y + icon_size + 5.0,
+            y: rect.y,
             width: icon_size,
             height: icon_size,
-            color: YELLOW,
+            color: DARKGRAY,
         });
     }
 
-    // Used Time Slots
+    // Draw a smaller green rectangle for each used time slot
     for i in 0..state.time_slots.used {
         elements.push(UiElement::Rectangle {
-            x: rect.x + (state.time_slots.get_free() + i) as f32 * (icon_size + 5.0),
-            y: rect.y + icon_size + 5.0,
-            width: icon_size,
-            height: icon_size,
-            color: GRAY,
+            x: rect.x + i as f32 * (icon_size + 5.0) + 5.0,
+            y: rect.y + 5.0,
+            width: icon_size - 10.0,
+            height: icon_size - 10.0,
+            color: GREEN,
         });
     }
 
     // Button for buying time slots
     elements.push(UiElement::Button {
         rectangle: UiRect {
-            x: rect.x + state.time_slots.total as f32 * (icon_size + 5.0),
-            y: rect.y + icon_size + 5.0,
-            w: 200.0,
+            x: rect.x + state.time_slots.total as f32 * (icon_size + 5.0) + 5.0,
+            y: rect.y,
+            w: 120.0,
             h: icon_size,
         },
         font: assets.fonts.main.clone(),
