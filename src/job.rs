@@ -148,7 +148,7 @@ pub fn build_job_card(
 
     // Job Info
     elements.push(UiElement::Text {
-        content: format!("Lvl {} | {}s", job.level, job.action_duration),
+        content: format!("Lvl {} | {}s", job.level, job.job_type.base_duration()),
         font: assets.fonts.main.clone(),
         x: inner_x,
         y: offset.y + card_padding_y + font_size_large + 28.0,
@@ -174,7 +174,7 @@ pub fn build_job_card(
 
     // Action Progress Text
     elements.push(UiElement::Text {
-        content: format!("{:.1} / {:.1}", job.time_accumulator, job.action_duration),
+        content: format!("{:.1} / {:.1}", job.time_accumulator, job.job_type.base_duration()),
         font: assets.fonts.main.clone(),
         x: inner_x + 10.0,
         y: progress_bar_action_y + 15.0,

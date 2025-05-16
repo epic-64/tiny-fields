@@ -70,79 +70,41 @@ impl GameMeta {
 }
 
 fn define_jobs() -> Vec<Job> {
-    let duration = 10.0;
-
     vec![
         Job::new(JobParameters {
             job_type: JobType::Woodcutting,
             name: "Woodcutting".to_string(),
-            action_duration: duration,
-            timeslot_cost: 1,
-            base_values: JobBaseValues { actions_until_level_up: 10, },
-            completion_effect: Effect::AddItem {
-                item: Item::Wood,
-                amount: 1,
-            },
+            completion_effect: Effect::AddItem { item: Item::Wood, amount: 1, },
         }),
 
         Job::new(JobParameters {
             job_type: JobType::Mining,
             name: "Mining".to_string(),
-            action_duration: duration,
-            timeslot_cost: 1,
-            base_values: JobBaseValues { actions_until_level_up: 10, },
-            completion_effect: Effect::AddItem {
-                item: Item::Iron,
-                amount: 1,
-            },
+            completion_effect: Effect::AddItem { item: Item::Iron, amount: 1, },
         }),
 
         Job::new(JobParameters {
             job_type: JobType::Hunting,
             name: "Hunting".to_string(),
-            action_duration: duration,
-            timeslot_cost: 1,
-            base_values: JobBaseValues { actions_until_level_up: 10, },
-            completion_effect: Effect::AddItem {
-                item: Item::Meat,
-                amount: 1,
-            },
+            completion_effect: Effect::AddItem { item: Item::Meat, amount: 1, },
         }),
 
         Job::new(JobParameters {
             job_type: JobType::Herbalism,
             name: "Herbalism".to_string(),
-            action_duration: duration,
-            timeslot_cost: 1,
-            base_values: JobBaseValues { actions_until_level_up: 10, },
-            completion_effect: Effect::AddItem {
-                item: Item::Herb,
-                amount: 1,
-            },
+            completion_effect: Effect::AddItem { item: Item::Herb, amount: 1, },
         }),
 
         Job::new(JobParameters {
             job_type: JobType::Foraging,
             name: "Foraging".to_string(),
-            action_duration: duration,
-            timeslot_cost: 1,
-            base_values: JobBaseValues { actions_until_level_up: 10, },
-            completion_effect: Effect::AddItem {
-                item: Item::Berry,
-                amount: 1,
-            },
+            completion_effect: Effect::AddItem { item: Item::Berry, amount: 1, },
         }),
 
         Job::new(JobParameters {
             job_type: JobType::Smithing,
             name: "Smithing".to_string(),
-            action_duration: duration,
-            timeslot_cost: 1,
-            base_values: JobBaseValues { actions_until_level_up: 10, },
-            completion_effect: Effect::AddItem {
-                item: Item::IronBar,
-                amount: 1,
-            },
+            completion_effect: Effect::AddItem { item: Item::IronBar, amount: 1, },
         }),
     ]
 }
@@ -323,6 +285,14 @@ impl JobType {
             _ => (textures.wood_1.clone(), textures.wood_2.clone()),
         }
     }
+
+    pub fn base_actions_to_level_up(&self) -> i32 {
+        10
+    }
+
+    pub fn base_duration(&self) -> f32 {
+        10.0
+    }
 }
 
 #[derive(Clone)]
@@ -332,30 +302,21 @@ pub struct Job {
     pub action_progress: Progress,
     pub level_up_progress: Progress,
     pub level: i32,
-    pub action_duration: f32,
     pub time_accumulator: f32,
     pub running: bool,
     pub actions_done: i32,
     pub timeslot_cost: i32,
-    pub base_values: JobBaseValues,
     pub completion_effect: Effect,
 }
 
 pub struct JobParameters {
     pub job_type: JobType,
     pub name: String,
-    pub action_duration: f32,
-    pub timeslot_cost: i32,
-    pub base_values: JobBaseValues,
     pub completion_effect: Effect,
 }
 
 impl Job {
     pub fn new(p: JobParameters) -> Self {
-        if p.action_duration % 2.0 != 0.0 {
-            panic!("action_duration must be divisible by 2.0");
-        }
-
         Self {
             level: 1,
             running: false,
@@ -363,11 +324,9 @@ impl Job {
             level_up_progress: Progress{value: 0.0},
             time_accumulator: 0.0,
             actions_done: 0,
+            timeslot_cost: 1,
             job_type: p.job_type,
             name: p.name,
-            timeslot_cost: p.timeslot_cost,
-            base_values: p.base_values,
-            action_duration: p.action_duration,
             completion_effect: p.completion_effect,
         }
     }
@@ -381,11 +340,13 @@ impl Job {
     }
 
     pub fn update_progress(&mut self, dt: f32) -> Option<Effect> {
-        self.time_accumulator += dt;
-        self.action_progress.set(self.time_accumulator / self.action_duration);
+        let duration = self.job_type.base_duration();
 
-        if self.time_accumulator >= self.action_duration {
-            self.time_accumulator -= self.action_duration;
+        self.time_accumulator += dt;
+        self.action_progress.set(self.time_accumulator / duration);
+
+        if self.time_accumulator >= duration {
+            self.time_accumulator -= duration;
             self.actions_done += 1;
 
             // update level up progress bar
@@ -411,7 +372,7 @@ impl Job {
     }
 
     pub fn actions_to_level_up(&self) -> i32 {
-        let base_actions = self.base_values.actions_until_level_up;
+        let base_actions = self.job_type.base_actions_to_level_up();
         let growth_factor: f32 = 1.5;
 
         (base_actions as f32 * growth_factor.powi(self.level - 1)) as i32
