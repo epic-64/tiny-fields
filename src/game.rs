@@ -168,7 +168,8 @@ impl GameState {
     }
 
     // Step logic (tick + inputs)
-    pub fn step(&mut self, actions: &[Intent], dt: f32) {
+    pub fn step(&mut self, actions: &[Intent], dt: f32) -> Vec<Effect>
+    {
         let free_timeslots = self.time_slots.get_free();
 
         for action in actions {
@@ -190,20 +191,24 @@ impl GameState {
                 },
                 Intent::SkipSeconds(seconds) => {
                     for _ in 0..*seconds {
+                        // skip capturing effects because we don't want to draw millions of events
                         self.update_progress(1.0);
                     }
                 }
             }
         }
 
-        self.update_progress(dt);
-
         if self.performance_flags.timeslots_changed {
             self.time_slots.used = get_used_timeslots(&self.jobs);
         }
+
+        let effects = self.update_progress(dt);
+
+        effects
     }
 
-    fn update_progress(&mut self, dt: f32) -> () {
+    fn update_progress(&mut self, dt: f32) -> Vec<Effect>
+    {
         let mut effects = vec![];
 
         for job in &mut self.jobs {
@@ -214,13 +219,15 @@ impl GameState {
             }
         }
 
-        for effect in effects {
+        for effect in &effects {
             match effect {
                 Effect::AddItem { item, amount } => {
-                    self.inventory.add_item(item, amount);
+                    self.inventory.add_item(*item, *amount);
                 }
             }
         }
+
+        effects
     }
 }
 

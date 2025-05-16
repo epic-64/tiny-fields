@@ -8,7 +8,7 @@ pub mod job;
 pub mod ui;
 
 use crate::draw::{draw, UiElement};
-use crate::game::{Assets, GameState, Intent, MouseInput, UiRect};
+use crate::game::{Assets, Effect, GameState, Intent, MouseInput, UiRect};
 use crate::job::JobUi;
 
 pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
@@ -66,7 +66,23 @@ async fn main() {
         all_intents.extend(get_intents(&inventory_elements, &mouse_input));
 
         // Update game state
-        state.step(&all_intents, dt);
+        let effects = state.step(&all_intents, dt);
+        // build UI elements from effects
+        let mut effects_elements: Vec<UiElement> = vec![];
+        for effect in effects {
+            match effect {
+                Effect::AddItem { item, amount } => {
+                    effects_elements.push(UiElement::Text {
+                        content: format!("{} + {}", item.to_string(), amount),
+                        font: assets.fonts.main.clone(),
+                        x: 50.0,
+                        y: 50.0,
+                        font_size: 20.0,
+                        color: WHITE,
+                    })
+                }
+            }
+        }
 
         // Draw everything
         clear_background(ORANGE);
@@ -75,6 +91,7 @@ async fn main() {
         inventory_elements.iter().for_each(|el|draw(el, &mouse_input));
         cheat_buttons.iter().for_each(|el|draw(el, &mouse_input));
         debug_elements.iter().for_each(|el|draw(el, &mouse_input));
+        effects_elements.iter().for_each(|el|draw(el, &mouse_input));
 
         // Keep track of FPS
         let elapsed = now() - frame_start;
