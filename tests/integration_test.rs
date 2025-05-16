@@ -1,4 +1,4 @@
-use tiny_fields::game::{GameState, Intent};
+use tiny_fields::game::{GameState, Intent, Item};
 use tiny_fields::game::Intent::ToggleJob;
 
 #[test]
@@ -8,7 +8,7 @@ fn it_works() {
 
     game_state.step(intents.as_slice(), 0.016);
 
-    assert_eq!(game_state.total_money, 0);
+    assert_eq!(game_state.inventory.get_item(Item::Coin), 0);
 }
 
 #[test]

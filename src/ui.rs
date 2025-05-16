@@ -30,11 +30,11 @@ impl ScrollContainer {
             self.scroll_offset.y += mouse_wheel_delta * 40.0;
         }
 
-        if is_mouse_button_pressed(MouseButton::Right) {
+        if is_mouse_button_pressed(MouseButton::Left) {
             self.last_mouse_position = Vec2::from(mouse_position());
         }
 
-        if is_mouse_button_down(MouseButton::Right) {
+        if is_mouse_button_down(MouseButton::Left) {
             let current_mouse_pos = Vec2::from(mouse_position());
             let delta = current_mouse_pos - self.last_mouse_position;
 

@@ -16,6 +16,8 @@ pub struct Textures {
     pub wood_2: Texture2D,
     pub mining_1: Texture2D,
     pub mining_2: Texture2D,
+    pub hunting_1: Texture2D,
+    pub hunting_2: Texture2D,
 }
 
 pub struct Fonts {
@@ -147,7 +149,6 @@ fn define_jobs() -> Vec<Job> {
 
 pub struct GameState {
     pub jobs: Vec<Job>,
-    pub total_money: i64,
     pub time_slots: TimeSlots,
     pub performance_flags: PerformanceFlags,
     pub game_meta: GameMeta,
@@ -158,7 +159,6 @@ impl GameState {
     pub fn new() -> Self {
         Self {
             jobs: define_jobs(),
-            total_money: 0,
             time_slots: TimeSlots { total: 3, used: 0, },
             performance_flags: PerformanceFlags::new(),
             game_meta: GameMeta::new(),
@@ -181,8 +181,8 @@ impl GameState {
                 Intent::BuyTimeSlot => {
                     let upgrade_cost = self.time_slots.get_upgrade_cost();
 
-                    if self.total_money >= upgrade_cost {
-                        self.total_money -= upgrade_cost;
+                    if self.inventory.get_item(Item::Coin) >= upgrade_cost as i32 {
+                        self.inventory.add_item(Item::Coin, -upgrade_cost);
                         self.time_slots.total += 1;
                         self.performance_flags.timeslots_changed = true;
                     }
@@ -312,6 +312,7 @@ impl JobType {
         match self {
             JobType::Woodcutting => (textures.wood_1.clone(), textures.wood_2.clone()),
             JobType::Mining => (textures.mining_1.clone(), textures.mining_2.clone()),
+            JobType::Hunting => (textures.hunting_1.clone(), textures.hunting_2.clone()),
             _ => (textures.wood_1.clone(), textures.wood_2.clone()),
         }
     }
@@ -470,5 +471,9 @@ impl Inventory {
         } else {
             self.items.insert(item, amount as i32);
         }
+    }
+
+    pub fn get_item(&self, item: Item) -> i32 {
+        *self.items.get(&item).unwrap_or(&0)
     }
 }

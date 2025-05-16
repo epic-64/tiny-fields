@@ -8,7 +8,7 @@ pub mod job;
 pub mod ui;
 
 use crate::draw::{draw, UiElement};
-use crate::game::{pretty_number, Assets, GameState, Intent, MouseInput, UiRect};
+use crate::game::{Assets, GameState, Intent, MouseInput, UiRect};
 use crate::job::JobUi;
 
 pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
@@ -51,6 +51,7 @@ async fn main() {
 
         // build all ui elements (draw commands)
         let job_elements = job_ui.build(&state, &assets);
+
         let top_hud_elements = get_top_hud(&state, &assets, UiRect { x: 50.0, y: 15.0, w: screen_width(), h: 50.0 });
         let inventory_elements = build_inventory_elements(&state, &assets, UiRect { x: 600.0, y: 15.0, w: 200.0, h: 80.0 });
 
@@ -121,10 +122,12 @@ async fn load_assets() -> Assets {
     let wood_2: Texture2D = load_texture("ChopChop_2_.png").await.expect("Couldn't load file");
     let mining_1: Texture2D = load_texture("ClingCling_1.png").await.expect("Couldn't load file");
     let mining_2: Texture2D = load_texture("ClingCling_2.png").await.expect("Couldn't load file");
+    let hunting_1: Texture2D = load_texture("PewPew_1.png").await.expect("Couldn't load file");
+    let hunting_2: Texture2D = load_texture("PewPew_2.png").await.expect("Couldn't load file");
 
     let main_font = load_ttf_font("Menlo-Regular.ttf").await.expect("Couldn't load font");
 
-    let textures = Textures { wood_1, wood_2, mining_1, mining_2 };
+    let textures = Textures { wood_1, wood_2, mining_1, mining_2, hunting_1, hunting_2 };
     let fonts = Fonts { main: Some(main_font) };
 
     Assets { fonts, textures }
@@ -167,26 +170,6 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
     let mut elements = vec![];
 
     let icon_size = 60.0;
-    let font_size = 30.0;
-
-    // Money Rect
-    elements.push(UiElement::Rectangle {
-        x: rect.x,
-        y: rect.y,
-        width: icon_size,
-        height: icon_size,
-        color: GREEN,
-    });
-
-    // Money Text
-    elements.push(UiElement::Text {
-        content: pretty_number(state.total_money),
-        font: assets.fonts.main.clone(),
-        x: rect.x + 60.0,
-        y: rect.y + font_size,
-        font_size,
-        color: WHITE,
-    });
 
     // Free Time Slots
     for i in 0..state.time_slots.get_free() {
