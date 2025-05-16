@@ -8,7 +8,7 @@ pub mod job;
 pub mod ui;
 
 use crate::draw::{draw, UiElement};
-use crate::game::{Assets, Effect, GameState, Intent, MouseInput, UiRect};
+use crate::game::{Assets, Effect, GameState, Intent, MouseInput, TextParticle, UiRect};
 use crate::job::JobUi;
 
 pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
@@ -67,22 +67,39 @@ async fn main() {
 
         // Update game state
         let effects = state.step(&all_intents, dt);
-        // build UI elements from effects
-        let mut effects_elements: Vec<UiElement> = vec![];
-        for effect in effects {
+
+        // remove expired text particles
+        state.text_particles.retain(|particle| { particle.is_alive() });
+
+        // trigger new text particles
+        for effect in &effects {
             match effect {
                 Effect::AddItem { item, amount } => {
-                    effects_elements.push(UiElement::Text {
-                        content: format!("{} + {}", item.to_string(), amount),
-                        font: assets.fonts.main.clone(),
-                        x: 50.0,
-                        y: 50.0,
-                        font_size: 20.0,
+                    state.text_particles.push(TextParticle {
+                        text: format!("{} + {}", item.to_string(), amount),
+                        position: Vec2::new(50.0, 50.0),
+                        velocity: Vec2::new(0.0, -20.0),
                         color: WHITE,
-                    })
+                        lifetime: 2.0
+                    });
                 }
             }
         }
+
+        // step through all text particles
+        state.text_particles.iter_mut().for_each(|particle| particle.step(dt));
+
+        // Build UI elements for text particles
+        let effects_elements: Vec<UiElement> = state.text_particles.iter().map(|particle| {
+            UiElement::Text {
+                content: particle.text.clone(),
+                font: assets.fonts.main.clone(),
+                x: particle.position.x,
+                y: particle.position.y,
+                font_size: 20.0,
+                color: particle.color,
+            }
+        }).collect();
 
         // Draw everything
         clear_background(ORANGE);
@@ -281,12 +298,6 @@ pub fn build_inventory_elements(state: &GameState, assets: &Assets, rect: UiRect
         height: rect.h,
         color: DARKGRAY,
     });
-
-    // draw all items in the inventory
-    // pub struct Inventory {
-    //     pub wood: i64,
-    //     pub iron: i64,
-    // }
 
     let inventory = &state.inventory;
     let item_size = 40.0;

@@ -1,5 +1,7 @@
 use std::collections::HashMap;
+use macroquad::color::Color;
 use macroquad::input::MouseButton;
+use macroquad::math::Vec2;
 use macroquad::prelude::Texture2D;
 use macroquad::text::Font;
 
@@ -121,6 +123,7 @@ pub struct GameState {
     pub performance_flags: PerformanceFlags,
     pub game_meta: GameMeta,
     pub inventory: Inventory,
+    pub text_particles: Vec<TextParticle>,
 }
 
 impl GameState {
@@ -131,6 +134,7 @@ impl GameState {
             performance_flags: PerformanceFlags::new(),
             game_meta: GameMeta::new(),
             inventory: Inventory::new(),
+            text_particles: vec![],
         }
     }
 
@@ -297,7 +301,10 @@ impl JobType {
     }
 
     pub fn base_duration(&self) -> f32 {
-        10.0
+        match self {
+            JobType::Foraging => 1.0,
+            _ => 10.0,
+        }
     }
 }
 
@@ -444,5 +451,24 @@ impl Inventory {
 
     pub fn get_item(&self, item: Item) -> i64 {
         *self.items.get(&item).unwrap_or(&0)
+    }
+}
+
+pub struct TextParticle {
+    pub text: String,
+    pub position: Vec2,
+    pub velocity: Vec2,
+    pub lifetime: f32,
+    pub color: Color,
+}
+
+impl TextParticle {
+    pub fn step(&mut self, dt: f32) {
+        self.position += self.velocity * dt;
+        self.lifetime -= dt;
+    }
+
+    pub fn is_alive(&self) -> bool {
+        self.lifetime > 0.0
     }
 }
