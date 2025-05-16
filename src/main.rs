@@ -135,17 +135,20 @@ fn build_debug_elements(state: &GameState, assets: &Assets, rect: UiRect) -> Vec
 }
 
 async fn load_assets() -> Assets {
-    let wood_1: Texture2D = load_texture("ChopChop_1_.png").await.expect("Couldn't load file");
-    let wood_2: Texture2D = load_texture("ChopChop_2_.png").await.expect("Couldn't load file");
-    let mining_1: Texture2D = load_texture("ClingCling_1.png").await.expect("Couldn't load file");
-    let mining_2: Texture2D = load_texture("ClingCling_2.png").await.expect("Couldn't load file");
-    let hunting_1: Texture2D = load_texture("PewPew_1.png").await.expect("Couldn't load file");
-    let hunting_2: Texture2D = load_texture("PewPew_2.png").await.expect("Couldn't load file");
+    let textures = Textures {
+        wood_1: load_texture("ChopChop_1_.png").await.expect("Couldn't load file"),
+        wood_2: load_texture("ChopChop_2_.png").await.expect("Couldn't load file"),
+        mining_1: load_texture("ClingCling_1.png").await.expect("Couldn't load file"),
+        mining_2: load_texture("ClingCling_2.png").await.expect("Couldn't load file"),
+        hunting_1: load_texture("PewPew_1.png").await.expect("Couldn't load file"),
+        hunting_2: load_texture("PewPew_2.png").await.expect("Couldn't load file"),
+        smithing_1: load_texture("BomBom_1.png").await.expect("Couldn't load file"),
+        smithing_2: load_texture("BomBom_2.png").await.expect("Couldn't load file"),
+    };
 
-    let main_font = load_ttf_font("Menlo-Regular.ttf").await.expect("Couldn't load font");
-
-    let textures = Textures { wood_1, wood_2, mining_1, mining_2, hunting_1, hunting_2 };
-    let fonts = Fonts { main: Some(main_font) };
+    let fonts = Fonts {
+        main: Some(load_ttf_font("Menlo-Regular.ttf").await.expect("Couldn't load font"))
+    };
 
     Assets { fonts, textures }
 }

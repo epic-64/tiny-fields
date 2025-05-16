@@ -148,7 +148,7 @@ pub fn build_job_card(
 
     // Job Info
     elements.push(UiElement::Text {
-        content: format!("Lvl {} | ${} | {}s", job.level, job.money_per_action(), job.action_duration),
+        content: format!("Lvl {} | {}s", job.level, job.action_duration),
         font: assets.fonts.main.clone(),
         x: inner_x,
         y: offset.y + card_padding_y + font_size_large + 28.0,

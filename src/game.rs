@@ -18,6 +18,8 @@ pub struct Textures {
     pub mining_2: Texture2D,
     pub hunting_1: Texture2D,
     pub hunting_2: Texture2D,
+    pub smithing_1: Texture2D,
+    pub smithing_2: Texture2D,
 }
 
 pub struct Fonts {
@@ -76,10 +78,7 @@ fn define_jobs() -> Vec<Job> {
             name: "Woodcutting".to_string(),
             action_duration: duration,
             timeslot_cost: 1,
-            base_values: JobBaseValues {
-                money_per_action: 3,
-                actions_until_level_up: 10,
-            },
+            base_values: JobBaseValues { actions_until_level_up: 10, },
             completion_effect: Effect::AddItem {
                 item: Item::Wood,
                 amount: 1,
@@ -91,10 +90,7 @@ fn define_jobs() -> Vec<Job> {
             name: "Mining".to_string(),
             action_duration: duration,
             timeslot_cost: 1,
-            base_values: JobBaseValues {
-                money_per_action: 30,
-                actions_until_level_up: 10,
-            },
+            base_values: JobBaseValues { actions_until_level_up: 10, },
             completion_effect: Effect::AddItem {
                 item: Item::Iron,
                 amount: 1,
@@ -106,10 +102,7 @@ fn define_jobs() -> Vec<Job> {
             name: "Hunting".to_string(),
             action_duration: duration,
             timeslot_cost: 1,
-            base_values: JobBaseValues {
-                money_per_action: 500,
-                actions_until_level_up: 10,
-            },
+            base_values: JobBaseValues { actions_until_level_up: 10, },
             completion_effect: Effect::AddItem {
                 item: Item::Meat,
                 amount: 1,
@@ -121,10 +114,7 @@ fn define_jobs() -> Vec<Job> {
             name: "Herbalism".to_string(),
             action_duration: duration,
             timeslot_cost: 1,
-            base_values: JobBaseValues {
-                money_per_action: 100,
-                actions_until_level_up: 10,
-            },
+            base_values: JobBaseValues { actions_until_level_up: 10, },
             completion_effect: Effect::AddItem {
                 item: Item::Herb,
                 amount: 1,
@@ -136,12 +126,21 @@ fn define_jobs() -> Vec<Job> {
             name: "Foraging".to_string(),
             action_duration: duration,
             timeslot_cost: 1,
-            base_values: JobBaseValues {
-                money_per_action: 500,
-                actions_until_level_up: 10,
-            },
+            base_values: JobBaseValues { actions_until_level_up: 10, },
             completion_effect: Effect::AddItem {
                 item: Item::Berry,
+                amount: 1,
+            },
+        }),
+
+        Job::new(JobParameters {
+            job_type: JobType::Smithing,
+            name: "Smithing".to_string(),
+            action_duration: duration,
+            timeslot_cost: 1,
+            base_values: JobBaseValues { actions_until_level_up: 10, },
+            completion_effect: Effect::AddItem {
+                item: Item::IronBar,
                 amount: 1,
             },
         }),
@@ -290,7 +289,6 @@ impl Progress {
 
 #[derive(Clone)]
 pub struct JobBaseValues {
-    pub money_per_action: i32,
     pub actions_until_level_up: i32,
 }
 
@@ -321,6 +319,7 @@ impl JobType {
             JobType::Woodcutting => (textures.wood_1.clone(), textures.wood_2.clone()),
             JobType::Mining => (textures.mining_1.clone(), textures.mining_2.clone()),
             JobType::Hunting => (textures.hunting_1.clone(), textures.hunting_2.clone()),
+            JobType::Smithing => (textures.smithing_1.clone(), textures.smithing_2.clone()),
             _ => (textures.wood_1.clone(), textures.wood_2.clone()),
         }
     }
@@ -411,13 +410,6 @@ impl Job {
         self.level_up_progress.reset();
     }
 
-    pub fn money_per_action(&self) -> i64 {
-        let base_money_per_action = self.base_values.money_per_action;
-        let growth_factor: f32 = 1.3;
-
-        (base_money_per_action as f32 * growth_factor.powi(self.level - 1)) as i64
-    }
-
     pub fn actions_to_level_up(&self) -> i32 {
         let base_actions = self.base_values.actions_until_level_up;
         let growth_factor: f32 = 1.5;
@@ -445,6 +437,7 @@ pub enum Item {
     Herb,
     Meat,
     Berry,
+    IronBar,
 }
 
 impl Item {
@@ -456,6 +449,7 @@ impl Item {
             Item::Herb => "Herb".to_string(),
             Item::Meat => "Meat".to_string(),
             Item::Berry => "Berry".to_string(),
+            Item::IronBar => "Iron Bar".to_string(),
         }
     }
 }
