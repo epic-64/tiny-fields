@@ -102,6 +102,21 @@ fn define_jobs() -> Vec<Job> {
         }),
 
         Job::new(JobParameters {
+            job_type: JobType::Hunting,
+            name: "Hunting".to_string(),
+            action_duration: duration,
+            timeslot_cost: 1,
+            base_values: JobBaseValues {
+                money_per_action: 500,
+                actions_until_level_up: 10,
+            },
+            completion_effect: Effect::AddItem {
+                item: Item::Meat,
+                amount: 1,
+            },
+        }),
+
+        Job::new(JobParameters {
             job_type: JobType::Herbalism,
             name: "Herbalism".to_string(),
             action_duration: duration,
@@ -116,20 +131,6 @@ fn define_jobs() -> Vec<Job> {
             },
         }),
 
-        Job::new(JobParameters {
-            job_type: JobType::Hunting,
-            name: "Hunting".to_string(),
-            action_duration: duration,
-            timeslot_cost: 1,
-            base_values: JobBaseValues {
-                money_per_action: 500,
-                actions_until_level_up: 10,
-            },
-            completion_effect: Effect::AddItem {
-                item: Item::Meat,
-                amount: 1,
-            },
-        }),
         Job::new(JobParameters {
             job_type: JobType::Foraging,
             name: "Foraging".to_string(),
