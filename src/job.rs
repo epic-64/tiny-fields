@@ -107,10 +107,12 @@ pub fn build_job_card(
     let button_width = 90.0;
     let inner_x = offset.x + card_padding_x + image_width + card_spacing;
 
+    let (image1, image2) = job.job_type.get_images(assets);
+
     let chosen_image = if job.running && job.time_accumulator % 2.0 < 1.0 {
-        &assets.textures.wood_2
+        image1
     } else {
-        &assets.textures.wood_1
+        image2
     };
 
     let mut elements = vec![];

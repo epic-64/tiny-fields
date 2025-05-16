@@ -119,10 +119,12 @@ fn build_debug_elements(state: &GameState, assets: &Assets, rect: UiRect) -> Vec
 async fn load_assets() -> Assets {
     let wood_1: Texture2D = load_texture("ChopChop_1_.png").await.expect("Couldn't load file");
     let wood_2: Texture2D = load_texture("ChopChop_2_.png").await.expect("Couldn't load file");
+    let mining_1: Texture2D = load_texture("ClingCling_1.png").await.expect("Couldn't load file");
+    let mining_2: Texture2D = load_texture("ClingCling_2.png").await.expect("Couldn't load file");
 
     let main_font = load_ttf_font("Menlo-Regular.ttf").await.expect("Couldn't load font");
 
-    let textures = Textures { wood_1, wood_2 };
+    let textures = Textures { wood_1, wood_2, mining_1, mining_2 };
     let fonts = Fonts { main: Some(main_font) };
 
     Assets { fonts, textures }

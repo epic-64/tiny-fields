@@ -14,6 +14,8 @@ pub struct MouseInput {
 pub struct Textures {
     pub wood_1: Texture2D,
     pub wood_2: Texture2D,
+    pub mining_1: Texture2D,
+    pub mining_2: Texture2D,
 }
 
 pub struct Fonts {
@@ -68,6 +70,7 @@ fn define_jobs() -> Vec<Job> {
 
     vec![
         Job::new(JobParameters {
+            job_type: JobType::Woodcutting,
             name: "Woodcutting".to_string(),
             action_duration: duration,
             timeslot_cost: 1,
@@ -82,6 +85,7 @@ fn define_jobs() -> Vec<Job> {
         }),
 
         Job::new(JobParameters {
+            job_type: JobType::Mining,
             name: "Mining".to_string(),
             action_duration: duration,
             timeslot_cost: 1,
@@ -96,6 +100,7 @@ fn define_jobs() -> Vec<Job> {
         }),
 
         Job::new(JobParameters {
+            job_type: JobType::Herbalism,
             name: "Herbalism".to_string(),
             action_duration: duration,
             timeslot_cost: 1,
@@ -110,6 +115,7 @@ fn define_jobs() -> Vec<Job> {
         }),
 
         Job::new(JobParameters {
+            job_type: JobType::Hunting,
             name: "Hunting".to_string(),
             action_duration: duration,
             timeslot_cost: 1,
@@ -123,6 +129,7 @@ fn define_jobs() -> Vec<Job> {
             },
         }),
         Job::new(JobParameters {
+            job_type: JobType::Foraging,
             name: "Foraging".to_string(),
             action_duration: duration,
             timeslot_cost: 1,
@@ -285,7 +292,34 @@ pub enum Effect {
 }
 
 #[derive(Clone)]
+pub enum JobType {
+    Woodcutting,
+    Mining,
+    Herbalism,
+    Hunting,
+    Foraging,
+    Woodworking,
+    Smithing,
+    Cooking,
+    Alchemy,
+    Selling,
+}
+
+impl JobType {
+    pub fn get_images(&self, assets: &Assets) -> (Texture2D, Texture2D) {
+        let textures = &assets.textures;
+
+        match self {
+            JobType::Woodcutting => (textures.wood_1.clone(), textures.wood_2.clone()),
+            JobType::Mining => (textures.mining_1.clone(), textures.mining_2.clone()),
+            _ => (textures.wood_1.clone(), textures.wood_2.clone()),
+        }
+    }
+}
+
+#[derive(Clone)]
 pub struct Job {
+    pub job_type: JobType,
     pub name: String,
     pub action_progress: Progress,
     pub level_up_progress: Progress,
@@ -300,6 +334,7 @@ pub struct Job {
 }
 
 pub struct JobParameters {
+    pub job_type: JobType,
     pub name: String,
     pub action_duration: f32,
     pub timeslot_cost: i32,
@@ -320,6 +355,7 @@ impl Job {
             level_up_progress: Progress{value: 0.0},
             time_accumulator: 0.0,
             actions_done: 0,
+            job_type: p.job_type,
             name: p.name,
             timeslot_cost: p.timeslot_cost,
             base_values: p.base_values,
