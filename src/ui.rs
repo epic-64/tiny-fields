@@ -33,7 +33,10 @@ impl ScrollContainer {
 
             let upper_bound = 0.0;
             if self.scroll_offset.y > upper_bound {
-                self.scroll_offset.y -= self.scroll_offset.y * factor;
+                self.scroll_offset.y = self.scroll_offset.y.lerp(upper_bound, factor);
+                if (self.scroll_offset.y - upper_bound).abs() < 1.0 {
+                    self.scroll_offset.y = upper_bound;
+                }
             }
 
             let lower_bound = -self.total_height + self.rect.h;
