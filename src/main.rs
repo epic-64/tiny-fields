@@ -74,7 +74,7 @@ async fn main() {
         // trigger new text particles
         for effect in &effects {
             match effect {
-                EffectWithSource::JobSource { job, effect } => {
+                EffectWithSource::Job { job, effect } => {
                     match effect {
                         Effect::AddItem { item, amount } => {
                             state.text_particles.push(TextParticle {

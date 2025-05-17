@@ -187,7 +187,7 @@ impl GameState {
         for job in &mut self.jobs {
             if job.running {
                 if let Some(effect) = job.update_progress(dt) {
-                    effects.push(EffectWithSource::JobSource {
+                    effects.push(EffectWithSource::Job {
                         job: job.clone(),
                         effect: effect.clone(),
                     });
@@ -198,7 +198,7 @@ impl GameState {
         // process side effects
         for effect in &effects {
             match effect {
-                EffectWithSource::JobSource { effect, .. } => {
+                EffectWithSource::Job { effect, .. } => {
                     match effect {
                         Effect::AddItem { item, amount } => {
                             self.inventory.add_item(*item, *amount);
@@ -280,7 +280,7 @@ pub enum Effect {
 }
 
 pub enum EffectWithSource {
-    JobSource { job: Job, effect: Effect },
+    Job { job: Job, effect: Effect },
 }
 
 #[derive(Clone, PartialEq)]
