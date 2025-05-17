@@ -1,17 +1,21 @@
 use crate::draw::UiElement;
 use crate::game::{Assets, GameState, MouseInput, UiRect};
 use macroquad::prelude::*;
+use crate::job::{JOB_CARD_HEIGHT, JOB_CARD_SPACING_OUTER};
 
 pub struct ScrollContainer {
     pub rect: UiRect,
+    total_height: f32,
     scroll_offset: Vec2,
     last_mouse_position: Vec2,
 }
 
 impl ScrollContainer {
     pub fn new(rect: UiRect) -> Self {
+        let height = rect.h;
         Self {
             rect,
+            total_height: height,
             scroll_offset: Vec2::new(0.0, 0.0),
             last_mouse_position: Vec2::new(0.0, 0.0),
         }
@@ -25,18 +29,16 @@ impl ScrollContainer {
         // Move the container back to its boundary over time if it was scrolled too far
         // using exponential decay. Only if the mouse is not pressed.
         if !is_mouse_button_down(MouseButton::Left) {
-            let upper_bound = 0.0;
+            let factor = 0.15;
 
+            let upper_bound = 0.0;
             if self.scroll_offset.y > upper_bound {
-                // exponential decay
-                self.scroll_offset.y -= self.scroll_offset.y * 0.15;
+                self.scroll_offset.y -= self.scroll_offset.y * factor;
             }
 
-            let lower_bound = -500.0; // Example lower bound, adjust as needed
-
+            let lower_bound = -self.total_height + self.rect.h;
             if self.scroll_offset.y < lower_bound {
-                // exponential decay
-                self.scroll_offset.y -= self.scroll_offset.y * 0.15;
+                self.scroll_offset.y -= self.scroll_offset.y * factor;
             }
         }
     }
@@ -67,7 +69,7 @@ impl ScrollContainer {
     }
 
     pub fn build(
-        &self,
+        &mut self,
         state: &GameState,
         assets: &Assets,
         build_ui_elements: fn(&GameState, &Assets, &UiRect, Vec2) -> Vec<UiElement>
@@ -91,6 +93,10 @@ impl ScrollContainer {
 
         // Remove the clipping area
         elements.push(UiElement::Scissor { clip: None });
+
+        // determine total height of all job cards (inspect elements)
+        self.total_height = state.jobs.len() as f32 * JOB_CARD_HEIGHT
+            + (state.jobs.len() as f32 - 1.0) * JOB_CARD_SPACING_OUTER;
 
         elements
     }

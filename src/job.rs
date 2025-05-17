@@ -19,7 +19,7 @@ impl JobUi {
         self.scroll_container.update(mouse_input);
     }
 
-    pub fn build(&self, state: &GameState, assets: &Assets) -> Vec<UiElement> {
+    pub fn build(&mut self, state: &GameState, assets: &Assets) -> Vec<UiElement> {
         let mut elements: Vec<UiElement> = vec![];
 
         // add decorations
@@ -38,6 +38,9 @@ impl JobUi {
     }
 }
 
+pub const JOB_CARD_HEIGHT: f32 = 150.0;
+pub const JOB_CARD_SPACING_OUTER: f32 = 5.0;
+
 fn build_job_cards(
     state: &GameState,
     assets: &Assets,
@@ -48,9 +51,9 @@ fn build_job_cards(
     let mut elements: Vec<UiElement> = vec![];
 
     let mut container_offset = offset;
-    let card_height = 150.0;
+    let card_height = JOB_CARD_HEIGHT;
     let card_width = clip_rect.w;
-    let card_spacing = 15.0;
+    let card_spacing_inner = 15.0;
     let card_padding_x = 20.0;
     let card_padding_y = 20.0;
 
@@ -72,12 +75,12 @@ fn build_job_cards(
             card_width,
             card_padding_x,
             card_padding_y,
-            card_spacing,
+            card_spacing_inner,
         );
 
         elements.extend(job_draw_container);
 
-        container_offset += Vec2::new(0.0, card_height + 5.0);
+        container_offset += Vec2::new(0.0, card_height + JOB_CARD_SPACING_OUTER);
     }
 
     elements
