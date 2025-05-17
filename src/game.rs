@@ -76,43 +76,44 @@ fn define_jobs() -> Vec<Job> {
         Job::new(JobParameters {
             job_type: JobType::Woodcutting,
             name: "Woodcutting".to_string(),
-            completion_effect: Effect::AddItem { item: Item::Wood, amount: 1, },
+            completion_effect: Effect::JobProducesItem {
+                item: Item::Wood, amount: 1, },
         }),
 
         Job::new(JobParameters {
             job_type: JobType::Woodcutting,
             name: "Woodcutting".to_string(),
-            completion_effect: Effect::AddItem { item: Item::Wood, amount: 1, },
+            completion_effect: Effect::JobProducesItem { item: Item::Wood, amount: 1, },
         }),
 
         Job::new(JobParameters {
             job_type: JobType::Mining,
             name: "Mining".to_string(),
-            completion_effect: Effect::AddItem { item: Item::Iron, amount: 1, },
+            completion_effect: Effect::JobProducesItem { item: Item::Iron, amount: 1, },
         }),
 
         Job::new(JobParameters {
             job_type: JobType::Hunting,
             name: "Hunting".to_string(),
-            completion_effect: Effect::AddItem { item: Item::Meat, amount: 1, },
+            completion_effect: Effect::JobProducesItem { item: Item::Meat, amount: 1, },
         }),
 
         Job::new(JobParameters {
             job_type: JobType::Herbalism,
             name: "Herbalism".to_string(),
-            completion_effect: Effect::AddItem { item: Item::Herb, amount: 1, },
+            completion_effect: Effect::JobProducesItem { item: Item::Herb, amount: 1, },
         }),
 
         Job::new(JobParameters {
             job_type: JobType::Foraging,
             name: "Foraging".to_string(),
-            completion_effect: Effect::AddItem { item: Item::Berry, amount: 1, },
+            completion_effect: Effect::JobProducesItem { item: Item::Berry, amount: 1, },
         }),
 
         Job::new(JobParameters {
             job_type: JobType::Smithing,
             name: "Smithing".to_string(),
-            completion_effect: Effect::AddItem { item: Item::IronBar, amount: 1, },
+            completion_effect: Effect::JobProducesItem { item: Item::IronBar, amount: 1, },
         }),
     ]
 }
@@ -139,7 +140,7 @@ impl GameState {
     }
 
     // Step logic (tick + inputs)
-    pub fn step(&mut self, actions: &[Intent], dt: f32) -> Vec<Effect>
+    pub fn step(&mut self, actions: &[Intent], dt: f32) -> Vec<EffectWithSource>
     {
         let free_timeslots = self.time_slots.get_free();
 
@@ -178,22 +179,30 @@ impl GameState {
         effects
     }
 
-    fn update_progress(&mut self, dt: f32) -> Vec<Effect>
+    fn update_progress(&mut self, dt: f32) -> Vec<EffectWithSource>
     {
         let mut effects = vec![];
 
         for job in &mut self.jobs {
             if job.running {
                 if let Some(effect) = job.update_progress(dt) {
-                    effects.push(effect);
+                    effects.push(EffectWithSource::JobSource {
+                        job: job.clone(),
+                        effect: effect.clone(),
+                    });
                 }
             }
         }
 
+        // process side effects
         for effect in &effects {
             match effect {
-                Effect::AddItem { item, amount } => {
-                    self.inventory.add_item(*item, *amount);
+                EffectWithSource::JobSource { job, effect } => {
+                    match effect {
+                        Effect::JobProducesItem { item, amount } => {
+                            self.inventory.add_item(*item, *amount);
+                        }
+                    } 
                 }
             }
         }
@@ -266,7 +275,11 @@ pub struct JobBaseValues {
 
 #[derive(Clone)]
 pub enum Effect {
-    AddItem { item: Item, amount: i64 },
+    JobProducesItem { item: Item, amount: i64 },
+}
+
+pub enum EffectWithSource {
+    JobSource { job: Job, effect: Effect },
 }
 
 #[derive(Clone)]

@@ -8,7 +8,7 @@ pub mod job;
 pub mod ui;
 
 use crate::draw::{draw, UiElement};
-use crate::game::{Assets, Effect, GameState, Intent, MouseInput, TextParticle, UiRect};
+use crate::game::{Assets, Effect, EffectWithSource, GameState, Intent, MouseInput, TextParticle, UiRect};
 use crate::job::JobUi;
 
 pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
@@ -74,14 +74,18 @@ async fn main() {
         // trigger new text particles
         for effect in &effects {
             match effect {
-                Effect::AddItem { item, amount } => {
-                    state.text_particles.push(TextParticle {
-                        text: format!("{} + {}", item.to_string(), amount),
-                        position: Vec2::new(50.0, 50.0),
-                        velocity: Vec2::new(0.0, -20.0),
-                        color: WHITE,
-                        lifetime: 2.0
-                    });
+                EffectWithSource::JobSource { job, effect } => {
+                    match effect {
+                        Effect::JobProducesItem { item, amount } => {
+                            state.text_particles.push(TextParticle {
+                                text: format!("{} + {}", item.to_string(), amount),
+                                position: Vec2::new(50.0, 50.0),
+                                velocity: Vec2::new(0.0, -20.0),
+                                color: WHITE,
+                                lifetime: 2.0
+                            });
+                        }
+                    }
                 }
             }
         }
