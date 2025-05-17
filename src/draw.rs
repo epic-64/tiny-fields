@@ -1,4 +1,4 @@
-use crate::game::{Intent, MouseInput, UiRect};
+use crate::game::{Intent, Job, MouseInput, UiRect};
 use macroquad::color::{Color, SKYBLUE, WHITE};
 use macroquad::math::Vec2;
 use macroquad::prelude::{draw_rectangle, draw_text_ex, draw_texture_ex, get_internal_gl, measure_text, DrawTextureParams, QuadGl, Texture2D};
@@ -35,6 +35,7 @@ pub enum UiElement {
     Rectangle { x: f32, y: f32, width: f32, height: f32, color: Color },
     Image { x: f32, y: f32, width: f32, height: f32, texture: Texture2D, color: Color },
     Scissor { clip: Option<(i32, i32, i32, i32)> },
+    JobMarker { x: f32, y: f32, job: Job},
 }
 
 pub fn is_hovered(command: &UiElement, mouse_input: &MouseInput) -> bool {
@@ -106,5 +107,6 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
         UiElement::Scissor { clip } => {
             gl.scissor(*clip)
         }
+        UiElement::JobMarker { .. } => {}
     }
 }

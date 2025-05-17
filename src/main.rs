@@ -76,12 +76,14 @@ async fn main() {
             match effect {
                 EffectWithSource::JobSource { job, effect } => {
                     match effect {
-                        Effect::JobProducesItem { item, amount } => {
+                        Effect::AddItem { item, amount } => {
+                            let text_offset = Vec2::new(150.0, 50.0);
+
                             state.text_particles.push(TextParticle {
                                 text: format!("{} + {}", item.to_string(), amount),
-                                position: Vec2::new(50.0, 50.0),
+                                position: Vec2::from(job.find_position(&job_elements)) + text_offset,
                                 velocity: Vec2::new(0.0, -20.0),
-                                color: WHITE,
+                                color: SKYBLUE,
                                 lifetime: 2.0
                             });
                         }

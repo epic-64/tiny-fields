@@ -4,6 +4,7 @@ use macroquad::input::MouseButton;
 use macroquad::math::Vec2;
 use macroquad::prelude::Texture2D;
 use macroquad::text::Font;
+use crate::draw::UiElement;
 
 pub struct MouseInput {
     pub pressed: Vec<MouseButton>,
@@ -76,44 +77,44 @@ fn define_jobs() -> Vec<Job> {
         Job::new(JobParameters {
             job_type: JobType::Woodcutting,
             name: "Woodcutting".to_string(),
-            completion_effect: Effect::JobProducesItem {
+            completion_effect: Effect::AddItem {
                 item: Item::Wood, amount: 1, },
         }),
 
         Job::new(JobParameters {
             job_type: JobType::Woodcutting,
             name: "Woodcutting".to_string(),
-            completion_effect: Effect::JobProducesItem { item: Item::Wood, amount: 1, },
+            completion_effect: Effect::AddItem { item: Item::Wood, amount: 1, },
         }),
 
         Job::new(JobParameters {
             job_type: JobType::Mining,
             name: "Mining".to_string(),
-            completion_effect: Effect::JobProducesItem { item: Item::Iron, amount: 1, },
+            completion_effect: Effect::AddItem { item: Item::Iron, amount: 1, },
         }),
 
         Job::new(JobParameters {
             job_type: JobType::Hunting,
             name: "Hunting".to_string(),
-            completion_effect: Effect::JobProducesItem { item: Item::Meat, amount: 1, },
+            completion_effect: Effect::AddItem { item: Item::Meat, amount: 1, },
         }),
 
         Job::new(JobParameters {
             job_type: JobType::Herbalism,
             name: "Herbalism".to_string(),
-            completion_effect: Effect::JobProducesItem { item: Item::Herb, amount: 1, },
+            completion_effect: Effect::AddItem { item: Item::Herb, amount: 1, },
         }),
 
         Job::new(JobParameters {
             job_type: JobType::Foraging,
             name: "Foraging".to_string(),
-            completion_effect: Effect::JobProducesItem { item: Item::Berry, amount: 1, },
+            completion_effect: Effect::AddItem { item: Item::Berry, amount: 1, },
         }),
 
         Job::new(JobParameters {
             job_type: JobType::Smithing,
             name: "Smithing".to_string(),
-            completion_effect: Effect::JobProducesItem { item: Item::IronBar, amount: 1, },
+            completion_effect: Effect::AddItem { item: Item::IronBar, amount: 1, },
         }),
     ]
 }
@@ -199,10 +200,10 @@ impl GameState {
             match effect {
                 EffectWithSource::JobSource { job, effect } => {
                     match effect {
-                        Effect::JobProducesItem { item, amount } => {
+                        Effect::AddItem { item, amount } => {
                             self.inventory.add_item(*item, *amount);
                         }
-                    } 
+                    }
                 }
             }
         }
@@ -245,7 +246,7 @@ impl UiRect {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct Progress {
     value: f32, // Value between 0.0 and 1.0
 }
@@ -273,16 +274,16 @@ pub struct JobBaseValues {
     pub actions_until_level_up: i32,
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub enum Effect {
-    JobProducesItem { item: Item, amount: i64 },
+    AddItem { item: Item, amount: i64 },
 }
 
 pub enum EffectWithSource {
     JobSource { job: Job, effect: Effect },
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub enum JobType {
     Woodcutting,
     Mining,
@@ -321,7 +322,7 @@ impl JobType {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct Job {
     pub job_type: JobType,
     pub name: String,
@@ -402,6 +403,26 @@ impl Job {
         let growth_factor: f32 = 1.5;
 
         (base_actions as f32 * growth_factor.powi(self.level - 1)) as i32
+    }
+
+    pub fn find_position(&self, elements: &Vec<UiElement>) -> (f32, f32) {
+        let mut found_x = 0.0;
+        let mut found_y = 0.0;
+
+        for element in elements {
+            match element {
+                UiElement::JobMarker { x, y, job } => {
+                    if job.name == self.name {
+                        found_x = *x;
+                        found_y = *y;
+                        break;
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        (found_x, found_y)
     }
 }
 

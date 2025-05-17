@@ -117,6 +117,13 @@ pub fn build_job_card(
 
     let mut elements = vec![];
 
+    // Job Marker
+    elements.push(UiElement::JobMarker {
+        x: offset.x,
+        y: offset.y,
+        job: job.clone(),
+    });
+    
     // Background
     elements.push(UiElement::Rectangle {
         x: offset.x,
