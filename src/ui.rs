@@ -21,6 +21,24 @@ impl ScrollContainer {
         if self.rect.is_hovered(mouse_input) {
             self.handle_scroll()
         }
+
+        // Move the container back to its boundary over time if it was scrolled too far
+        // using exponential decay. Only if the mouse is not pressed.
+        if !is_mouse_button_down(MouseButton::Left) {
+            let upper_bound = 0.0;
+
+            if self.scroll_offset.y > upper_bound {
+                // exponential decay
+                self.scroll_offset.y -= self.scroll_offset.y * 0.15;
+            }
+
+            let lower_bound = -500.0; // Example lower bound, adjust as needed
+
+            if self.scroll_offset.y < lower_bound {
+                // exponential decay
+                self.scroll_offset.y -= self.scroll_offset.y * 0.15;
+            }
+        }
     }
 
     fn handle_scroll(&mut self) {
