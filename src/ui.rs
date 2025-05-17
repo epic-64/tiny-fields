@@ -30,8 +30,8 @@ impl ScrollContainer {
         // using exponential decay. Only if the mouse is not pressed.
         if !is_mouse_button_down(MouseButton::Left) {
             let factor = 0.1;
-
             let upper_bound = 0.0;
+            
             if self.scroll_offset.y > upper_bound {
                 self.scroll_offset.y = self.scroll_offset.y.lerp(upper_bound, factor);
                 if (self.scroll_offset.y - upper_bound).abs() < 1.0 {
@@ -39,7 +39,12 @@ impl ScrollContainer {
                 }
             }
 
-            let lower_bound = -self.total_height + self.rect.h;
+            let lower_bound = if self.total_height > self.rect.h {
+                -self.total_height + self.rect.h
+            } else {
+                0.0
+            };
+            
             if self.scroll_offset.y < lower_bound {
                 self.scroll_offset.y = self.scroll_offset.y.lerp(lower_bound, factor);
                 if (self.scroll_offset.y - lower_bound).abs() < 1.0 {
