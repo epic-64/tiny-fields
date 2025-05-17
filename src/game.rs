@@ -198,7 +198,7 @@ impl GameState {
         // process side effects
         for effect in &effects {
             match effect {
-                EffectWithSource::JobSource { job, effect } => {
+                EffectWithSource::JobSource { effect, .. } => {
                     match effect {
                         Effect::AddItem { item, amount } => {
                             self.inventory.add_item(*item, *amount);
