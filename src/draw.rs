@@ -35,7 +35,7 @@ pub enum UiElement {
     Rectangle { x: f32, y: f32, width: f32, height: f32, color: Color },
     Image { x: f32, y: f32, width: f32, height: f32, texture: Texture2D, color: Color },
     Scissor { clip: Option<(i32, i32, i32, i32)> },
-    JobMarker { x: f32, y: f32, job: Job},
+    JobParticleMarker { x: f32, y: f32, job: Job},
 }
 
 pub fn is_hovered(command: &UiElement, mouse_input: &MouseInput) -> bool {
@@ -107,6 +107,6 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
         UiElement::Scissor { clip } => {
             gl.scissor(*clip)
         }
-        UiElement::JobMarker { .. } => {}
+        UiElement::JobParticleMarker { .. } => {}
     }
 }

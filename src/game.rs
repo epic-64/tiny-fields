@@ -316,8 +316,7 @@ impl JobType {
 
     pub fn base_duration(&self) -> f32 {
         match self {
-            JobType::Foraging => 1.0,
-            _ => 10.0,
+            _ => 4.0,
         }
     }
 }
@@ -405,13 +404,13 @@ impl Job {
         (base_actions as f32 * growth_factor.powi(self.level - 1)) as i32
     }
 
-    pub fn find_position(&self, elements: &Vec<UiElement>) -> (f32, f32) {
+    pub fn get_particle_marker(&self, elements: &Vec<UiElement>) -> (f32, f32) {
         let mut found_x = 0.0;
         let mut found_y = 0.0;
 
         for element in elements {
             match element {
-                UiElement::JobMarker { x, y, job } => {
+                UiElement::JobParticleMarker { x, y, job } => {
                     if job.name == self.name {
                         found_x = *x;
                         found_y = *y;
