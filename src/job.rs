@@ -1,5 +1,5 @@
 use crate::draw::UiElement;
-use crate::game::{Assets, GameState, Intent, Job, MouseInput, UiRect};
+use crate::game::{Assets, GameState, Intent, JobInstance, MouseInput, UiRect};
 use crate::ui::ScrollContainer;
 use macroquad::color::{Color, BLUE, DARKBLUE, DARKGRAY, GRAY, GREEN, WHITE};
 use macroquad::math::Vec2;
@@ -89,7 +89,7 @@ fn build_job_cards(
 pub fn build_job_card(
     clip: &Option<(i32, i32, i32, i32)>,
     assets: &Assets,
-    job: &Job,
+    job: &JobInstance,
     job_id: usize,
     offset: Vec2,
     card_height: f32,
@@ -148,7 +148,7 @@ pub fn build_job_card(
 
     // Title Bar
     elements.push(UiElement::Text {
-        content: job.name.clone() + " ",
+        content: job.job_type.get_name(),
         font: assets.fonts.main.clone(),
         x: inner_x,
         y: offset.y + card_padding_y + font_size_large,

@@ -72,55 +72,8 @@ impl GameMeta {
     }
 }
 
-fn define_jobs() -> Vec<Job> {
-    vec![
-        Job::new(JobParameters {
-            job_type: JobType::Woodcutting,
-            name: "Woodcutting".to_string(),
-            completion_effect: Effect::AddItem {
-                item: Item::Wood, amount: 1, },
-        }),
-
-        Job::new(JobParameters {
-            job_type: JobType::Woodcutting,
-            name: "Woodcutting".to_string(),
-            completion_effect: Effect::AddItem { item: Item::Wood, amount: 1, },
-        }),
-
-        Job::new(JobParameters {
-            job_type: JobType::Mining,
-            name: "Mining".to_string(),
-            completion_effect: Effect::AddItem { item: Item::Iron, amount: 1, },
-        }),
-
-        Job::new(JobParameters {
-            job_type: JobType::Hunting,
-            name: "Hunting".to_string(),
-            completion_effect: Effect::AddItem { item: Item::Meat, amount: 1, },
-        }),
-
-        Job::new(JobParameters {
-            job_type: JobType::Herbalism,
-            name: "Herbalism".to_string(),
-            completion_effect: Effect::AddItem { item: Item::Herb, amount: 1, },
-        }),
-
-        Job::new(JobParameters {
-            job_type: JobType::Foraging,
-            name: "Foraging".to_string(),
-            completion_effect: Effect::AddItem { item: Item::Berry, amount: 1, },
-        }),
-
-        Job::new(JobParameters {
-            job_type: JobType::Smithing,
-            name: "Smithing".to_string(),
-            completion_effect: Effect::AddItem { item: Item::IronBar, amount: 1, },
-        }),
-    ]
-}
-
 pub struct GameState {
-    pub jobs: Vec<Job>,
+    pub jobs: Vec<JobInstance>,
     pub time_slots: TimeSlots,
     pub performance_flags: PerformanceFlags,
     pub game_meta: GameMeta,
@@ -131,13 +84,22 @@ pub struct GameState {
 impl GameState {
     pub fn new() -> Self {
         Self {
-            jobs: define_jobs(),
+            jobs: vec![],
             time_slots: TimeSlots { total: 3, used: 0, },
             performance_flags: PerformanceFlags::new(),
             game_meta: GameMeta::new(),
             inventory: Inventory::new(),
             text_particles: vec![],
         }
+    }
+
+    pub fn add_job_instance(&mut self, job_type: JobType) {
+        self.jobs.push(
+            JobInstance::new(JobParameters {
+                instance_id: self.jobs.iter().map(|j| j.instance_id).max().unwrap_or(0) + 1,
+                job_type: job_type.clone(),
+            })
+        );
     }
 
     // Step logic (tick + inputs)
@@ -212,7 +174,7 @@ impl GameState {
     }
 }
 
-fn get_used_timeslots(jobs: &[Job]) -> i32 {
+fn get_used_timeslots(jobs: &[JobInstance]) -> i32 {
     jobs.iter().filter(|j| j.running).map(|j| j.timeslot_cost).sum()
 }
 
@@ -280,7 +242,7 @@ pub enum Effect {
 }
 
 pub enum EffectWithSource {
-    Job { job: Job, effect: Effect },
+    Job { job: JobInstance, effect: Effect },
 }
 
 #[derive(Clone, PartialEq)]
@@ -319,12 +281,42 @@ impl JobType {
             _ => 4.0,
         }
     }
+
+    pub fn get_name(&self) -> String {
+        match self {
+            JobType::Woodcutting => "Woodcutting".to_string(),
+            JobType::Mining      => "Mining".to_string(),
+            JobType::Hunting     => "Hunting".to_string(),
+            JobType::Smithing    => "Smithing".to_string(),
+            JobType::Herbalism   => "Herbalism".to_string(),
+            JobType::Foraging    => "Foraging".to_string(),
+            JobType::Woodworking => "Woodworking".to_string(),
+            JobType::Cooking     => "Cooking".to_string(),
+            JobType::Alchemy     => "Alchemy".to_string(),
+            JobType::Selling     => "Selling".to_string(),
+        }
+    }
+
+    pub fn get_completion_effect(&self) -> Effect {
+        match self {
+            JobType::Woodcutting => Effect::AddItem { item: Item::Wood, amount: 1 },
+            JobType::Mining      => Effect::AddItem { item: Item::Iron, amount: 1 },
+            JobType::Hunting     => Effect::AddItem { item: Item::Meat, amount: 1 },
+            JobType::Smithing    => Effect::AddItem { item: Item::IronBar, amount: 1 },
+            JobType::Herbalism   => Effect::AddItem { item: Item::Herb, amount: 1 },
+            JobType::Foraging    => Effect::AddItem { item: Item::Berry, amount: 1 },
+            JobType::Woodworking => Effect::AddItem { item: Item::Wood, amount: 1 },
+            JobType::Cooking     => Effect::AddItem { item: Item::Meat, amount: 1 },
+            JobType::Alchemy     => Effect::AddItem { item: Item::Herb, amount: 1 },
+            JobType::Selling     => Effect::AddItem { item: Item::Coin, amount: 1 },
+        }
+    }
 }
 
 #[derive(Clone, PartialEq)]
-pub struct Job {
+pub struct JobInstance {
+    pub instance_id: i32,
     pub job_type: JobType,
-    pub name: String,
     pub action_progress: Progress,
     pub level_up_progress: Progress,
     pub level: i32,
@@ -332,18 +324,17 @@ pub struct Job {
     pub running: bool,
     pub actions_done: i32,
     pub timeslot_cost: i32,
-    pub completion_effect: Effect,
 }
 
 pub struct JobParameters {
+    pub instance_id: i32,
     pub job_type: JobType,
-    pub name: String,
-    pub completion_effect: Effect,
 }
 
-impl Job {
+impl JobInstance {
     pub fn new(p: JobParameters) -> Self {
         Self {
+            instance_id: p.instance_id,
             level: 1,
             running: false,
             action_progress: Progress{value: 0.0},
@@ -352,8 +343,6 @@ impl Job {
             actions_done: 0,
             timeslot_cost: 1,
             job_type: p.job_type,
-            name: p.name,
-            completion_effect: p.completion_effect,
         }
     }
 
@@ -385,7 +374,7 @@ impl Job {
                 self.level_up();
             }
 
-            Some(self.completion_effect.clone())
+            Some(self.job_type.get_completion_effect())
         } else {
             None
         }
@@ -411,7 +400,7 @@ impl Job {
         for element in elements {
             match element {
                 UiElement::JobParticleMarker { x, y, job } => {
-                    if job.name == self.name {
+                    if job.instance_id == self.instance_id {
                         found_x = *x;
                         found_y = *y;
                         break;

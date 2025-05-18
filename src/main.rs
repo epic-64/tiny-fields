@@ -8,7 +8,7 @@ pub mod job;
 pub mod ui;
 
 use crate::draw::{draw, UiElement};
-use crate::game::{Assets, Effect, EffectWithSource, GameState, Intent, MouseInput, TextParticle, UiRect};
+use crate::game::{Assets, Effect, EffectWithSource, GameState, Intent, Item, JobInstance, JobParameters, JobType, MouseInput, TextParticle, UiRect};
 use crate::job::JobUi;
 
 pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
@@ -24,6 +24,11 @@ async fn main() {
     request_new_screen_size(1600.0, 900.0);
 
     let mut state = GameState::new();
+
+    state.add_job_instance(JobType::Woodcutting);
+    state.add_job_instance(JobType::Woodcutting);
+    state.add_job_instance(JobType::Woodcutting);
+
     let assets: Assets = load_assets().await;
 
     let mut job_ui = JobUi::new(UiRect{ x: 25.0, y: 100.0, w: 500.0, h: 600.0 });
@@ -68,9 +73,6 @@ async fn main() {
         // Update game state
         let effects = state.step(&all_intents, dt);
 
-        // remove expired text particles
-        state.text_particles.retain(|particle| { particle.is_alive() });
-
         // trigger new text particles
         for effect in &effects {
             match effect {
@@ -89,6 +91,9 @@ async fn main() {
                 }
             }
         }
+
+        // remove expired text particles
+        state.text_particles.retain(|particle| { particle.is_alive() });
 
         // step through all text particles
         state.text_particles.iter_mut().for_each(|particle| particle.step(dt));
