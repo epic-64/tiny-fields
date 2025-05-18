@@ -8,7 +8,7 @@ pub mod job;
 pub mod ui;
 
 use crate::draw::{draw, UiElement};
-use crate::game::{Assets, Effect, EffectWithSource, GameState, Intent, Item, JobInstance, JobParameters, JobType, MouseInput, TextParticle, UiRect};
+use crate::game::{Assets, Effect, EffectWithSource, GameState, Intent, JobType, MouseInput, TextParticle, UiRect};
 use crate::job::JobUi;
 
 pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
