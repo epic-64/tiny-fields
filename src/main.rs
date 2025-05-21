@@ -226,6 +226,7 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
             width: icon_size,
             height: icon_size,
             color: Palette::DarkGray.get_color(),
+            bordered: false
         });
     }
 
@@ -237,6 +238,7 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
             width: icon_size - 10.0,
             height: icon_size - 10.0,
             color: Palette::Grass.get_color(),
+            bordered: false
         });
     }
 
@@ -306,7 +308,8 @@ pub fn build_inventory_elements(state: &GameState, assets: &Assets, rect: UiRect
         y: rect.y,
         width: rect.w,
         height: rect.h,
-        color: DARKGRAY,
+        color: Palette::Mocha.get_color(),
+        bordered: true,
     });
 
     let inventory = &state.inventory;
@@ -320,7 +323,8 @@ pub fn build_inventory_elements(state: &GameState, assets: &Assets, rect: UiRect
             y: rect.y,
             width: item_size,
             height: item_size,
-            color: GRAY,
+            color: Palette::DarkGray.get_color(),
+            bordered: true,
         });
 
         elements.push(UiElement::Text {

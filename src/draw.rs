@@ -1,4 +1,4 @@
-use crate::game::{Intent, JobInstance, MouseInput, UiRect};
+use crate::game::{Intent, JobInstance, MouseInput, Palette, UiRect};
 use macroquad::color::{Color, SKYBLUE, WHITE};
 use macroquad::math::Vec2;
 use macroquad::prelude::{draw_rectangle, draw_text_ex, draw_texture_ex, get_internal_gl, measure_text, DrawTextureParams, QuadGl, Texture2D};
@@ -38,7 +38,7 @@ pub enum UiElement {
         background_color: Color,
         foreground_color: Color,
     },
-    Rectangle { x: f32, y: f32, width: f32, height: f32, color: Color },
+    Rectangle { x: f32, y: f32, width: f32, height: f32, color: Color, bordered: bool },
     Image { x: f32, y: f32, width: f32, height: f32, texture: Texture2D, color: Color },
     Scissor { clip: Option<(i32, i32, i32, i32)> },
     JobParticleMarker { x: f32, y: f32, job: JobInstance },
@@ -46,7 +46,7 @@ pub enum UiElement {
 
 pub fn is_hovered(command: &UiElement, mouse_input: &MouseInput) -> bool {
     match command {
-        UiElement::RectButton { rectangle, parent_clip, .. } | 
+        UiElement::RectButton { rectangle, parent_clip, .. } |
         UiElement::ImgButton { rectangle, parent_clip, .. } => {
             let clip_is_hovered = if let Some(clip) = parent_clip {
                 let (x, y, w, h) = clip;
@@ -82,8 +82,13 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
             draw_rectangle(*x, *y, *width, *height, *background_color);
             draw_rectangle(*x, *y, *width * *progress, *height, *foreground_color);
         }
-        UiElement::Rectangle { x, y, width, height, color } => {
-            draw_rectangle(*x, *y, *width, *height, *color);
+        UiElement::Rectangle { x, y, width, height, color, bordered } => {
+            if *bordered {
+                draw_rectangle(*x, *y, *width, *height, Palette::Black.get_color());
+                draw_rectangle(*x + 4.0, *y + 4.0, *width - 8.0, *height - 8.0, *color);
+            } else {
+                draw_rectangle(*x, *y, *width, *height, *color);
+            }
         }
         UiElement::Image { x, y, width, height, texture, color } => {
             let params = DrawTextureParams {

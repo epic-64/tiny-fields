@@ -1,5 +1,5 @@
 use crate::draw::UiElement;
-use crate::game::{Assets, GameState, Intent, JobInstance, MouseInput, UiRect};
+use crate::game::{Assets, GameState, Intent, JobInstance, MouseInput, Palette, UiRect};
 use crate::ui::ScrollContainer;
 use macroquad::color::{Color, BLUE, DARKBLUE, DARKGRAY, GRAY, GREEN, WHITE};
 use macroquad::math::Vec2;
@@ -30,6 +30,7 @@ impl JobUi {
             width: self.scroll_container.rect.w + padding * 2.0,
             height: self.scroll_container.rect.h + padding * 2.0,
             color: Color::from_rgba(0, 0, 0, 100),
+            bordered: false,
         });
 
         elements.extend(self.scroll_container.build(state, assets, build_job_cards));
@@ -133,7 +134,8 @@ pub fn build_job_card(
         y: offset.y,
         width: card_width,
         height: card_height,
-        color: Color::from_rgba(240, 240, 230, 255),
+        color: Palette::Mocha.get_color(),
+        bordered: true,
     });
 
     // Job Animation
