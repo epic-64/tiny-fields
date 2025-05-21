@@ -216,7 +216,7 @@ pub fn build_job_card(
     });
 
     // Start / Stop Button
-    elements.push(UiElement::Button {
+    elements.push(UiElement::RectButton {
         rectangle: UiRect {
             x: offset.x + card_width - button_width - card_padding_x,
             y: offset.y + card_padding_y,

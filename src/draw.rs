@@ -14,13 +14,19 @@ pub enum UiElement {
         color: Color,
         font: Option<Font>,
     },
-    Button {
+    RectButton {
         rectangle: UiRect,
         font_size: f32,
         font: Option<Font>,
         text: String,
         color: Color,
         intent: Intent,
+        parent_clip: Option<(i32, i32, i32, i32)>,
+    },
+    ImgButton {
+        rectangle: UiRect,
+        intent: Intent,
+        texture: Texture2D,
         parent_clip: Option<(i32, i32, i32, i32)>,
     },
     ProgressBar {
@@ -40,7 +46,8 @@ pub enum UiElement {
 
 pub fn is_hovered(command: &UiElement, mouse_input: &MouseInput) -> bool {
     match command {
-        UiElement::Button { rectangle, parent_clip, .. } => {
+        UiElement::RectButton { rectangle, parent_clip, .. } | 
+        UiElement::ImgButton { rectangle, parent_clip, .. } => {
             let clip_is_hovered = if let Some(clip) = parent_clip {
                 let (x, y, w, h) = clip;
                 UiRect {
@@ -76,16 +83,16 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
             draw_rectangle(*x, *y, *width * *progress, *height, *foreground_color);
         }
         UiElement::Rectangle { x, y, width, height, color } => {
-            draw_rectangle(*x, *y, *width as f32, *height as f32, *color);
+            draw_rectangle(*x, *y, *width, *height, *color);
         }
         UiElement::Image { x, y, width, height, texture, color } => {
             let params = DrawTextureParams {
-                dest_size: Some(Vec2::new(*width as f32, *height as f32)),
+                dest_size: Some(Vec2::new(*width, *height)),
                 ..Default::default()
             };
             draw_texture_ex(texture, *x, *y, *color, params);
         }
-        UiElement::Button { rectangle: r, font_size, text, color, font, .. } => {
+        UiElement::RectButton { rectangle: r, font_size, text, color, font, .. } => {
             if is_hovered(command, mouse_input) {
                 draw_rectangle(r.x - 2.0, r.y - 2.0, r.w + 4.0, r.h + 4.0, SKYBLUE);
             }
@@ -103,6 +110,17 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
                 color: WHITE,
                 ..Default::default()
             });
+        }
+        UiElement::ImgButton { rectangle: r, texture, .. } => {
+            if is_hovered(command, mouse_input) {
+                draw_rectangle(r.x - 2.0, r.y - 2.0, r.w + 4.0, r.h + 4.0, SKYBLUE);
+            }
+
+            let params = DrawTextureParams {
+                dest_size: Some(Vec2::new(r.w, r.h)),
+                ..Default::default()
+            };
+            draw_texture_ex(texture, r.x, r.y, WHITE, params);
         }
         UiElement::Scissor { clip } => {
             gl.scissor(*clip)

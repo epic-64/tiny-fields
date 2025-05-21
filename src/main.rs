@@ -184,7 +184,8 @@ pub fn get_intents(elements: &Vec<UiElement>, mouse_input: &MouseInput) -> Vec<I
 
     for element in elements {
         match element {
-            UiElement::Button { rectangle, intent, parent_clip, .. } => {
+            UiElement::RectButton { rectangle, intent, parent_clip, .. } |
+            UiElement::ImgButton { rectangle, intent, parent_clip, ..} => {
                 // First, check if the hovered position is within the clipping area.
                 // (if there is no clipping area, we skip this check)
                 if let Some(area) = *parent_clip {
@@ -240,7 +241,7 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
     }
 
     // Button for buying time slots
-    elements.push(UiElement::Button {
+    elements.push(UiElement::RectButton {
         rectangle: UiRect {
             x: rect.x + state.time_slots.total as f32 * (icon_size + 5.0) + 5.0,
             y: rect.y,
@@ -262,7 +263,7 @@ pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
     let mut elements = vec![];
 
     // Button for skipping 5 minutes
-    elements.push(UiElement::Button {
+    elements.push(UiElement::RectButton {
         rectangle: UiRect {
             x: rect.x,
             y: rect.y,
@@ -278,7 +279,7 @@ pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
     });
 
     // Button for skipping 1 week
-    elements.push(UiElement::Button {
+    elements.push(UiElement::RectButton {
         rectangle: UiRect {
             x: rect.x + 210.0,
             y: rect.y,
