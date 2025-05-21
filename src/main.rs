@@ -8,7 +8,7 @@ pub mod job;
 pub mod ui;
 
 use crate::draw::{draw, UiElement};
-use crate::game::{Assets, Effect, EffectWithSource, GameState, Intent, JobType, MouseInput, TextParticle, UiRect};
+use crate::game::{Assets, Effect, EffectWithSource, GameState, Intent, JobType, MouseInput, Palette, TextParticle, UiRect};
 use crate::job::JobUi;
 
 pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
@@ -111,7 +111,7 @@ async fn main() {
         }).collect();
 
         // Draw everything
-        clear_background(ORANGE);
+        clear_background(Palette::Anthracite.get_color());
         top_hud_elements.iter().for_each(|el|draw(el, &mouse_input));
         job_elements.iter().for_each(|el|draw(el, &mouse_input));
         inventory_elements.iter().for_each(|el|draw(el, &mouse_input));
@@ -225,7 +225,7 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
             y: rect.y,
             width: icon_size,
             height: icon_size,
-            color: DARKGRAY,
+            color: Palette::DarkGray.get_color(),
         });
     }
 
@@ -236,7 +236,7 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
             y: rect.y + 5.0,
             width: icon_size - 10.0,
             height: icon_size - 10.0,
-            color: GREEN,
+            color: Palette::Grass.get_color(),
         });
     }
 
@@ -252,7 +252,7 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
         intent: Intent::BuyTimeSlot,
         text: format!("Buy ({})", state.time_slots.get_upgrade_cost()),
         font_size: 14.0,
-        color: DARKGRAY,
+        color: Palette::DarkGray.get_color(),
         parent_clip: None,
     });
 
@@ -274,7 +274,7 @@ pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
         intent: Intent::SkipSeconds(300),
         text: "Skip 5 min".to_string(),
         font_size: 14.0,
-        color: DARKGRAY,
+        color: Palette::DarkGray.get_color(),
         parent_clip: None,
     });
 
@@ -290,7 +290,7 @@ pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
         intent: Intent::SkipSeconds(604_800),
         text: "Skip 1 week".to_string(),
         font_size: 14.0,
-        color: DARKGRAY,
+        color: Palette::DarkGray.get_color(),
         parent_clip: None,
     });
 
