@@ -21,9 +21,10 @@ pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
 #[macroquad::main("Tiny Fields")]
 async fn main() {
     set_pc_assets_folder("assets");
-    request_new_screen_size(1600.0, 900.0);
+    request_new_screen_size(1280., 720.0);
 
     let mut state = GameState::new();
+    let mut is_fullscreen = false;
 
     state.add_job_instance(JobType::Woodcutting);
     state.add_job_instance(JobType::Woodcutting);
@@ -41,6 +42,15 @@ async fn main() {
     loop {
         let frame_start = now();
         let dt = get_frame_time();
+
+        // toggle fullscreen on F11
+        if is_key_pressed(KeyCode::F11) {
+            is_fullscreen = !is_fullscreen;
+            set_fullscreen(is_fullscreen);
+            if !is_fullscreen {
+                request_new_screen_size(1280.0, 720.0);
+            }
+        }
 
         // collect inputs (IO)
         let mouse_input = MouseInput {

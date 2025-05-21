@@ -29,7 +29,7 @@ impl JobUi {
             y: self.scroll_container.rect.y - padding,
             width: self.scroll_container.rect.w + padding * 2.0,
             height: self.scroll_container.rect.h + padding * 2.0,
-            color: Color::from_rgba(0, 0, 0, 100),
+            color: Color::from_rgba(255, 255, 255, 50),
             bordered: false,
         });
 
@@ -54,9 +54,9 @@ fn build_job_cards(
     let mut container_offset = offset;
     let card_height = JOB_CARD_HEIGHT;
     let card_width = clip_rect.w;
-    let card_spacing_inner = 15.0;
-    let card_padding_x = 20.0;
-    let card_padding_y = 20.0;
+    let card_spacing_inner = 16.0;
+    let card_padding_x = 16.0;
+    let card_padding_y = 16.0;
 
     let container_clip = Some((
         clip_rect.x as i32,
@@ -139,11 +139,22 @@ pub fn build_job_card(
     });
 
     // Job Animation
-    elements.push(UiElement::Image {
+    // Job animation background
+    elements.push(UiElement::Rectangle {
         x: offset.x + card_padding_x,
         y: offset.y + card_padding_y,
         width: image_width,
         height: card_height - card_padding_y * 2.0,
+        color: Palette::OffWhite.get_color(),
+        bordered: true,
+    });
+
+    let image_padding = 12.0;
+    elements.push(UiElement::Image {
+        x: offset.x + card_padding_x + image_padding,
+        y: offset.y + card_padding_y + image_padding,
+        width: image_width - image_padding * 2.0,
+        height: card_height - card_padding_y * 2.0 - image_padding * 2.0,
         texture: chosen_image.clone(),
         color: if job.running { WHITE } else { Color::from_rgba(90, 90, 90, 255) },
     });
