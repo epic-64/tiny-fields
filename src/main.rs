@@ -123,7 +123,7 @@ async fn main() {
         }).collect();
 
         // Draw everything
-        clear_background(Palette::Anthracite.get_color());
+        clear_background(palette::GAME_BACKGROUND.get_color());
         top_hud_elements.iter().for_each(|el|draw(el, &mouse_input));
         job_elements.iter().for_each(|el|draw(el, &mouse_input));
         inventory_elements.iter().for_each(|el|draw(el, &mouse_input));
@@ -237,7 +237,7 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
             y: rect.y,
             width: icon_size,
             height: icon_size,
-            color: Palette::DarkGray.get_color(),
+            color: palette::BUTTON_BACKGROUND.get_color(),
             bordered: false
         });
     }
@@ -249,7 +249,7 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
             y: rect.y + 5.0,
             width: icon_size - 10.0,
             height: icon_size - 10.0,
-            color: Palette::Grass.get_color(),
+            color: palette::PROGRESS_COLOR.get_color(),
             bordered: false
         });
     }
@@ -266,7 +266,7 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
         intent: Intent::BuyTimeSlot,
         text: format!("Buy ({})", state.time_slots.get_upgrade_cost()),
         font_size: 14.0,
-        color: Palette::DarkGray.get_color(),
+        color: palette::BUTTON_BACKGROUND.get_color(),
         parent_clip: None,
     });
 
@@ -288,7 +288,7 @@ pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
         intent: Intent::SkipSeconds(300),
         text: "Skip 5 min".to_string(),
         font_size: 14.0,
-        color: Palette::DarkGray.get_color(),
+        color: palette::BUTTON_BACKGROUND.get_color(),
         parent_clip: None,
     });
 

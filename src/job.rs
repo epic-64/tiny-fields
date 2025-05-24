@@ -3,7 +3,7 @@ use crate::game::{Assets, GameState, Intent, JobInstance, MouseInput, UiRect};
 use crate::ui::ScrollContainer;
 use macroquad::color::{Color, BLUE, DARKBLUE, DARKGRAY, GRAY, GREEN, WHITE};
 use macroquad::math::Vec2;
-use crate::palette::Palette;
+use crate::palette;
 
 pub struct JobUi {
     scroll_container: ScrollContainer,
@@ -136,7 +136,7 @@ pub fn build_job_card(
         y: offset.y,
         width: card_width,
         height: card_height,
-        color: Palette::White.get_color(),
+        color: palette::CARD_BACKGROUND.get_color(),
         bordered: false,
     });
 
@@ -147,7 +147,7 @@ pub fn build_job_card(
         y: offset.y + card_padding_y,
         width: image_width,
         height: card_height - card_padding_y * 2.0,
-        color: Palette::OffWhite.get_color(),
+        color: palette::IMAGE_BACKGROUND.get_color(),
         bordered: true,
     });
 
@@ -193,8 +193,8 @@ pub fn build_job_card(
         width: progress_bar_width,
         height: progress_bar_height,
         progress: job.action_progress.get(),
-        background_color: GRAY,
-        foreground_color: GREEN,
+        background_color: palette::BAR_BACKGROUND.get_color(),
+        foreground_color: palette::PROGRESS_COLOR.get_color(),
     });
 
     // Action Progress Text

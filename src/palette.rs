@@ -1,5 +1,16 @@
 use macroquad::color::Color;
 
+pub const TEXT: Palette = Palette::Anthracite;
+pub const BORDER: Palette = Palette::Anthracite;
+pub const GAME_BACKGROUND: Palette = Palette::Anthracite;
+pub const CARD_BACKGROUND: Palette = Palette::White;
+pub const BAR_BACKGROUND: Palette = Palette::White;
+pub const BUTTON_BACKGROUND: Palette = Palette::OffWhite;
+pub const IMAGE_BACKGROUND: Palette = Palette::OffWhite;
+pub const SKILL_COLOR: Palette = Palette::Aqua;
+pub const PRODUCT_COLOR: Palette = Palette::Peach;
+pub const PROGRESS_COLOR: Palette = Palette::Grass;
+
 pub enum Palette {
     Anthracite,
     DarkGray,
