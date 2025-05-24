@@ -38,6 +38,7 @@ pub enum UiElement {
         progress: f32,
         background_color: Color,
         foreground_color: Color,
+        with_border: bool,
     },
     Rectangle { x: f32, y: f32, width: f32, height: f32, color: Color, bordered: bool },
     Image { x: f32, y: f32, width: f32, height: f32, texture: Texture2D, color: Color },
@@ -79,9 +80,16 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
                 ..Default::default()
             });
         }
-        UiElement::ProgressBar { x, y, width, height, progress, background_color, foreground_color } => {
-            draw_rectangle(*x, *y, *width, *height, *background_color);
-            draw_rectangle(*x, *y, *width * *progress, *height, *foreground_color);
+        UiElement::ProgressBar { x, y, width, height, progress, background_color, foreground_color, with_border } => {
+            if *with_border {
+                let strength = 2.0;
+                draw_rectangle(*x, *y, *width, *height, palette::BORDER.get_color());
+                draw_rectangle(*x + strength, *y + strength, *width - strength * 2., *height - strength * 2., *background_color);
+                draw_rectangle(*x + strength, *y + strength, (*width - strength * 2.) * *progress, *height - strength * 2., *foreground_color);
+            } else {
+                draw_rectangle(*x, *y, *width, *height, *background_color);
+                draw_rectangle(*x, *y, *width * *progress, *height, *foreground_color);
+            }
         }
         UiElement::Rectangle { x, y, width, height, color, bordered } => {
             if *bordered {
