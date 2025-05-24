@@ -5,49 +5,13 @@ use macroquad::math::Vec2;
 use crate::palette;
 use crate::palette::Palette;
 
-pub struct JobUi {
-    scroll_container: ScrollContainer,
-}
-
-impl JobUi {
-    pub fn new(rect: UiRect) -> Self {
-        Self {
-            scroll_container: ScrollContainer::new(rect),
-        }
-    }
-
-    pub fn update(&mut self, mouse_input: &MouseInput) {
-        self.scroll_container.update(mouse_input);
-    }
-
-    pub fn build(&mut self, state: &GameState, assets: &Assets) -> Vec<UiElement> {
-        let mut elements: Vec<UiElement> = vec![];
-
-        // add decorations
-        let padding = 5.0;
-        elements.push(UiElement::Rectangle {
-            x: self.scroll_container.rect.x - padding,
-            y: self.scroll_container.rect.y - padding,
-            width: self.scroll_container.rect.w + padding * 2.0,
-            height: self.scroll_container.rect.h + padding * 2.0,
-            color: palette::BORDER.get_color(),
-            bordered: false,
-        });
-
-        elements.extend(self.scroll_container.build(state, assets, build_job_cards));
-
-        elements
-    }
-}
-
 pub const JOB_CARD_HEIGHT: f32 = 192.0;
 pub const JOB_CARD_WIDTH: f32 = 384.0;
 pub const JOB_CARD_SPACING_OUTER: f32 = 5.0;
 
-fn build_job_cards(
+pub fn build_job_cards(
     state: &GameState,
     assets: &Assets,
-    clip_rect: &UiRect,
     offset: Vec2
 ) -> Vec<UiElement>
 {
@@ -60,16 +24,9 @@ fn build_job_cards(
     let card_padding_x = 16.0;
     let card_padding_y = 16.0;
 
-    let container_clip = Some((
-        clip_rect.x as i32,
-        clip_rect.y as i32,
-        clip_rect.w as i32,
-        clip_rect.h as i32,
-    ));
-
     for (id, job) in state.jobs.iter().enumerate() {
         let job_draw_container = build_job_card(
-            &container_clip,
+            &None, // No clipping for the job cards
             assets,
             job,
             id,

@@ -10,7 +10,7 @@ pub mod palette;
 use crate::game::{Fonts, Textures};
 use crate::draw::{draw, UiElement};
 use crate::game::{Assets, Effect, EffectWithSource, GameState, Intent, JobType, MouseInput, TextParticle, UiRect};
-use crate::job::JobUi;
+use crate::job::{build_job_cards};
 
 pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
     vec![MouseButton::Left, MouseButton::Right, MouseButton::Middle]
@@ -32,8 +32,6 @@ async fn main() {
     state.add_job_instance(JobType::Woodcutting);
 
     let assets: Assets = load_assets().await;
-
-    let mut job_ui = JobUi::new(UiRect{ x: 25.0, y: 100.0, w: 500.0, h: 600.0 });
 
     // Example for using quad-storage
     // let storage = &mut quad_storage::STORAGE.lock().unwrap();
@@ -62,17 +60,13 @@ async fn main() {
             scroll_y: mouse_wheel().1,
         };
 
-        // Some UIs can be moved around based on inputs
-        job_ui.update(&mouse_input);
-
         // build all ui elements (draw commands)
-        let job_elements = job_ui.build(&state, &assets);
-
+        let job_elements = build_job_cards(&state, &assets, Vec2::new(25.0, 100.0));
         let top_hud_elements = get_top_hud(&state, &assets, UiRect { x: 25.0, y: 25.0, w: screen_width(), h: 50.0 });
         let inventory_elements = build_inventory_elements(&state, &assets, UiRect { x: 600.0, y: 15.0, w: 200.0, h: 80.0 });
 
-        let cheat_buttons = get_cheat_buttons(&assets, UiRect { x: 50.0, y: 790.0, w: 200.0, h: 40.0 });
-        let debug_elements = build_debug_elements(&state, &assets, UiRect { x: 50.0, y: 850.0, w: 200.0, h: 40.0 });
+        let cheat_buttons = get_cheat_buttons(&assets, UiRect { x: 600.0, y: 25.0, w: 200.0, h: 40.0 });
+        let debug_elements = build_debug_elements(&state, &assets, UiRect { x: 700.0, y: 25.0, w: 200.0, h: 40.0 });
 
         // collect all intents from UI interactions
         let mut all_intents: Vec<Intent> = vec![];
