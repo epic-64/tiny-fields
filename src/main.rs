@@ -48,6 +48,10 @@ async fn main() {
         let frame_start = now();
         let dt = get_frame_time();
 
+        let resolution_offset_x = (screen_width() - 1280.0) / 2.0;
+        let resolution_offset_y = (screen_height() - 720.0) / 2.0;
+        let resolution_offset = Vec2::new(resolution_offset_x, resolution_offset_y);
+
         // toggle fullscreen on F11
         if is_key_pressed(KeyCode::F11) {
             is_fullscreen = !is_fullscreen;
@@ -67,7 +71,7 @@ async fn main() {
         };
 
         // build all ui elements (draw commands)
-        let job_elements = build_job_cards(&state, &assets, Vec2::new(25.0, 100.0));
+        let job_elements = build_job_cards(&state, &assets, Vec2::new(25.0, 100.0) + resolution_offset);
         let top_hud_elements = get_top_hud(&state, &assets, UiRect { x: 25.0, y: 25.0, w: screen_width(), h: 50.0 });
         let inventory_elements = build_inventory_elements(&state, &assets, UiRect { x: 600.0, y: 15.0, w: 200.0, h: 80.0 });
 
