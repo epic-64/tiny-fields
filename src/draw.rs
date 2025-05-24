@@ -1,8 +1,9 @@
-use crate::game::{Intent, JobInstance, MouseInput, Palette, UiRect};
+use crate::game::{Intent, JobInstance, MouseInput, UiRect};
 use macroquad::color::{Color, SKYBLUE, WHITE};
 use macroquad::math::Vec2;
 use macroquad::prelude::{draw_rectangle, draw_text_ex, draw_texture_ex, get_internal_gl, measure_text, DrawTextureParams, QuadGl, Texture2D};
 use macroquad::text::{Font, TextParams};
+use crate::palette::Palette;
 
 #[derive(Clone)]
 pub enum UiElement {
@@ -84,8 +85,9 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
         }
         UiElement::Rectangle { x, y, width, height, color, bordered } => {
             if *bordered {
+                let strength = 2.0;
                 draw_rectangle(*x, *y, *width, *height, Palette::Black.get_color());
-                draw_rectangle(*x + 4.0, *y + 4.0, *width - 8.0, *height - 8.0, *color);
+                draw_rectangle(*x + strength, *y + strength, *width - strength * 2., *height - strength * 2., *color);
             } else {
                 draw_rectangle(*x, *y, *width, *height, *color);
             }

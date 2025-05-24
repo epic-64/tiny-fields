@@ -1,4 +1,3 @@
-use game::{Fonts, Textures};
 use macroquad::miniquad::date::now;
 use macroquad::prelude::*;
 
@@ -6,10 +5,13 @@ pub mod draw;
 pub mod game;
 pub mod job;
 pub mod ui;
+pub mod palette;
 
+use crate::game::{Fonts, Textures};
 use crate::draw::{draw, UiElement};
-use crate::game::{Assets, Effect, EffectWithSource, GameState, Intent, JobType, MouseInput, Palette, TextParticle, UiRect};
+use crate::game::{Assets, Effect, EffectWithSource, GameState, Intent, JobType, MouseInput, TextParticle, UiRect};
 use crate::job::JobUi;
+use crate::palette::Palette;
 
 pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
     vec![MouseButton::Left, MouseButton::Right, MouseButton::Middle]

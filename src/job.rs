@@ -1,8 +1,9 @@
 use crate::draw::UiElement;
-use crate::game::{Assets, GameState, Intent, JobInstance, MouseInput, Palette, UiRect};
+use crate::game::{Assets, GameState, Intent, JobInstance, MouseInput, UiRect};
 use crate::ui::ScrollContainer;
 use macroquad::color::{Color, BLUE, DARKBLUE, DARKGRAY, GRAY, GREEN, WHITE};
 use macroquad::math::Vec2;
+use crate::palette::Palette;
 
 pub struct JobUi {
     scroll_container: ScrollContainer,
@@ -39,7 +40,8 @@ impl JobUi {
     }
 }
 
-pub const JOB_CARD_HEIGHT: f32 = 150.0;
+pub const JOB_CARD_HEIGHT: f32 = 192.0;
+pub const JOB_CARD_WIDTH: f32 = 384.0;
 pub const JOB_CARD_SPACING_OUTER: f32 = 5.0;
 
 fn build_job_cards(
@@ -53,7 +55,7 @@ fn build_job_cards(
 
     let mut container_offset = offset;
     let card_height = JOB_CARD_HEIGHT;
-    let card_width = clip_rect.w;
+    let card_width = JOB_CARD_WIDTH;
     let card_spacing_inner = 16.0;
     let card_padding_x = 16.0;
     let card_padding_y = 16.0;
@@ -134,8 +136,8 @@ pub fn build_job_card(
         y: offset.y,
         width: card_width,
         height: card_height,
-        color: Palette::Mocha.get_color(),
-        bordered: true,
+        color: Palette::White.get_color(),
+        bordered: false,
     });
 
     // Job Animation
