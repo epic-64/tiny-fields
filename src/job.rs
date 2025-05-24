@@ -1,9 +1,9 @@
 use crate::draw::UiElement;
 use crate::game::{Assets, GameState, Intent, JobInstance, MouseInput, UiRect};
 use crate::ui::ScrollContainer;
-use macroquad::color::{Color, BLUE, DARKBLUE, DARKGRAY, GRAY, GREEN, WHITE};
 use macroquad::math::Vec2;
 use crate::palette;
+use crate::palette::Palette;
 
 pub struct JobUi {
     scroll_container: ScrollContainer,
@@ -30,7 +30,7 @@ impl JobUi {
             y: self.scroll_container.rect.y - padding,
             width: self.scroll_container.rect.w + padding * 2.0,
             height: self.scroll_container.rect.h + padding * 2.0,
-            color: Color::from_rgba(255, 255, 255, 50),
+            color: palette::BORDER.get_color(),
             bordered: false,
         });
 
@@ -102,9 +102,9 @@ pub fn build_job_card(
     card_spacing: f32,
 ) -> Vec<UiElement>
 {
-    let color_primary = DARKBLUE;
-    let color_secondary = DARKGRAY;
-    let color_button = GRAY;
+    let color_primary = palette::TEXT.get_color();
+    let color_secondary = palette::BORDER.get_color();
+    let color_button = palette::BUTTON_BACKGROUND.get_color();
 
     let font_size_large = 20.0;
     let font_size_small = 14.0;
@@ -158,7 +158,7 @@ pub fn build_job_card(
         width: image_width - image_padding * 2.0,
         height: card_height - card_padding_y * 2.0 - image_padding * 2.0,
         texture: chosen_image.clone(),
-        color: if job.running { WHITE } else { Color::from_rgba(90, 90, 90, 255) },
+        color: Palette::White.get_color(),
     });
 
     // Title Bar
@@ -204,7 +204,7 @@ pub fn build_job_card(
         x: inner_x + 10.0,
         y: progress_bar_action_y + 15.0,
         font_size: font_size_small,
-        color: WHITE,
+        color: palette::TEXT.get_color(),
     });
 
     let progress_bar_level_y = progress_bar_action_y + progress_bar_height + 5.0;
@@ -216,8 +216,8 @@ pub fn build_job_card(
         width: progress_bar_width,
         height: progress_bar_height,
         progress: job.level_up_progress.get(),
-        background_color: GRAY,
-        foreground_color: BLUE,
+        background_color: palette::BAR_BACKGROUND.get_color(),
+        foreground_color: palette::PROGRESS_COLOR.get_color(),
     });
 
     // Level Up Progress Text
@@ -227,7 +227,7 @@ pub fn build_job_card(
         x: inner_x + 10.0,
         y: progress_bar_level_y + 15.0,
         font_size: font_size_small,
-        color: WHITE,
+        color: palette::TEXT.get_color(),
     });
 
     // Start / Stop Button
