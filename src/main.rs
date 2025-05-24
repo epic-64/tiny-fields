@@ -11,7 +11,6 @@ use crate::game::{Fonts, Textures};
 use crate::draw::{draw, UiElement};
 use crate::game::{Assets, Effect, EffectWithSource, GameState, Intent, JobType, MouseInput, TextParticle, UiRect};
 use crate::job::JobUi;
-use crate::palette::Palette;
 
 pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
     vec![MouseButton::Left, MouseButton::Right, MouseButton::Middle]
@@ -304,7 +303,7 @@ pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
         intent: Intent::SkipSeconds(604_800),
         text: "Skip 1 week".to_string(),
         font_size: 14.0,
-        color: Palette::DarkGray.get_color(),
+        color: palette::BUTTON_BACKGROUND.get_color(),
         parent_clip: None,
     });
 
@@ -320,7 +319,7 @@ pub fn build_inventory_elements(state: &GameState, assets: &Assets, rect: UiRect
         y: rect.y,
         width: rect.w,
         height: rect.h,
-        color: Palette::Mocha.get_color(),
+        color: palette::CARD_BACKGROUND.get_color(),
         bordered: true,
     });
 
@@ -335,7 +334,7 @@ pub fn build_inventory_elements(state: &GameState, assets: &Assets, rect: UiRect
             y: rect.y,
             width: item_size,
             height: item_size,
-            color: Palette::DarkGray.get_color(),
+            color: palette::IMAGE_BACKGROUND.get_color(),
             bordered: true,
         });
 
