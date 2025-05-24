@@ -13,6 +13,9 @@ pub fn build_job_cards(state: &GameState, assets: &Assets, offset: Vec2) -> Vec<
     let mut elements: Vec<UiElement> = vec![];
 
     let mut container_offset = offset;
+    let mut offset_x = offset.x;
+    let mut offset_y = offset.y;
+
     let card_height = JOB_CARD_HEIGHT;
     let card_width = JOB_CARD_WIDTH;
     let card_spacing_inner = 8.0;
@@ -35,7 +38,14 @@ pub fn build_job_cards(state: &GameState, assets: &Assets, offset: Vec2) -> Vec<
 
         elements.extend(job_draw_container);
 
-        container_offset += Vec2::new(0.0, card_height + JOB_CARD_SPACING_OUTER);
+        if (id + 1) % 3 == 0 && id != 0 {
+            offset_x = offset.x; // Reset horizontal offset for the new row
+            offset_y += card_height + JOB_CARD_SPACING_OUTER;
+        } else {
+            offset_x += card_width + card_spacing_inner;
+        }
+
+        container_offset = Vec2::new(offset_x, offset_y);
     }
 
     elements
