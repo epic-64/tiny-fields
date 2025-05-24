@@ -30,6 +30,12 @@ async fn main() {
     state.add_job_instance(JobType::Woodcutting);
     state.add_job_instance(JobType::Woodcutting);
     state.add_job_instance(JobType::Woodcutting);
+    state.add_job_instance(JobType::Woodcutting);
+    state.add_job_instance(JobType::Woodcutting);
+    state.add_job_instance(JobType::Woodcutting);
+    state.add_job_instance(JobType::Woodcutting);
+    state.add_job_instance(JobType::Woodcutting);
+    state.add_job_instance(JobType::Woodcutting);
 
     let assets: Assets = load_assets().await;
 

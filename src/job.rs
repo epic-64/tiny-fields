@@ -1,6 +1,5 @@
 use crate::draw::UiElement;
-use crate::game::{Assets, GameState, Intent, JobInstance, MouseInput, UiRect};
-use crate::ui::ScrollContainer;
+use crate::game::{Assets, GameState, Intent, JobInstance, UiRect};
 use macroquad::math::Vec2;
 use crate::palette;
 use crate::palette::Palette;
@@ -9,20 +8,16 @@ pub const JOB_CARD_HEIGHT: f32 = 192.0;
 pub const JOB_CARD_WIDTH: f32 = 384.0;
 pub const JOB_CARD_SPACING_OUTER: f32 = 5.0;
 
-pub fn build_job_cards(
-    state: &GameState,
-    assets: &Assets,
-    offset: Vec2
-) -> Vec<UiElement>
+pub fn build_job_cards(state: &GameState, assets: &Assets, offset: Vec2) -> Vec<UiElement>
 {
     let mut elements: Vec<UiElement> = vec![];
 
     let mut container_offset = offset;
     let card_height = JOB_CARD_HEIGHT;
     let card_width = JOB_CARD_WIDTH;
-    let card_spacing_inner = 16.0;
-    let card_padding_x = 16.0;
-    let card_padding_y = 16.0;
+    let card_spacing_inner = 8.0;
+    let card_padding_x = 8.0;
+    let card_padding_y = 8.0;
 
     for (id, job) in state.jobs.iter().enumerate() {
         let job_draw_container = build_job_card(
@@ -67,6 +62,10 @@ pub fn build_job_card(
     let font_size_small = 14.0;
 
     let image_width = 90.0f32;
+    let image_height = 120.0f32;
+    let image_x = offset.x + card_padding_x;
+    let image_y = offset.y + card_height - image_height - card_padding_y;
+
     let button_width = 90.0;
     let inner_x = offset.x + card_padding_x + image_width + card_spacing;
 
@@ -100,20 +99,20 @@ pub fn build_job_card(
     // Job Animation
     // Job animation background
     elements.push(UiElement::Rectangle {
-        x: offset.x + card_padding_x,
-        y: offset.y + card_padding_y,
+        x: image_x,
+        y: image_y,
         width: image_width,
-        height: card_height - card_padding_y * 2.0,
+        height: image_height,
         color: palette::IMAGE_BACKGROUND.get_color(),
         bordered: true,
     });
 
     let image_padding = 12.0;
     elements.push(UiElement::Image {
-        x: offset.x + card_padding_x + image_padding,
-        y: offset.y + card_padding_y + image_padding,
+        x: image_x + image_padding,
+        y: image_y + image_padding,
         width: image_width - image_padding * 2.0,
-        height: card_height - card_padding_y * 2.0 - image_padding * 2.0,
+        height: image_height - image_padding * 2.0,
         texture: chosen_image.clone(),
         color: Palette::White.get_color(),
     });
