@@ -2,7 +2,7 @@ use macroquad::color::Color;
 
 pub const TEXT: Palette = Palette::Anthracite;
 pub const BORDER: Palette = Palette::Anthracite;
-pub const GAME_BACKGROUND: Palette = Palette::Anthracite;
+pub const GAME_BACKGROUND: Palette = Palette::Mocha;
 pub const CARD_BACKGROUND: Palette = Palette::White;
 pub const BAR_BACKGROUND: Palette = Palette::White;
 pub const BUTTON_BACKGROUND: Palette = Palette::OffWhite;

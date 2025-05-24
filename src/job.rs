@@ -5,8 +5,8 @@ use crate::palette;
 use crate::palette::Palette;
 
 pub const JOB_CARD_HEIGHT: f32 = 192.0;
-pub const JOB_CARD_WIDTH: f32 = 384.0;
-pub const JOB_CARD_SPACING_OUTER: f32 = 5.0;
+pub const JOB_CARD_WIDTH: f32 = 404.0;
+pub const JOB_CARD_SPACING_OUTER: f32 = 8.0;
 
 pub fn build_job_cards(state: &GameState, assets: &Assets, offset: Vec2) -> Vec<UiElement>
 {
@@ -42,7 +42,7 @@ pub fn build_job_cards(state: &GameState, assets: &Assets, offset: Vec2) -> Vec<
             offset_x = offset.x; // Reset horizontal offset for the new row
             offset_y += card_height + JOB_CARD_SPACING_OUTER;
         } else {
-            offset_x += card_width + card_spacing_inner;
+            offset_x += card_width + JOB_CARD_SPACING_OUTER;
         }
 
         container_offset = Vec2::new(offset_x, offset_y);
