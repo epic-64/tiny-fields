@@ -31,11 +31,11 @@ async fn main() {
     state.add_job_instance(JobType::Woodcutting);
     state.add_job_instance(JobType::Woodcutting);
     state.add_job_instance(JobType::Woodcutting);
-    state.add_job_instance(JobType::Woodcutting);
-    state.add_job_instance(JobType::Woodcutting);
-    state.add_job_instance(JobType::Woodcutting);
-    state.add_job_instance(JobType::Woodcutting);
-    state.add_job_instance(JobType::Woodcutting);
+    state.add_job_instance(JobType::Mining);
+    state.add_job_instance(JobType::Hunting);
+    state.add_job_instance(JobType::Hunting);
+    state.add_job_instance(JobType::Hunting);
+    state.add_job_instance(JobType::Hunting);
 
     let assets: Assets = load_assets().await;
 
@@ -72,18 +72,11 @@ async fn main() {
 
         // build all ui elements (draw commands)
         let job_elements = build_job_cards(&state, &assets, Vec2::new(25.0, 100.0) + resolution_offset);
-        let top_hud_elements = get_top_hud(&state, &assets, UiRect { x: 25.0, y: 25.0, w: screen_width(), h: 50.0 });
-        let inventory_elements = build_inventory_elements(&state, &assets, UiRect { x: 600.0, y: 15.0, w: 200.0, h: 80.0 });
-
-        let cheat_buttons = get_cheat_buttons(&assets, UiRect { x: 600.0, y: 25.0, w: 200.0, h: 40.0 });
         let debug_elements = build_debug_elements(&state, &assets, UiRect { x: 700.0, y: 25.0, w: 200.0, h: 40.0 });
 
         // collect all intents from UI interactions
         let mut all_intents: Vec<Intent> = vec![];
         all_intents.extend(get_intents(&job_elements, &mouse_input));
-        all_intents.extend(get_intents(&top_hud_elements, &mouse_input));
-        all_intents.extend(get_intents(&cheat_buttons, &mouse_input));
-        all_intents.extend(get_intents(&inventory_elements, &mouse_input));
 
         // Update game state
         let effects = state.step(&all_intents, dt);
@@ -127,12 +120,8 @@ async fn main() {
 
         // Draw everything
         clear_background(palette::GAME_BACKGROUND.get_color());
-        top_hud_elements.iter().for_each(|el|draw(el, &mouse_input));
         job_elements.iter().for_each(|el|draw(el, &mouse_input));
-        inventory_elements.iter().for_each(|el|draw(el, &mouse_input));
-        cheat_buttons.iter().for_each(|el|draw(el, &mouse_input));
         debug_elements.iter().for_each(|el|draw(el, &mouse_input));
-        effects_elements.iter().for_each(|el|draw(el, &mouse_input));
 
         // Keep track of FPS
         let elapsed = now() - frame_start;
@@ -148,16 +137,6 @@ fn build_debug_elements(state: &GameState, assets: &Assets, rect: UiRect) -> Vec
     let mut elements = vec![];
     let font_size = 20.0;
 
-    // FPS Text
-    elements.push(UiElement::Text {
-        content: format!("FPS: {:.2}", state.game_meta.effective_fps),
-        font: assets.fonts.mono.clone(),
-        x: rect.x,
-        y: rect.y,
-        font_size,
-        color: WHITE,
-    });
-
     // Add Frame Time and Raw FPS Text
     elements.push(UiElement::Text {
         content: format!(
@@ -167,7 +146,7 @@ fn build_debug_elements(state: &GameState, assets: &Assets, rect: UiRect) -> Vec
         ),
         font: assets.fonts.mono.clone(),
         x: rect.x,
-        y: rect.y + font_size,
+        y: rect.y,
         font_size,
         color: WHITE,
     });

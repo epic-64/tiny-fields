@@ -18,7 +18,7 @@ pub fn build_job_cards(state: &GameState, assets: &Assets, offset: Vec2) -> Vec<
 
     let card_height = JOB_CARD_HEIGHT;
     let card_width = JOB_CARD_WIDTH;
-    let card_spacing_inner = 8.0;
+    let card_spacing_inner = 6.0;
     let card_padding_x = 12.0;
     let card_padding_y = 12.0;
 
@@ -66,8 +66,6 @@ pub fn build_job_card(
 {
     let color_primary = palette::TEXT.get_color();
     let color_secondary = palette::BORDER.get_color();
-    let color_button = palette::BUTTON_BACKGROUND.get_color();
-
     let font_size_large = 16.0;
     let font_size_small = 14.0;
 
@@ -75,8 +73,6 @@ pub fn build_job_card(
     let image_height = 120.0f32;
     let image_x = offset.x + card_padding_x;
     let image_y = offset.y + card_height - image_height - card_padding_y;
-
-    let button_width = 90.0;
     let inner_x = offset.x + card_padding_x + image_width + card_spacing;
 
     let (image1, image2) = job.job_type.get_images(assets);
@@ -127,6 +123,50 @@ pub fn build_job_card(
         color: Palette::White.get_color(),
     });
 
+    let right_side_width = 64.0;
+
+    // Draw HyperMode button on the right
+    elements.push(UiElement::RectButton {
+        rectangle: UiRect {
+            x: offset.x + card_width - right_side_width - card_padding_x,
+            y: image_y,
+            w: right_side_width,
+            h: 30.0,
+        },
+        font: assets.fonts.text_bold.clone(),
+        parent_clip: clip.clone(),
+        font_size: font_size_small,
+        text: "Hyper".to_string(),
+        color: palette::TEXT.get_color(),
+        intent: Intent::ToggleHyperMode(job_id),
+    });
+
+    // Draw Image on the right
+    elements.push(UiElement::Rectangle {
+        x: offset.x + card_width - right_side_width - card_padding_x,
+        y: image_y + 40.0,
+        width: right_side_width,
+        height: right_side_width,
+        color: palette::PRODUCT_COLOR.get_color(),
+        bordered: true,
+    });
+
+    // Draw 4 resource icons in the middle
+    let resource_icon_size = 50.0;
+    let resource_icon_spacing = 4.0;
+
+    for i in 0..4 {
+        let resource_x = inner_x + (i as f32 * (resource_icon_size + resource_icon_spacing));
+        elements.push(UiElement::Rectangle {
+            x: resource_x,
+            y: offset.y + card_padding_y + 96.0,
+            width: resource_icon_size,
+            height: resource_icon_size,
+            color: palette::IMAGE_BACKGROUND.get_color(),
+            bordered: true,
+        });
+    }
+
     // Title Bar
     elements.push(UiElement::Text {
         content: job.job_type.get_name(),
@@ -163,32 +203,37 @@ pub fn build_job_card(
         with_border: true,
     });
 
-    let progress_bar_level_y = progress_bar_action_y + progress_bar_height + 5.0;
-
-    // Level Up Progress Bar
-    // elements.push(UiElement::ProgressBar {
-    //     x: inner_x,
-    //     y: progress_bar_level_y,
-    //     width: progress_bar_width,
-    //     height: progress_bar_height,
-    //     progress: job.level_up_progress.get(),
-    //     background_color: palette::BAR_BACKGROUND.get_color(),
-    //     foreground_color: palette::PROGRESS_COLOR.get_color(),
-    // });
+    // Delete Button
+    let button_dimensions = 30.0;
+    let button_spacing = 4.0;
+    elements.push(UiElement::RectButton {
+        rectangle: UiRect {
+            x: offset.x + card_width - button_dimensions - card_padding_x,
+            y: offset.y + card_padding_y,
+            w: button_dimensions,
+            h: button_dimensions,
+        },
+        font: assets.fonts.text_bold.clone(),
+        parent_clip: clip.clone(),
+        font_size: font_size_small,
+        text: "x".to_string(),
+        color: palette::TEXT.get_color(),
+        intent: Intent::ToggleJob(job_id),
+    });
 
     // Start / Stop Button
     elements.push(UiElement::RectButton {
         rectangle: UiRect {
-            x: offset.x + card_width - button_width - card_padding_x,
+            x: offset.x + card_width - button_dimensions * 2.0 - button_spacing - card_padding_x,
             y: offset.y + card_padding_y,
-            w: button_width,
-            h: 50.0,
+            w: button_dimensions,
+            h: button_dimensions,
         },
-        font: assets.fonts.mono.clone(),
+        font: assets.fonts.text_bold.clone(),
         parent_clip: clip.clone(),
         font_size: font_size_small,
-        text: if job.running { "Stop".to_string() } else { "Start".to_string() },
-        color: color_button,
+        text: if job.running { "||".to_string() } else { ">".to_string() },
+        color: palette::TEXT.get_color(),
         intent: Intent::ToggleJob(job_id),
     });
 

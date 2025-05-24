@@ -87,7 +87,7 @@ impl GameState {
     pub fn new() -> Self {
         Self {
             jobs: vec![],
-            time_slots: TimeSlots { total: 3, used: 0, },
+            time_slots: TimeSlots { total: 9, used: 0, },
             performance_flags: PerformanceFlags::new(),
             game_meta: GameMeta::new(),
             inventory: Inventory::new(),
@@ -117,6 +117,9 @@ impl GameState {
                         self.performance_flags.timeslots_changed = true;
                     }
                 }
+                Intent::ToggleHyperMode(index) => {
+                    // todo: implement hyper mode toggle
+                },
                 Intent::BuyTimeSlot => {
                     let upgrade_cost = self.time_slots.get_upgrade_cost();
 
@@ -185,6 +188,7 @@ pub enum Intent {
     ToggleJob(usize),
     BuyTimeSlot,
     SkipSeconds(i32),
+    ToggleHyperMode(usize),
 }
 
 #[derive(Clone)]
