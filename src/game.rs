@@ -26,7 +26,9 @@ pub struct Textures {
 }
 
 pub struct Fonts {
-    pub main: Option<Font>
+    pub mono: Option<Font>,
+    pub text: Option<Font>,
+    pub text_bold: Option<Font>,
 }
 
 pub struct Assets {
@@ -284,7 +286,7 @@ impl JobType {
 
     pub fn get_name(&self) -> String {
         match self {
-            JobType::Woodcutting => "Woodcutting".to_string(),
+            JobType::Woodcutting => "Lumberjacking".to_string(),
             JobType::Mining      => "Mining".to_string(),
             JobType::Hunting     => "Hunting".to_string(),
             JobType::Smithing    => "Smithing".to_string(),

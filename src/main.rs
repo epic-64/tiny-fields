@@ -113,7 +113,7 @@ async fn main() {
         let effects_elements: Vec<UiElement> = state.text_particles.iter().map(|particle| {
             UiElement::Text {
                 content: particle.text.clone(),
-                font: assets.fonts.main.clone(),
+                font: assets.fonts.mono.clone(),
                 x: particle.position.x,
                 y: particle.position.y,
                 font_size: 12.0,
@@ -147,7 +147,7 @@ fn build_debug_elements(state: &GameState, assets: &Assets, rect: UiRect) -> Vec
     // FPS Text
     elements.push(UiElement::Text {
         content: format!("FPS: {:.2}", state.game_meta.effective_fps),
-        font: assets.fonts.main.clone(),
+        font: assets.fonts.mono.clone(),
         x: rect.x,
         y: rect.y,
         font_size,
@@ -161,7 +161,7 @@ fn build_debug_elements(state: &GameState, assets: &Assets, rect: UiRect) -> Vec
             state.game_meta.frame_time * 1000.0,
             state.game_meta.raw_fps
         ),
-        font: assets.fonts.main.clone(),
+        font: assets.fonts.mono.clone(),
         x: rect.x,
         y: rect.y + font_size,
         font_size,
@@ -184,7 +184,9 @@ async fn load_assets() -> Assets {
     };
 
     let fonts = Fonts {
-        main: Some(load_ttf_font("Menlo-Regular.ttf").await.expect("Couldn't load font"))
+        mono: Some(load_ttf_font("Menlo-Regular.ttf").await.expect("Couldn't load font")),
+        text: Some(load_ttf_font("WorkSans-Regular.ttf").await.expect("Couldn't load font")),
+        text_bold: Some(load_ttf_font("WorkSans-SemiBold.ttf").await.expect("Couldn't load font")),
     };
 
     Assets { fonts, textures }
@@ -261,7 +263,7 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
             w: 120.0,
             h: icon_size,
         },
-        font: assets.fonts.main.clone(),
+        font: assets.fonts.mono.clone(),
         intent: Intent::BuyTimeSlot,
         text: format!("Buy ({})", state.time_slots.get_upgrade_cost()),
         font_size: 14.0,
@@ -283,7 +285,7 @@ pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
             w: 200.0,
             h: 40.0,
         },
-        font: assets.fonts.main.clone(),
+        font: assets.fonts.mono.clone(),
         intent: Intent::SkipSeconds(300),
         text: "Skip 5 min".to_string(),
         font_size: 14.0,
@@ -299,7 +301,7 @@ pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
             w: 200.0,
             h: 40.0,
         },
-        font: assets.fonts.main.clone(),
+        font: assets.fonts.mono.clone(),
         intent: Intent::SkipSeconds(604_800),
         text: "Skip 1 week".to_string(),
         font_size: 14.0,
@@ -340,7 +342,7 @@ pub fn build_inventory_elements(state: &GameState, assets: &Assets, rect: UiRect
 
         elements.push(UiElement::Text {
             content: format!("{}", item_name.to_string()),
-            font: assets.fonts.main.clone(),
+            font: assets.fonts.mono.clone(),
             x: rect.x + index as f32 * (item_size + 5.0),
             y: rect.y + item_size / 2.0,
             font_size: 14.0,
@@ -349,7 +351,7 @@ pub fn build_inventory_elements(state: &GameState, assets: &Assets, rect: UiRect
 
         elements.push(UiElement::Text {
             content: format!("{}", item_count),
-            font: assets.fonts.main.clone(),
+            font: assets.fonts.mono.clone(),
             x: rect.x + index as f32 * (item_size + 5.0),
             y: rect.y + item_size,
             font_size: 14.0,

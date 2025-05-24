@@ -68,7 +68,7 @@ pub fn build_job_card(
     let color_secondary = palette::BORDER.get_color();
     let color_button = palette::BUTTON_BACKGROUND.get_color();
 
-    let font_size_large = 20.0;
+    let font_size_large = 16.0;
     let font_size_small = 14.0;
 
     let image_width = 90.0f32;
@@ -130,8 +130,8 @@ pub fn build_job_card(
     // Title Bar
     elements.push(UiElement::Text {
         content: job.job_type.get_name(),
-        font: assets.fonts.main.clone(),
-        x: inner_x,
+        font: assets.fonts.text_bold.clone(),
+        x: offset.x + card_padding_x,
         y: offset.y + card_padding_y + font_size_large,
         font_size: font_size_large,
         color: color_primary,
@@ -140,9 +140,9 @@ pub fn build_job_card(
     // Job Info
     elements.push(UiElement::Text {
         content: format!("Lvl {} | {}s", job.level, job.job_type.base_duration()),
-        font: assets.fonts.main.clone(),
-        x: inner_x,
-        y: offset.y + card_padding_y + font_size_large + 28.0,
+        font: assets.fonts.text.clone(),
+        x: offset.x + card_padding_x,
+        y: offset.y + card_padding_y + 40.,
         font_size: font_size_small,
         color: color_secondary,
     });
@@ -166,7 +166,7 @@ pub fn build_job_card(
     // Action Progress Text
     elements.push(UiElement::Text {
         content: format!("{:.1} / {:.1}", job.time_accumulator, job.job_type.base_duration()),
-        font: assets.fonts.main.clone(),
+        font: assets.fonts.mono.clone(),
         x: inner_x + 10.0,
         y: progress_bar_action_y + 15.0,
         font_size: font_size_small,
@@ -189,7 +189,7 @@ pub fn build_job_card(
     // Level Up Progress Text
     elements.push(UiElement::Text {
         content: format!("Level Up: {} / {}", job.actions_done, job.actions_to_level_up()),
-        font: assets.fonts.main.clone(),
+        font: assets.fonts.mono.clone(),
         x: inner_x + 10.0,
         y: progress_bar_level_y + 15.0,
         font_size: font_size_small,
@@ -204,7 +204,7 @@ pub fn build_job_card(
             w: button_width,
             h: 50.0,
         },
-        font: assets.fonts.main.clone(),
+        font: assets.fonts.mono.clone(),
         parent_clip: clip.clone(),
         font_size: font_size_small,
         text: if job.running { "Stop".to_string() } else { "Start".to_string() },
