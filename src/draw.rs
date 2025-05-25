@@ -2,6 +2,7 @@ use crate::game::{Intent, JobInstance, MouseInput, UiRect};
 use macroquad::color::{Color, SKYBLUE, WHITE};
 use macroquad::math::Vec2;
 use macroquad::prelude::{draw_rectangle, draw_text_ex, draw_texture_ex, get_internal_gl, measure_text, DrawTextureParams, QuadGl, Texture2D};
+use macroquad::shapes::draw_circle;
 use macroquad::text::{Font, TextParams};
 use crate::palette;
 
@@ -40,6 +41,7 @@ pub enum UiElement {
         foreground_color: Color,
         with_border: bool,
     },
+    Circle { x: f32, y: f32, radius: f32, color: Color },
     Rectangle { x: f32, y: f32, width: f32, height: f32, color: Color, bordered: bool },
     Image { x: f32, y: f32, width: f32, height: f32, texture: Texture2D, color: Color },
     Scissor { clip: Option<(i32, i32, i32, i32)> },
@@ -100,6 +102,9 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
                 draw_rectangle(*x, *y, *width, *height, *color);
             }
         }
+        UiElement::Circle { x, y, radius, color } => {
+            draw_circle(*x, *y, *radius, *color);
+        }
         UiElement::Image { x, y, width, height, texture, color } => {
             let params = DrawTextureParams {
                 dest_size: Some(Vec2::new(*width, *height)),
@@ -142,4 +147,50 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
         }
         UiElement::JobParticleMarker { .. } => {}
     }
+}
+
+pub fn pill(x: f32, y: f32, w: f32, h: f32, text: &str, text_color: Color) -> Vec<UiElement> {
+    let mut elements = Vec::new();
+
+    let radius = h / 2.0;
+
+    // add circle on the left
+    elements.push(UiElement::Circle {
+        x: x,
+        y: y + radius,
+        radius: radius,
+        color: palette::PILL_COLOR.get_color(),
+    });
+
+    // add rectangle in the middle
+    elements.push(UiElement::Rectangle {
+        x: x,
+        y: y,
+        width: w,
+        height: h,
+        color: palette::PILL_COLOR.get_color(),
+        bordered: false,
+    });
+
+    // add circle on the right
+    elements.push(UiElement::Circle {
+        x: x + w,
+        y: y + radius,
+        radius: radius,
+        color: palette::PILL_COLOR.get_color(),
+    });
+
+    // add text in the middle
+    let font_size = 16.0;
+    let text_measure = measure_text(text, None, font_size as u16, 1.0);
+    elements.push(UiElement::Text {
+        content: text.to_string(),
+        x: x + w / 2.0 - text_measure.width / 2.0,
+        y: y + h / 2.0 + text_measure.height / 2.0,
+        font_size: font_size,
+        color: text_color,
+        font: None,
+    });
+
+    elements
 }

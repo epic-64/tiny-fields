@@ -8,11 +8,14 @@ pub const BAR_BACKGROUND: Palette = Palette::White;
 pub const BUTTON_BACKGROUND: Palette = Palette::OffWhite;
 pub const IMAGE_BACKGROUND: Palette = Palette::OffWhite;
 pub const SKILL_COLOR: Palette = Palette::Aqua;
+pub const PILL_COLOR: Palette = Palette::AnthraciteLight;
+pub const PILL_TEXT_COLOR: Palette = Palette::White;
 pub const PRODUCT_COLOR: Palette = Palette::Peach;
 pub const PROGRESS_COLOR: Palette = Palette::Grass;
 
 pub enum Palette {
     Anthracite,
+    AnthraciteLight,
     DarkGray,
     Coral,
     Aqua,
@@ -28,6 +31,7 @@ impl Palette {
     pub fn get_color(&self) -> Color {
         match self {
             Palette::Anthracite => Color::from_rgba(22, 27, 30, 255),
+            Palette::AnthraciteLight => Color::from_rgba(36, 41, 46, 255),
             Palette::DarkGray => Color::from_rgba(84, 84, 84, 255),
             Palette::Coral => Color::from_rgba(255, 87, 87, 255),
             Palette::Aqua => Color::from_rgba(12, 192, 223, 255),

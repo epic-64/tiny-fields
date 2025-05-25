@@ -1,4 +1,4 @@
-use crate::draw::UiElement;
+use crate::draw::{pill, UiElement};
 use crate::game::{Assets, GameState, Intent, JobInstance, UiRect};
 use macroquad::math::Vec2;
 use crate::palette;
@@ -165,6 +165,20 @@ pub fn build_job_card(
             color: palette::IMAGE_BACKGROUND.get_color(),
             bordered: true,
         });
+
+        // draw pill at the bottom of the rectangle
+        let pill_width = resource_icon_size - 24.0;
+        let pill_height = 14.0;
+        elements.extend(
+            pill(
+                resource_x + resource_icon_size / 2.0 - pill_width / 2.0,
+                offset.y + card_padding_y + 96.0 + resource_icon_size - pill_height / 2.0,
+                pill_width,
+                pill_height,
+                "1234", // Placeholder for resource amount
+                Palette::Peach.get_color()
+            )
+        )
     }
 
     // Title Bar
