@@ -165,6 +165,7 @@ async fn load_assets() -> Assets {
         smithing_1: load_texture("BomBom_1.png").await.expect("Couldn't load file"),
         smithing_2: load_texture("BomBom_2.png").await.expect("Couldn't load file"),
         wood_burner: load_texture("wood_burner.png").await.expect("Couldn't load file"),
+        meat_cheap: load_texture("meat_cheap.png").await.expect("Couldn't load file"),
     };
 
     let fonts = Fonts {

@@ -24,6 +24,7 @@ pub struct Textures {
     pub smithing_1: Texture2D,
     pub smithing_2: Texture2D,
     pub wood_burner: Texture2D,
+    pub meat_cheap: Texture2D,
 }
 
 pub struct Fonts {
@@ -38,12 +39,7 @@ pub struct Assets {
 }
 
 impl Assets {
-    pub fn get_product_texture(&self, product: &Item) -> Texture2D {
-        match product {
-            Item::Wood => self.textures.wood_burner.clone(),
-            _ => self.textures.wood_burner.clone(), // todo: change to correct texture
-        }
-    }
+    //
 }
 
 pub struct PerformanceFlags {
@@ -477,6 +473,14 @@ impl Item {
             Item::Meat => "Meat".to_string(),
             Item::Berry => "Berry".to_string(),
             Item::IronBar => "Iron Bar".to_string(),
+        }
+    }
+
+    pub fn get_texture(&self, assets: &Assets) -> Texture2D {
+        match self {
+            Item::Wood => assets.textures.wood_burner.clone(),
+            Item::Meat => assets.textures.meat_cheap.clone(),
+            _ => assets.textures.wood_burner.clone(), // todo: change to correct texture
         }
     }
 }
