@@ -24,6 +24,7 @@ pub fn build_job_cards(state: &GameState, assets: &Assets, offset: Vec2) -> Vec<
 
     for (id, job) in state.jobs.iter().enumerate() {
         let job_draw_container = build_job_card(
+            state,
             &None, // No clipping for the job cards
             assets,
             job,
@@ -52,6 +53,7 @@ pub fn build_job_cards(state: &GameState, assets: &Assets, offset: Vec2) -> Vec<
 }
 
 pub fn build_job_card(
+    state: &GameState,
     clip: &Option<(i32, i32, i32, i32)>,
     assets: &Assets,
     job: &JobInstance,
@@ -168,7 +170,7 @@ pub fn build_job_card(
             image_y + 40.0 - 14.0 / 2.0,
             24.0,
             14.0,
-            "1234", // Placeholder for product amount
+            state.inventory.get_item_amount(job.job_type.get_product()).to_string().as_str(),
             Palette::White.get_color(),
         )
     );

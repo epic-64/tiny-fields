@@ -8,7 +8,7 @@ fn it_works() {
 
     game_state.step(intents.as_slice(), 0.016);
 
-    assert_eq!(game_state.inventory.get_item(Item::Coin), 0);
+    assert_eq!(game_state.inventory.get_item_amount(Item::Coin), 0);
 }
 
 #[test]

@@ -313,7 +313,7 @@ pub fn build_inventory_elements(state: &GameState, assets: &Assets, rect: UiRect
     let inventory = &state.inventory;
     let item_size = 40.0;
 
-    let items = inventory.items.clone();
+    let items = inventory.item_amounts.clone();
 
     for (index, (item_name, item_count)) in items.iter().enumerate() {
         elements.push(UiElement::Rectangle {
