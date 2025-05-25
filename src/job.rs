@@ -157,7 +157,7 @@ pub fn build_job_card(
         y: image_y + 40.0 + 8.0,
         width: right_side_width - 16.0,
         height: right_side_width - 16.0,
-        texture: assets.textures.wood_burner.clone(),
+        texture: assets.get_product_texture(&job.job_type.get_product()),
         color: Palette::White.get_color(),
     });
 
