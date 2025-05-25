@@ -37,6 +37,15 @@ pub struct Assets {
     pub textures: Textures,
 }
 
+impl Assets {
+    pub fn get_product_texture(&self, product: &Item) -> Texture2D {
+        match product {
+            Item::Wood => self.textures.wood_burner.clone(),
+            _ => self.textures.wood_burner.clone(), // todo: change to correct texture
+        }
+    }
+}
+
 pub struct PerformanceFlags {
     pub timeslots_changed: bool,
 }
@@ -267,7 +276,7 @@ pub enum JobType {
 }
 
 impl JobType {
-    pub fn get_images(&self, assets: &Assets) -> (Texture2D, Texture2D) {
+    pub fn get_animation_images(&self, assets: &Assets) -> (Texture2D, Texture2D) {
         let textures = &assets.textures;
 
         match self {
@@ -301,6 +310,21 @@ impl JobType {
             JobType::Cooking     => "Cooking".to_string(),
             JobType::Alchemy     => "Alchemy".to_string(),
             JobType::Selling     => "Selling".to_string(),
+        }
+    }
+
+    pub fn get_product(&self) -> Item {
+        match self {
+            JobType::Woodcutting => Item::Wood,
+            JobType::Mining      => Item::Iron,
+            JobType::Hunting     => Item::Meat,
+            JobType::Smithing    => Item::IronBar,
+            JobType::Herbalism   => Item::Herb,
+            JobType::Foraging    => Item::Berry,
+            JobType::Woodworking => Item::Wood, // todo: change to correct item
+            JobType::Cooking     => Item::Meat, // todo: change to correct item
+            JobType::Alchemy     => Item::Herb, // todo: change to correct item
+            JobType::Selling     => Item::Coin,
         }
     }
 

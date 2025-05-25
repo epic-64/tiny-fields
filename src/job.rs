@@ -75,7 +75,7 @@ pub fn build_job_card(
     let image_y = offset.y + card_height - image_height - card_padding_y;
     let inner_x = offset.x + card_padding_x + image_width + card_spacing;
 
-    let (image1, image2) = job.job_type.get_images(assets);
+    let (image1, image2) = job.job_type.get_animation_images(assets);
 
     let chosen_image = if job.running && job.time_accumulator % 2.0 < 1.0 {
         image1
@@ -102,8 +102,7 @@ pub fn build_job_card(
         bordered: false,
     });
 
-    // Job Animation
-    // Job animation background
+    // Job Animation background
     elements.push(UiElement::Rectangle {
         x: image_x,
         y: image_y,
@@ -113,6 +112,7 @@ pub fn build_job_card(
         bordered: true,
     });
 
+    // Job Animation Image
     let image_padding = 12.0;
     elements.push(UiElement::Image {
         x: image_x + image_padding,
