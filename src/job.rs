@@ -170,17 +170,23 @@ pub fn build_job_card(
             image_y + 40.0 - 14.0 / 2.0,
             24.0,
             14.0,
-            state.inventory.get_item_amount(job.job_type.get_product()).to_string().as_str(),
+            state.inventory.get_item_amount(&job.job_type.get_product()).to_string().as_str(),
             Palette::White.get_color(),
         )
     );
 
     // Draw 4 resource icons in the middle
     let resource_icon_size = 50.0;
+    let resource_icon_padding = 4.0;
     let resource_icon_spacing = 4.0;
 
-    for i in 0..4 {
+    let required_items = job.job_type.get_required_items();
+    let item_slots = required_items.len();
+
+    for (i, (required_item, required_amount)) in required_items.iter().enumerate() {
         let resource_x = inner_x + (i as f32 * (resource_icon_size + resource_icon_spacing));
+
+        // draw background rectangle
         elements.push(UiElement::Rectangle {
             x: resource_x,
             y: offset.y + card_padding_y + 96.0,
@@ -190,6 +196,17 @@ pub fn build_job_card(
             bordered: true,
         });
 
+        // draw resource icon
+        let inner_size = resource_icon_size - resource_icon_padding * 2.0;
+        elements.push(UiElement::Image {
+            x: resource_x + resource_icon_size / 2.0 - inner_size / 2.0,
+            y: offset.y + card_padding_y + 96.0 + resource_icon_size / 2.0 - inner_size / 2.0,
+            width: inner_size,
+            height: inner_size,
+            texture: required_item.get_texture(&assets),
+            color: Palette::White.get_color(),
+        });
+
         // draw pill at the top of the rectangle
         elements.extend(
             pill(
@@ -197,7 +214,7 @@ pub fn build_job_card(
                 offset.y + card_padding_y + 96.0 - 14.0 / 2.0,
                 24.0,
                 14.0,
-                "1234",
+                state.inventory.get_item_amount(required_item).to_string().as_str(),
                 Palette::White.get_color(),
             )
         );
@@ -211,7 +228,7 @@ pub fn build_job_card(
                 offset.y + card_padding_y + 96.0 + resource_icon_size - pill_height / 2.0,
                 pill_width,
                 pill_height,
-                "1234", // Placeholder for resource amount
+                required_amount.to_string().as_str(),
                 Palette::Peach.get_color()
             )
         )

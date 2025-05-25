@@ -25,6 +25,7 @@ pub struct Textures {
     pub smithing_2: Texture2D,
     pub wood_burner: Texture2D,
     pub meat_cheap: Texture2D,
+    pub coin: Texture2D,
 }
 
 pub struct Fonts {
@@ -129,7 +130,7 @@ impl GameState {
                 Intent::BuyTimeSlot => {
                     let upgrade_cost = self.time_slots.get_upgrade_cost();
 
-                    if self.inventory.get_item_amount(Item::Coin) >= upgrade_cost {
+                    if self.inventory.get_item_amount(&Item::Coin) >= upgrade_cost {
                         self.inventory.add_item(Item::Coin, -upgrade_cost);
                         self.time_slots.total += 1;
                         self.performance_flags.timeslots_changed = true;
@@ -160,7 +161,7 @@ impl GameState {
         for job in &mut self.jobs {
             if job.running {
                 if let Some(effect) = job.update_progress(dt) {
-                    effects.push(EffectWithSource::Job {
+                    effects.push(EffectWithSource::JobSource {
                         job: job.clone(),
                         effect: effect.clone(),
                     });
@@ -171,7 +172,7 @@ impl GameState {
         // process side effects
         for effect in &effects {
             match effect {
-                EffectWithSource::Job { effect, .. } => {
+                EffectWithSource::JobSource { effect, .. } => {
                     match effect {
                         Effect::AddItem { item, amount } => {
                             self.inventory.add_item(*item, *amount);
@@ -254,7 +255,7 @@ pub enum Effect {
 }
 
 pub enum EffectWithSource {
-    Job { job: JobInstance, effect: Effect },
+    JobSource { job: JobInstance, effect: Effect },
 }
 
 #[derive(Clone, PartialEq)]
@@ -318,9 +319,22 @@ impl JobType {
             JobType::Herbalism   => Item::Herb,
             JobType::Foraging    => Item::Berry,
             JobType::Woodworking => Item::Wood, // todo: change to correct item
-            JobType::Cooking     => Item::Meat, // todo: change to correct item
+            JobType::Cooking     => Item::Sandwich,
             JobType::Alchemy     => Item::Herb, // todo: change to correct item
             JobType::Selling     => Item::Coin,
+        }
+    }
+
+    pub fn get_required_items(&self) -> Vec<(Item, i64)>{
+        match self {
+            JobType::Woodcutting => vec![(Item::Coin, 1)],
+            JobType::Cooking     => vec![
+                (Item::Wood, 4),
+                (Item::Meat, 1),
+                (Item::Coin, 1),
+                (Item::Herb, 1),
+            ],
+            _ => vec![],
         }
     }
 
@@ -461,6 +475,7 @@ pub enum Item {
     Meat,
     Berry,
     IronBar,
+    Sandwich,
 }
 
 impl Item {
@@ -473,6 +488,7 @@ impl Item {
             Item::Meat => "Meat".to_string(),
             Item::Berry => "Berry".to_string(),
             Item::IronBar => "Iron Bar".to_string(),
+            Item::Sandwich => "Sandwich".to_string(),
         }
     }
 
@@ -480,6 +496,7 @@ impl Item {
         match self {
             Item::Wood => assets.textures.wood_burner.clone(),
             Item::Meat => assets.textures.meat_cheap.clone(),
+            Item::Coin => assets.textures.coin.clone(),
             _ => assets.textures.wood_burner.clone(), // todo: change to correct texture
         }
     }
@@ -506,8 +523,8 @@ impl Inventory {
         }
     }
 
-    pub fn get_item_amount(&self, item: Item) -> i64 {
-        *self.item_amounts.get(&item).unwrap_or(&0)
+    pub fn get_item_amount(&self, item: &Item) -> i64 {
+        *self.item_amounts.get(item).unwrap_or(&0)
     }
 }
 

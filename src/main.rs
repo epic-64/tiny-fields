@@ -31,7 +31,7 @@ async fn main() {
     state.add_job_instance(JobType::Woodcutting);
     state.add_job_instance(JobType::Woodcutting);
     state.add_job_instance(JobType::Woodcutting);
-    state.add_job_instance(JobType::Mining);
+    state.add_job_instance(JobType::Cooking);
     state.add_job_instance(JobType::Hunting);
     state.add_job_instance(JobType::Hunting);
     state.add_job_instance(JobType::Hunting);
@@ -84,7 +84,7 @@ async fn main() {
         // trigger new text particles
         for effect in &effects {
             match effect {
-                EffectWithSource::Job { job, effect } => {
+                EffectWithSource::JobSource { job, effect } => {
                     match effect {
                         Effect::AddItem { item, amount } => {
                             state.text_particles.push(TextParticle {
@@ -166,6 +166,7 @@ async fn load_assets() -> Assets {
         smithing_2: load_texture("BomBom_2.png").await.expect("Couldn't load file"),
         wood_burner: load_texture("wood_burner.png").await.expect("Couldn't load file"),
         meat_cheap: load_texture("meat_cheap.png").await.expect("Couldn't load file"),
+        coin: load_texture("coin.png").await.expect("Couldn't load file"),
     };
 
     let fonts = Fonts {
