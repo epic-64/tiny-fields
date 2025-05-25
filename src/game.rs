@@ -15,14 +15,15 @@ pub struct MouseInput {
 }
 
 pub struct Textures {
-    pub wood_1: Texture2D,
-    pub wood_2: Texture2D,
+    pub wood_anim_1: Texture2D,
+    pub wood_anim_2: Texture2D,
     pub mining_1: Texture2D,
     pub mining_2: Texture2D,
     pub hunting_1: Texture2D,
     pub hunting_2: Texture2D,
     pub smithing_1: Texture2D,
     pub smithing_2: Texture2D,
+    pub wood_burner: Texture2D,
 }
 
 pub struct Fonts {
@@ -270,11 +271,11 @@ impl JobType {
         let textures = &assets.textures;
 
         match self {
-            JobType::Woodcutting => (textures.wood_1.clone(), textures.wood_2.clone()),
+            JobType::Woodcutting => (textures.wood_anim_1.clone(), textures.wood_anim_2.clone()),
             JobType::Mining => (textures.mining_1.clone(), textures.mining_2.clone()),
             JobType::Hunting => (textures.hunting_1.clone(), textures.hunting_2.clone()),
             JobType::Smithing => (textures.smithing_1.clone(), textures.smithing_2.clone()),
-            _ => (textures.wood_1.clone(), textures.wood_2.clone()),
+            _ => (textures.wood_anim_1.clone(), textures.wood_anim_2.clone()),
         }
     }
 

@@ -141,7 +141,7 @@ pub fn build_job_card(
         intent: Intent::ToggleHyperMode(job_id),
     });
 
-    // Draw Image on the right
+    // Draw Product Image on the right
     elements.push(UiElement::Rectangle {
         x: offset.x + card_width - right_side_width - card_padding_x,
         y: image_y + 40.0,
@@ -150,6 +150,28 @@ pub fn build_job_card(
         color: palette::PRODUCT_COLOR.get_color(),
         bordered: true,
     });
+
+    // Draw Product Image
+    elements.push(UiElement::Image {
+        x: offset.x + card_width - right_side_width - card_padding_x + 8.0,
+        y: image_y + 40.0 + 8.0,
+        width: right_side_width - 16.0,
+        height: right_side_width - 16.0,
+        texture: assets.textures.wood_burner.clone(),
+        color: Palette::White.get_color(),
+    });
+
+    // Draw Product Pill at the top of the rectangle
+    elements.extend(
+        pill(
+            offset.x + card_width - right_side_width - card_padding_x + right_side_width / 2.0 - 24.0 / 2.0,
+            image_y + 40.0 - 14.0 / 2.0,
+            24.0,
+            14.0,
+            "1234", // Placeholder for product amount
+            Palette::White.get_color(),
+        )
+    );
 
     // Draw 4 resource icons in the middle
     let resource_icon_size = 50.0;
@@ -165,6 +187,18 @@ pub fn build_job_card(
             color: palette::IMAGE_BACKGROUND.get_color(),
             bordered: true,
         });
+
+        // draw pill at the top of the rectangle
+        elements.extend(
+            pill(
+                resource_x + resource_icon_size / 2.0 - 24.0 / 2.0,
+                offset.y + card_padding_y + 96.0 - 14.0 / 2.0,
+                24.0,
+                14.0,
+                "1234",
+                Palette::White.get_color(),
+            )
+        );
 
         // draw pill at the bottom of the rectangle
         let pill_width = resource_icon_size - 24.0;

@@ -156,14 +156,15 @@ fn build_debug_elements(state: &GameState, assets: &Assets, rect: UiRect) -> Vec
 
 async fn load_assets() -> Assets {
     let textures = Textures {
-        wood_1: load_texture("ChopChop_1_.png").await.expect("Couldn't load file"),
-        wood_2: load_texture("ChopChop_2_.png").await.expect("Couldn't load file"),
+        wood_anim_1: load_texture("ChopChop_1_.png").await.expect("Couldn't load file"),
+        wood_anim_2: load_texture("ChopChop_2_.png").await.expect("Couldn't load file"),
         mining_1: load_texture("ClingCling_1.png").await.expect("Couldn't load file"),
         mining_2: load_texture("ClingCling_2.png").await.expect("Couldn't load file"),
         hunting_1: load_texture("PewPew_1.png").await.expect("Couldn't load file"),
         hunting_2: load_texture("PewPew_2.png").await.expect("Couldn't load file"),
         smithing_1: load_texture("BomBom_1.png").await.expect("Couldn't load file"),
         smithing_2: load_texture("BomBom_2.png").await.expect("Couldn't load file"),
+        wood_burner: load_texture("wood_burner.png").await.expect("Couldn't load file"),
     };
 
     let fonts = Fonts {
