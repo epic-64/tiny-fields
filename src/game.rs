@@ -17,6 +17,8 @@ pub struct MouseInput {
 pub struct Textures {
     pub wood_anim_1: Texture2D,
     pub wood_anim_2: Texture2D,
+    pub cooking_anim_1: Texture2D,
+    pub cooking_anim_2: Texture2D,
     pub mining_1: Texture2D,
     pub mining_2: Texture2D,
     pub hunting_1: Texture2D,
@@ -281,6 +283,7 @@ impl JobType {
             JobType::Mining => (textures.mining_1.clone(), textures.mining_2.clone()),
             JobType::Hunting => (textures.hunting_1.clone(), textures.hunting_2.clone()),
             JobType::Smithing => (textures.smithing_1.clone(), textures.smithing_2.clone()),
+            JobType::Cooking => (textures.cooking_anim_1.clone(), textures.cooking_anim_2.clone()),
             _ => (textures.wood_anim_1.clone(), textures.wood_anim_2.clone()),
         }
     }
@@ -339,18 +342,7 @@ impl JobType {
     }
 
     pub fn get_completion_effect(&self) -> Effect {
-        match self {
-            JobType::Woodcutting => Effect::AddItem { item: Item::Wood, amount: 1 },
-            JobType::Mining      => Effect::AddItem { item: Item::Iron, amount: 1 },
-            JobType::Hunting     => Effect::AddItem { item: Item::Meat, amount: 1 },
-            JobType::Smithing    => Effect::AddItem { item: Item::IronBar, amount: 1 },
-            JobType::Herbalism   => Effect::AddItem { item: Item::Herb, amount: 1 },
-            JobType::Foraging    => Effect::AddItem { item: Item::Berry, amount: 1 },
-            JobType::Woodworking => Effect::AddItem { item: Item::Wood, amount: 1 },
-            JobType::Cooking     => Effect::AddItem { item: Item::Meat, amount: 1 },
-            JobType::Alchemy     => Effect::AddItem { item: Item::Herb, amount: 1 },
-            JobType::Selling     => Effect::AddItem { item: Item::Coin, amount: 1 },
-        }
+        Effect::AddItem { item: self.get_product(), amount: 1 }
     }
 }
 

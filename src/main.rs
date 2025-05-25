@@ -158,6 +158,8 @@ async fn load_assets() -> Assets {
     let textures = Textures {
         wood_anim_1: load_texture("ChopChop_1_.png").await.expect("Couldn't load file"),
         wood_anim_2: load_texture("ChopChop_2_.png").await.expect("Couldn't load file"),
+        cooking_anim_1: load_texture("pan_1.png").await.expect("Couldn't load file"),
+        cooking_anim_2: load_texture("pan_2.png").await.expect("Couldn't load file"),
         mining_1: load_texture("ClingCling_1.png").await.expect("Couldn't load file"),
         mining_2: load_texture("ClingCling_2.png").await.expect("Couldn't load file"),
         hunting_1: load_texture("PewPew_1.png").await.expect("Couldn't load file"),
