@@ -1,8 +1,13 @@
-use std::collections::HashMap;
-use macroquad::prelude::Texture2D;
+use macroquad::prelude::{Font, Texture2D};
 use macroquad::text::load_ttf_font;
 use macroquad::texture::load_texture;
-use crate::game::Fonts;
+use std::collections::HashMap;
+
+pub struct Fonts {
+    pub mono: Option<Font>,
+    pub text: Option<Font>,
+    pub text_bold: Option<Font>,
+}
 
 #[derive(Hash, Eq, PartialEq, Debug, Clone, Copy)]
 pub enum AssetId {

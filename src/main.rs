@@ -1,7 +1,6 @@
-use std::collections::HashMap;
+use crate::assets::{load_assets, Assets};
 use macroquad::miniquad::date::now;
 use macroquad::prelude::*;
-use crate::assets::{load_assets, Assets};
 
 pub mod draw;
 pub mod game;
@@ -12,7 +11,7 @@ pub mod assets;
 
 use crate::draw::{draw, UiElement};
 use crate::game::{Effect, EffectWithSource, GameState, Intent, JobType, MouseInput, TextParticle, UiRect};
-use crate::job::{build_job_cards};
+use crate::job::build_job_cards;
 
 pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
     vec![MouseButton::Left, MouseButton::Right, MouseButton::Middle]

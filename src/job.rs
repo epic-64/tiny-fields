@@ -1,9 +1,9 @@
+use crate::assets::Assets;
 use crate::draw::{pill, UiElement};
 use crate::game::{GameState, Intent, JobInstance, UiRect};
-use macroquad::math::Vec2;
-use crate::assets::Assets;
 use crate::palette;
 use crate::palette::Palette;
+use macroquad::math::Vec2;
 
 pub const JOB_CARD_HEIGHT: f32 = 192.0;
 pub const JOB_CARD_WIDTH: f32 = 404.0;

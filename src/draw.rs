@@ -1,10 +1,10 @@
 use crate::game::{Intent, JobInstance, MouseInput, UiRect};
+use crate::palette;
 use macroquad::color::{Color, SKYBLUE, WHITE};
 use macroquad::math::Vec2;
 use macroquad::prelude::{draw_rectangle, draw_text_ex, draw_texture_ex, get_internal_gl, measure_text, DrawTextureParams, QuadGl, Texture2D};
 use macroquad::shapes::draw_circle;
 use macroquad::text::{Font, TextParams};
-use crate::palette;
 
 #[derive(Clone)]
 pub enum UiElement {

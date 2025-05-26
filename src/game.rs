@@ -1,13 +1,12 @@
-use std::collections::HashMap;
+use crate::assets::AssetId::*;
+use crate::assets::{AssetId, Assets};
+use crate::draw::UiElement;
 use macroquad::color::Color;
 use macroquad::input::MouseButton;
 use macroquad::math::Vec2;
 use macroquad::prelude::Texture2D;
-use macroquad::text::Font;
+use std::collections::HashMap;
 use AssetId::{WoodAnim1, WoodAnim2};
-use crate::assets::{AssetId, Assets};
-use crate::assets::AssetId::{Coin, CookingAnim1, CookingAnim2, Hunting1, Hunting2, MeatCheap, Mining1, Mining2, Smithing1, Smithing2, WoodBurner};
-use crate::draw::UiElement;
 
 pub struct MouseInput {
     pub pressed: Vec<MouseButton>,
@@ -15,12 +14,6 @@ pub struct MouseInput {
     pub down: Vec<MouseButton>,
     pub position: (f32, f32),
     pub scroll_y: f32,
-}
-
-pub struct Fonts {
-    pub mono: Option<Font>,
-    pub text: Option<Font>,
-    pub text_bold: Option<Font>,
 }
 
 pub struct PerformanceFlags {
