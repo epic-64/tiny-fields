@@ -1,15 +1,17 @@
+use std::collections::HashMap;
 use macroquad::miniquad::date::now;
 use macroquad::prelude::*;
+use crate::assets::{load_assets, Assets};
 
 pub mod draw;
 pub mod game;
 pub mod job;
 pub mod ui;
 pub mod palette;
+pub mod assets;
 
-use crate::game::{Fonts, Textures};
 use crate::draw::{draw, UiElement};
-use crate::game::{Assets, Effect, EffectWithSource, GameState, Intent, JobType, MouseInput, TextParticle, UiRect};
+use crate::game::{Effect, EffectWithSource, GameState, Intent, JobType, MouseInput, TextParticle, UiRect};
 use crate::job::{build_job_cards};
 
 pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
@@ -152,32 +154,6 @@ fn build_debug_elements(state: &GameState, assets: &Assets, rect: UiRect) -> Vec
     });
 
     elements
-}
-
-async fn load_assets() -> Assets {
-    let textures = Textures {
-        wood_anim_1: load_texture("ChopChop_1_.png").await.expect("Couldn't load file"),
-        wood_anim_2: load_texture("ChopChop_2_.png").await.expect("Couldn't load file"),
-        cooking_anim_1: load_texture("pan_1.png").await.expect("Couldn't load file"),
-        cooking_anim_2: load_texture("pan_2.png").await.expect("Couldn't load file"),
-        mining_1: load_texture("ClingCling_1.png").await.expect("Couldn't load file"),
-        mining_2: load_texture("ClingCling_2.png").await.expect("Couldn't load file"),
-        hunting_1: load_texture("PewPew_1.png").await.expect("Couldn't load file"),
-        hunting_2: load_texture("PewPew_2.png").await.expect("Couldn't load file"),
-        smithing_1: load_texture("BomBom_1.png").await.expect("Couldn't load file"),
-        smithing_2: load_texture("BomBom_2.png").await.expect("Couldn't load file"),
-        wood_burner: load_texture("wood_burner.png").await.expect("Couldn't load file"),
-        meat_cheap: load_texture("meat_cheap.png").await.expect("Couldn't load file"),
-        coin: load_texture("coin.png").await.expect("Couldn't load file"),
-    };
-
-    let fonts = Fonts {
-        mono: Some(load_ttf_font("Menlo-Regular.ttf").await.expect("Couldn't load font")),
-        text: Some(load_ttf_font("WorkSans-Regular.ttf").await.expect("Couldn't load font")),
-        text_bold: Some(load_ttf_font("WorkSans-SemiBold.ttf").await.expect("Couldn't load font")),
-    };
-
-    Assets { fonts, textures }
 }
 
 pub fn get_intents(elements: &Vec<UiElement>, mouse_input: &MouseInput) -> Vec<Intent> {

@@ -4,6 +4,9 @@ use macroquad::input::MouseButton;
 use macroquad::math::Vec2;
 use macroquad::prelude::Texture2D;
 use macroquad::text::Font;
+use AssetId::{WoodAnim1, WoodAnim2};
+use crate::assets::{AssetId, Assets};
+use crate::assets::AssetId::{Coin, CookingAnim1, CookingAnim2, Hunting1, Hunting2, MeatCheap, Mining1, Mining2, Smithing1, Smithing2, WoodBurner};
 use crate::draw::UiElement;
 
 pub struct MouseInput {
@@ -14,35 +17,10 @@ pub struct MouseInput {
     pub scroll_y: f32,
 }
 
-pub struct Textures {
-    pub wood_anim_1: Texture2D,
-    pub wood_anim_2: Texture2D,
-    pub cooking_anim_1: Texture2D,
-    pub cooking_anim_2: Texture2D,
-    pub mining_1: Texture2D,
-    pub mining_2: Texture2D,
-    pub hunting_1: Texture2D,
-    pub hunting_2: Texture2D,
-    pub smithing_1: Texture2D,
-    pub smithing_2: Texture2D,
-    pub wood_burner: Texture2D,
-    pub meat_cheap: Texture2D,
-    pub coin: Texture2D,
-}
-
 pub struct Fonts {
     pub mono: Option<Font>,
     pub text: Option<Font>,
     pub text_bold: Option<Font>,
-}
-
-pub struct Assets {
-    pub fonts: Fonts,
-    pub textures: Textures,
-}
-
-impl Assets {
-    //
 }
 
 pub struct PerformanceFlags {
@@ -276,15 +254,13 @@ pub enum JobType {
 
 impl JobType {
     pub fn get_animation_images(&self, assets: &Assets) -> (Texture2D, Texture2D) {
-        let textures = &assets.textures;
-
         match self {
-            JobType::Woodcutting => (textures.wood_anim_1.clone(), textures.wood_anim_2.clone()),
-            JobType::Mining => (textures.mining_1.clone(), textures.mining_2.clone()),
-            JobType::Hunting => (textures.hunting_1.clone(), textures.hunting_2.clone()),
-            JobType::Smithing => (textures.smithing_1.clone(), textures.smithing_2.clone()),
-            JobType::Cooking => (textures.cooking_anim_1.clone(), textures.cooking_anim_2.clone()),
-            _ => (textures.wood_anim_1.clone(), textures.wood_anim_2.clone()),
+            JobType::Woodcutting => (WoodAnim1.texture(assets), WoodAnim2.texture(assets)),
+            JobType::Mining => (Mining1.texture(assets), Mining2.texture(assets)),
+            JobType::Hunting => (Hunting1.texture(assets), Hunting2.texture(assets)),
+            JobType::Smithing => (Smithing1.texture(assets), Smithing2.texture(assets)),
+            JobType::Cooking => (CookingAnim1.texture(assets), CookingAnim2.texture(assets)),
+            _ => (WoodAnim1.texture(assets), WoodAnim2.texture(assets)),
         }
     }
 
@@ -486,10 +462,10 @@ impl Item {
 
     pub fn get_texture(&self, assets: &Assets) -> Texture2D {
         match self {
-            Item::Wood => assets.textures.wood_burner.clone(),
-            Item::Meat => assets.textures.meat_cheap.clone(),
-            Item::Coin => assets.textures.coin.clone(),
-            _ => assets.textures.wood_burner.clone(), // todo: change to correct texture
+            Item::Wood => WoodBurner.texture(assets),
+            Item::Meat => MeatCheap.texture(assets),
+            Item::Coin => Coin.texture(assets),
+            _ => WoodBurner.texture(assets),
         }
     }
 }

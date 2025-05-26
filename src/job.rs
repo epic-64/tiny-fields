@@ -1,6 +1,7 @@
 use crate::draw::{pill, UiElement};
-use crate::game::{Assets, GameState, Intent, JobInstance, UiRect};
+use crate::game::{GameState, Intent, JobInstance, UiRect};
 use macroquad::math::Vec2;
+use crate::assets::Assets;
 use crate::palette;
 use crate::palette::Palette;
 

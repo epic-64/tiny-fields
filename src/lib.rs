@@ -3,3 +3,4 @@ pub mod draw;
 pub mod job;
 pub mod ui;
 pub mod palette;
+pub mod assets;

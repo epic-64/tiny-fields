@@ -1,6 +1,7 @@
 use crate::draw::UiElement;
-use crate::game::{Assets, GameState, MouseInput, UiRect};
+use crate::game::{GameState, MouseInput, UiRect};
 use macroquad::prelude::*;
+use crate::assets::Assets;
 use crate::job::{JOB_CARD_HEIGHT, JOB_CARD_SPACING_OUTER};
 
 pub struct ScrollContainer {
