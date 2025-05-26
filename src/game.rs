@@ -456,7 +456,7 @@ impl Item {
     pub fn get_texture(&self, assets: &Assets) -> Texture2D {
         match self {
             Item::Wood => WoodBurner.texture(assets),
-            Item::Meat => MeatCheap.texture(assets),
+            Item::Meat => MeatGame.texture(assets),
             Item::Coin => Coin.texture(assets),
             _ => WoodBurner.texture(assets),
         }
