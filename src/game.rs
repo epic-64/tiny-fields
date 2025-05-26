@@ -300,12 +300,7 @@ impl JobType {
     pub fn get_required_items(&self) -> Vec<(Item, i64)>{
         match self {
             JobType::Woodcutting => vec![(Item::Coin, 1)],
-            JobType::Cooking     => vec![
-                (Item::Wood, 4),
-                (Item::Meat, 1),
-                (Item::Coin, 1),
-                (Item::Herb, 1),
-            ],
+            JobType::Cooking => vec![(Item::Wood, 4), (Item::Meat, 1), (Item::Herb, 1), (Item::Bread, 1)],
             _ => vec![],
         }
     }
@@ -437,6 +432,7 @@ pub enum Item {
     Berry,
     IronBar,
     Sandwich,
+    Bread,
 }
 
 impl Item {
@@ -450,6 +446,7 @@ impl Item {
             Item::Berry => "Berry".to_string(),
             Item::IronBar => "Iron Bar".to_string(),
             Item::Sandwich => "Sandwich".to_string(),
+            Item::Bread => "Bread".to_string(),
         }
     }
 
@@ -458,6 +455,9 @@ impl Item {
             Item::Wood => WoodBurner.texture(assets),
             Item::Meat => MeatGame.texture(assets),
             Item::Coin => Coin.texture(assets),
+            Item::Bread => Bread.texture(assets),
+            Item::Herb => Herbs.texture(assets),
+            Item::Sandwich => Sandwich.texture(assets),
             _ => WoodBurner.texture(assets),
         }
     }
