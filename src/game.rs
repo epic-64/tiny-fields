@@ -133,7 +133,7 @@ impl GameState {
 
         for job in &mut self.jobs {
             if job.running {
-                if let Some(effect) = job.update_progress(dt) {
+                if let Some(effect) = job.update_progress(&mut self.inventory, dt) {
                     effects.push(EffectWithSource::JobSource {
                         job: job.clone(),
                         effect: effect.clone(),
@@ -324,6 +324,7 @@ pub struct JobInstance {
     pub running: bool,
     pub actions_done: i32,
     pub timeslot_cost: i32,
+    pub has_paid_resources: bool,
 }
 
 pub struct JobParameters {
@@ -343,6 +344,7 @@ impl JobInstance {
             actions_done: 0,
             timeslot_cost: 1,
             job_type: p.job_type,
+            has_paid_resources: false,
         }
     }
 
@@ -354,14 +356,35 @@ impl JobInstance {
         }
     }
 
-    pub fn update_progress(&mut self, dt: f32) -> Option<Effect> {
+    pub fn update_progress(&mut self, inventory: &mut Inventory, dt: f32) -> Option<Effect> {
         let duration = self.job_type.base_duration();
+
+        if !self.has_paid_resources {
+            // Check if we have the required items to start the job
+            let required_items = self.job_type.get_required_items();
+
+            for (item, amount) in &required_items {
+                if inventory.get_item_amount(&item) < *amount {
+                    // Not enough resources to start the job
+                    return None;
+                }
+            }
+
+            // Deduct the required items from the inventory
+            for (item, amount) in required_items {
+                inventory.add_item(item, -amount);
+            }
+
+            self.has_paid_resources = true; // Mark that we've paid resources
+        }
 
         self.time_accumulator += dt;
         self.action_progress.set(self.time_accumulator / duration);
 
         if self.time_accumulator >= duration {
+            // reset job instance
             self.time_accumulator -= duration;
+            self.has_paid_resources = false;
             self.actions_done += 1;
 
             // update level up progress bar
