@@ -186,6 +186,7 @@ pub fn build_job_card(
 
     for (i, (required_item, required_amount)) in required_items.iter().enumerate() {
         let resource_x = inner_x + (i as f32 * (resource_icon_size + resource_icon_spacing));
+        let draw_pills = *required_amount > 0;
 
         // draw background rectangle
         elements.push(UiElement::Rectangle {
@@ -208,31 +209,33 @@ pub fn build_job_card(
             color: Palette::White.get_color(),
         });
 
-        // draw pill at the top of the rectangle
-        elements.extend(
-            pill(
-                resource_x + resource_icon_size / 2.0 - 24.0 / 2.0,
-                offset.y + card_padding_y + 96.0 - 14.0 / 2.0,
-                24.0,
-                14.0,
-                state.inventory.get_item_amount(required_item).to_string().as_str(),
-                Palette::White.get_color(),
-            )
-        );
+        if draw_pills {
+            // draw pill at the top of the rectangle
+            elements.extend(
+                pill(
+                    resource_x + resource_icon_size / 2.0 - 24.0 / 2.0,
+                    offset.y + card_padding_y + 96.0 - 14.0 / 2.0,
+                    24.0,
+                    14.0,
+                    state.inventory.get_item_amount(required_item).to_string().as_str(),
+                    Palette::White.get_color(),
+                )
+            );
 
-        // draw pill at the bottom of the rectangle
-        let pill_width = resource_icon_size - 24.0;
-        let pill_height = 14.0;
-        elements.extend(
-            pill(
-                resource_x + resource_icon_size / 2.0 - pill_width / 2.0,
-                offset.y + card_padding_y + 96.0 + resource_icon_size - pill_height / 2.0,
-                pill_width,
-                pill_height,
-                required_amount.to_string().as_str(),
-                Palette::Peach.get_color()
+            // draw pill at the bottom of the rectangle
+            let pill_width = resource_icon_size - 24.0;
+            let pill_height = 14.0;
+            elements.extend(
+                pill(
+                    resource_x + resource_icon_size / 2.0 - pill_width / 2.0,
+                    offset.y + card_padding_y + 96.0 + resource_icon_size - pill_height / 2.0,
+                    pill_width,
+                    pill_height,
+                    required_amount.to_string().as_str(),
+                    Palette::Peach.get_color()
+                )
             )
-        )
+        }
     }
 
     // Title Bar

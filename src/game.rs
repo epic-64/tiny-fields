@@ -299,8 +299,9 @@ impl JobType {
 
     pub fn get_required_items(&self) -> Vec<(Item, i64)>{
         match self {
-            JobType::Woodcutting => vec![(Item::Coin, 1)],
+            JobType::Woodcutting => vec![(Item::Tree, 0)],
             JobType::Cooking => vec![(Item::Wood, 4), (Item::Meat, 1), (Item::Herb, 1), (Item::Bread, 1)],
+            JobType::Hunting => vec![(Item::Deer, 0)],
             _ => vec![],
         }
     }
@@ -433,6 +434,8 @@ pub enum Item {
     IronBar,
     Sandwich,
     Bread,
+    Tree,
+    Deer,
 }
 
 impl Item {
@@ -447,18 +450,22 @@ impl Item {
             Item::IronBar => "Iron Bar".to_string(),
             Item::Sandwich => "Sandwich".to_string(),
             Item::Bread => "Bread".to_string(),
+            Item::Tree => "Tree".to_string(),
+            Item::Deer => "Deer".to_string(),
         }
     }
 
     pub fn get_texture(&self, assets: &Assets) -> Texture2D {
         match self {
-            Item::Wood => WoodBurner.texture(assets),
+            Item::Wood => Wood.texture(assets),
             Item::Meat => MeatGame.texture(assets),
             Item::Coin => Coin.texture(assets),
             Item::Bread => Bread.texture(assets),
             Item::Herb => Herbs.texture(assets),
             Item::Sandwich => Sandwich.texture(assets),
-            _ => WoodBurner.texture(assets),
+            Item::Tree => Tree.texture(assets),
+            Item::Deer => Deer.texture(assets),
+            _ => Wood.texture(assets),
         }
     }
 }

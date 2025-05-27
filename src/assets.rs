@@ -21,13 +21,15 @@ pub enum AssetId {
     Hunting2,
     Smithing1,
     Smithing2,
-    WoodBurner,
+    Wood,
     MeatGame,
     Coin,
     BagOfCoins,
     Bread,
     Herbs,
     Sandwich,
+    Tree,
+    Deer,
 }
 
 impl AssetId {
@@ -48,13 +50,15 @@ fn asset_paths() -> Vec<(AssetId, &'static str)> {
         (AssetId::Hunting2, "PewPew_2.png"),
         (AssetId::Smithing1, "BomBom_1.png"),
         (AssetId::Smithing2, "BomBom_2.png"),
-        (AssetId::WoodBurner, "wood_burner.png"),
+        (AssetId::Wood, "chatgpt/wood.png"),
         (AssetId::MeatGame, "chatgpt/game.png"),
         (AssetId::Coin, "coin.png"),
         (AssetId::BagOfCoins, "chatgpt/bag_of_coins.png"),
         (AssetId::Bread, "chatgpt/bread.png"),
         (AssetId::Herbs, "chatgpt/herbs.png"),
         (AssetId::Sandwich, "chatgpt/sandwich.png"),
+        (AssetId::Tree, "chatgpt/tree.png"),
+        (AssetId::Deer, "chatgpt/deer.png"),
     ]
 }
 
