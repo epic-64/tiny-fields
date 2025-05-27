@@ -173,7 +173,7 @@ pub fn build_job_card(
             14.0,
             state.inventory.get_item_amount(&job.job_type.get_product()).to_string().as_str(),
             Palette::White.get_color(),
-            assets.fonts.mono.clone().unwrap()
+            assets.fonts.mono.clone()
         )
     );
 
@@ -220,7 +220,7 @@ pub fn build_job_card(
                     14.0,
                     state.inventory.get_item_amount(required_item).to_string().as_str(),
                     Palette::White.get_color(),
-                    assets.fonts.mono.clone().unwrap()
+                    assets.fonts.mono.clone()
                 )
             );
 
@@ -235,7 +235,7 @@ pub fn build_job_card(
                     pill_height,
                     required_amount.to_string().as_str(),
                     Palette::Peach.get_color(),
-                    assets.fonts.mono.clone().unwrap(),
+                    assets.fonts.mono.clone(),
                 )
             )
         }

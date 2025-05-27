@@ -4,9 +4,9 @@ use macroquad::texture::load_texture;
 use std::collections::HashMap;
 
 pub struct Fonts {
-    pub mono: Option<Font>,
-    pub text: Option<Font>,
-    pub text_bold: Option<Font>,
+    pub mono: Font,
+    pub text: Font,
+    pub text_bold: Font,
 }
 
 #[derive(Hash, Eq, PartialEq, Debug, Clone, Copy)]
@@ -81,9 +81,9 @@ pub async fn load_assets() -> Assets {
         .collect();
 
     let fonts = Fonts {
-        mono: Some(load_ttf_font("IBMPlexMono-Regular.ttf").await.expect("Couldn't load font")),
-        text: Some(load_ttf_font("WorkSans-Regular.ttf").await.expect("Couldn't load font")),
-        text_bold: Some(load_ttf_font("WorkSans-SemiBold.ttf").await.expect("Couldn't load font")),
+        mono: load_ttf_font("Lekton-Bold.ttf").await.expect("Couldn't load font"),
+        text: load_ttf_font("WorkSans-Regular.ttf").await.expect("Couldn't load font"),
+        text_bold: load_ttf_font("WorkSans-SemiBold.ttf").await.expect("Couldn't load font"),
     };
 
     Assets { fonts, textures: texture_map }

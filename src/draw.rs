@@ -15,12 +15,12 @@ pub enum UiElement {
         y: f32,
         font_size: f32,
         color: Color,
-        font: Option<Font>,
+        font: Font,
     },
     RectButton {
         rectangle: UiRect,
         font_size: f32,
-        font: Option<Font>,
+        font: Font,
         text: String,
         color: Color,
         intent: Intent,
@@ -77,7 +77,7 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
     match command {
         UiElement::Text { content, x, y, font_size, color, font } => {
             draw_text_ex(content, *x, *y, TextParams{
-                font: if let Some(f) = font { Some(f) } else { None },
+                font: Some(font),
                 font_size: *font_size as u16,
                 color: *color,
                 ..Default::default()
@@ -120,7 +120,7 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
 
             draw_rectangle(r.x, r.y, r.w, r.h, *color);
 
-            let the_font = if let Some(f) = font { Some(f) } else { None };
+            let the_font = Some(font);
             let text_measure = measure_text(text, the_font, *font_size as u16, 1.);
             let text_x = (r.x + (r.w - text_measure.width) / 2.0).round();
             let text_y = (r.y + (r.h + text_measure.height / 2.0) / 2.0).round();
@@ -182,15 +182,16 @@ pub fn pill(x: f32, y: f32, w: f32, h: f32, text: &str, text_color: Color, font:
     });
 
     // add text in the middle
-    let font_size = 14.0;
+    let font_size = 15.0;
+    let height = measure_text("8", Some(&font), font_size as u16, 1.0).height;
     let text_measure = measure_text(text, Some(&font), font_size as u16, 1.0);
     elements.push(UiElement::Text {
         content: text.to_string(),
-        x: (x + w / 2.0 - text_measure.width / 2.0).floor(),
-        y: (y + h / 2.0 + text_measure.height / 2.0).floor(),
+        x: (x + w / 2.0 - text_measure.width / 2.0).round(),
+        y: (y + h / 2.0 + height / 2.0).round() - 1.0,
         font_size: font_size,
         color: text_color,
-        font: Some(font),
+        font: font,
     });
 
     elements
