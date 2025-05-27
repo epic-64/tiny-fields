@@ -2,9 +2,10 @@ use crate::game::{Intent, JobInstance, MouseInput, UiRect};
 use crate::palette;
 use macroquad::color::{Color, SKYBLUE, WHITE};
 use macroquad::math::Vec2;
-use macroquad::prelude::{draw_rectangle, draw_text_ex, draw_texture_ex, get_internal_gl, measure_text, DrawTextureParams, QuadGl, Texture2D};
+use macroquad::prelude::{draw_rectangle, draw_text_ex, draw_texture, draw_texture_ex, get_internal_gl, measure_text, DrawTextureParams, QuadGl, Texture2D};
 use macroquad::shapes::draw_circle;
 use macroquad::text::{Font, TextParams};
+use macroquad::texture::set_default_filter_mode;
 
 #[derive(Clone)]
 pub enum UiElement {
@@ -149,7 +150,7 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
     }
 }
 
-pub fn pill(x: f32, y: f32, w: f32, h: f32, text: &str, text_color: Color) -> Vec<UiElement> {
+pub fn pill(x: f32, y: f32, w: f32, h: f32, text: &str, text_color: Color, font: Font) -> Vec<UiElement> {
     let mut elements = Vec::new();
 
     let radius = h / 2.0;
@@ -181,15 +182,15 @@ pub fn pill(x: f32, y: f32, w: f32, h: f32, text: &str, text_color: Color) -> Ve
     });
 
     // add text in the middle
-    let font_size = 16.0;
-    let text_measure = measure_text(text, None, font_size as u16, 1.0);
+    let font_size = 14.0;
+    let text_measure = measure_text(text, Some(&font), font_size as u16, 1.0);
     elements.push(UiElement::Text {
         content: text.to_string(),
-        x: x + w / 2.0 - text_measure.width / 2.0,
-        y: y + h / 2.0 + text_measure.height / 2.0,
+        x: (x + w / 2.0 - text_measure.width / 2.0).floor(),
+        y: (y + h / 2.0 + text_measure.height / 2.0).floor(),
         font_size: font_size,
         color: text_color,
-        font: None,
+        font: Some(font),
     });
 
     elements

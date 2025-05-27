@@ -41,7 +41,7 @@ impl AssetId {
 fn asset_paths() -> Vec<(AssetId, &'static str)> {
     vec![
         (AssetId::WoodAnim1, "ChopChop_1_.png"),
-        (AssetId::WoodAnim2, "ChopChop_2_.png"),
+        (AssetId::WoodAnim2, "chop2_lanczos.png"),
         (AssetId::CookingAnim1, "pan_1.png"),
         (AssetId::CookingAnim2, "pan_2.png"),
         (AssetId::Mining1, "ClingCling_1.png"),
@@ -81,7 +81,7 @@ pub async fn load_assets() -> Assets {
         .collect();
 
     let fonts = Fonts {
-        mono: Some(load_ttf_font("Menlo-Regular.ttf").await.expect("Couldn't load font")),
+        mono: Some(load_ttf_font("IBMPlexMono-Regular.ttf").await.expect("Couldn't load font")),
         text: Some(load_ttf_font("WorkSans-Regular.ttf").await.expect("Couldn't load font")),
         text_bold: Some(load_ttf_font("WorkSans-SemiBold.ttf").await.expect("Couldn't load font")),
     };
