@@ -189,6 +189,9 @@ pub fn build_job_card(
     for (i, (required_item, required_amount)) in required_items.iter().enumerate() {
         let resource_x = inner_x + (i as f32 * (resource_icon_size + resource_icon_spacing));
         let draw_pills = *required_amount > 0;
+        let player_has_enough =
+            *required_amount <= state.inventory.get_item_amount(required_item)
+            || job.has_paid_resources;
 
         // draw background rectangle
         elements.push(UiElement::Rectangle {
@@ -196,7 +199,7 @@ pub fn build_job_card(
             y: offset.y + card_padding_y + 96.0,
             width: resource_icon_size,
             height: resource_icon_size,
-            color: palette::IMAGE_BACKGROUND.get_color(),
+            color: if player_has_enough { palette::IMAGE_BACKGROUND.get_color() } else { Palette::Coral.get_color() },
             bordered: true,
         });
 
@@ -235,7 +238,7 @@ pub fn build_job_card(
                     pill_width,
                     pill_height,
                     required_amount.to_string().as_str(),
-                    Palette::Peach.get_color(),
+                    if player_has_enough { Palette::Peach.get_color() } else { Palette::Coral.get_color() },
                     assets.fonts.mono.clone(),
                 )
             )
