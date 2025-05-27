@@ -3,6 +3,7 @@ use macroquad::prelude::{Font, Texture2D};
 use macroquad::text::load_ttf_font;
 use macroquad::texture::load_texture;
 use std::collections::HashMap;
+use futures::join;
 
 pub struct Fonts {
     pub mono: Font,
@@ -107,8 +108,7 @@ async fn load_fonts() -> HashMap<FontId, Font> {
 }
 
 pub async fn load_assets() -> Assets {
-    let texture_map: HashMap<AssetId, Texture2D> = load_textures().await;
-    let font_map: HashMap<FontId, Font> = load_fonts().await;
+    let (texture_map, font_map) = join!(load_textures(), load_fonts());
 
     let fonts = Fonts {
         mono: font_map.get(&FontId::MonoBold).expect("Couldn't find Mono font").clone(),
