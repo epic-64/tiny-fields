@@ -39,9 +39,7 @@ pub enum AssetId {
     Sandwich,
     Tree,
     Deer,
-    FontMonoBold,
-    FontTextRegular,
-    FontTextBold,
+    ManaPotion,
 }
 
 impl AssetId {
@@ -71,6 +69,7 @@ fn texture_paths() -> Vec<(AssetId, &'static str)> {
         (AssetId::Sandwich, "chatgpt/sandwich.png"),
         (AssetId::Tree, "chatgpt/tree.png"),
         (AssetId::Deer, "chatgpt/deer.png"),
+        (AssetId::ManaPotion, "chatgpt/mana_potion.png"),
     ]
 }
 

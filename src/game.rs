@@ -292,7 +292,7 @@ impl JobType {
             JobType::Foraging    => Item::Berry,
             JobType::Woodworking => Item::Wood, // todo: change to correct item
             JobType::Cooking     => Item::Sandwich,
-            JobType::Alchemy     => Item::Herb, // todo: change to correct item
+            JobType::Alchemy     => Item::ManaPotion, // todo: change to correct item
             JobType::Selling     => Item::Coin,
         }
     }
@@ -300,8 +300,10 @@ impl JobType {
     pub fn get_required_items(&self) -> Vec<(Item, i64)>{
         match self {
             JobType::Woodcutting => vec![(Item::Tree, 0)],
-            JobType::Cooking => vec![(Item::Wood, 4), (Item::Meat, 1), (Item::Herb, 1), (Item::Bread, 1)],
+            JobType::Cooking => vec![(Item::Wood, 4), (Item::Meat, 1), (Item::Herb, 1), (Item::ManaPotion, 1)],
             JobType::Hunting => vec![(Item::Deer, 0)],
+            JobType::Alchemy => vec![(Item::Herb, 1)],
+            JobType::Herbalism => vec![(Item::Herb, 0)], // todo: change to correct item
             _ => vec![],
         }
     }
@@ -436,6 +438,7 @@ pub enum Item {
     Bread,
     Tree,
     Deer,
+    ManaPotion,
 }
 
 impl Item {
@@ -452,6 +455,7 @@ impl Item {
             Item::Bread => "Bread".to_string(),
             Item::Tree => "Tree".to_string(),
             Item::Deer => "Deer".to_string(),
+            Item::ManaPotion => "Mana Potion".to_string(),
         }
     }
 
@@ -465,6 +469,7 @@ impl Item {
             Item::Sandwich => Sandwich.texture(assets),
             Item::Tree => Tree.texture(assets),
             Item::Deer => Deer.texture(assets),
+            Item::ManaPotion => ManaPotion.texture(assets),
             _ => Wood.texture(assets),
         }
     }
