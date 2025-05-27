@@ -140,7 +140,8 @@ pub fn build_job_card(
         parent_clip: clip.clone(),
         font_size: font_size_small,
         text: "Hyper".to_string(),
-        color: palette::TEXT.get_color(),
+        background_color: palette::BUTTON_BACKGROUND.get_color(),
+        text_color: palette::BUTTON_TEXT.get_color(),
         intent: Intent::ToggleHyperMode(job_id),
     });
 
@@ -291,7 +292,8 @@ pub fn build_job_card(
         parent_clip: clip.clone(),
         font_size: font_size_small,
         text: "x".to_string(),
-        color: palette::TEXT.get_color(),
+        background_color: palette::BUTTON_BACKGROUND.get_color(),
+        text_color: palette::BUTTON_TEXT.get_color(),
         intent: Intent::ToggleJob(job_id),
     });
 
@@ -307,7 +309,8 @@ pub fn build_job_card(
         parent_clip: clip.clone(),
         font_size: font_size_small,
         text: if job.running { "||".to_string() } else { ">".to_string() },
-        color: palette::TEXT.get_color(),
+        background_color: palette::BUTTON_BACKGROUND.get_color(),
+        text_color: palette::BUTTON_TEXT.get_color(),
         intent: Intent::ToggleJob(job_id),
     });
 

@@ -231,7 +231,8 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
         intent: Intent::BuyTimeSlot,
         text: format!("Buy ({})", state.time_slots.get_upgrade_cost()),
         font_size: 14.0,
-        color: palette::BUTTON_BACKGROUND.get_color(),
+        background_color: palette::BUTTON_BACKGROUND.get_color(),
+        text_color: palette::BUTTON_TEXT.get_color(),
         parent_clip: None,
     });
 
@@ -253,7 +254,8 @@ pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
         intent: Intent::SkipSeconds(300),
         text: "Skip 5 min".to_string(),
         font_size: 14.0,
-        color: palette::BUTTON_BACKGROUND.get_color(),
+        background_color: palette::BUTTON_BACKGROUND.get_color(),
+        text_color: palette::BUTTON_TEXT.get_color(),
         parent_clip: None,
     });
 
@@ -269,7 +271,8 @@ pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
         intent: Intent::SkipSeconds(604_800),
         text: "Skip 1 week".to_string(),
         font_size: 14.0,
-        color: palette::BUTTON_BACKGROUND.get_color(),
+        background_color: palette::BUTTON_BACKGROUND.get_color(),
+        text_color: palette::BUTTON_TEXT.get_color(),
         parent_clip: None,
     });
 

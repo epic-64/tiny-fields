@@ -22,7 +22,8 @@ pub enum UiElement {
         font_size: f32,
         font: Font,
         text: String,
-        color: Color,
+        background_color: Color,
+        text_color: Color,
         intent: Intent,
         parent_clip: Option<(i32, i32, i32, i32)>,
     },
@@ -113,12 +114,12 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
             };
             draw_texture_ex(texture, *x, *y, *color, params);
         }
-        UiElement::RectButton { rectangle: r, font_size, text, color, font, .. } => {
+        UiElement::RectButton { rectangle: r, font_size, text, background_color, text_color, font, .. } => {
             if is_hovered(command, mouse_input) {
                 draw_rectangle(r.x - 2.0, r.y - 2.0, r.w + 4.0, r.h + 4.0, SKYBLUE);
             }
 
-            draw_rectangle(r.x, r.y, r.w, r.h, *color);
+            draw_rectangle(r.x, r.y, r.w, r.h, *background_color);
 
             let the_font = Some(font);
             let text_measure = measure_text(text, the_font, *font_size as u16, 1.);
@@ -128,7 +129,7 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
             draw_text_ex(text, text_x, text_y, TextParams {
                 font: the_font,
                 font_size: *font_size as u16,
-                color: WHITE,
+                color: *text_color,
                 ..Default::default()
             });
         }
