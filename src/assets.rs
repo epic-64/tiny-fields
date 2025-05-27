@@ -1,3 +1,4 @@
+use futures::future::join_all;
 use macroquad::prelude::{Font, Texture2D};
 use macroquad::text::load_ttf_font;
 use macroquad::texture::load_texture;
@@ -7,6 +8,13 @@ pub struct Fonts {
     pub mono: Font,
     pub text: Font,
     pub text_bold: Font,
+}
+
+#[derive(Hash, Eq, PartialEq, Debug, Clone, Copy)]
+pub enum FontId {
+    MonoBold,
+    TextRegular,
+    TextBold,
 }
 
 #[derive(Hash, Eq, PartialEq, Debug, Clone, Copy)]
@@ -30,6 +38,9 @@ pub enum AssetId {
     Sandwich,
     Tree,
     Deer,
+    FontMonoBold,
+    FontTextRegular,
+    FontTextBold,
 }
 
 impl AssetId {
@@ -38,7 +49,7 @@ impl AssetId {
     }
 }
 
-fn asset_paths() -> Vec<(AssetId, &'static str)> {
+fn texture_paths() -> Vec<(AssetId, &'static str)> {
     vec![
         (AssetId::WoodAnim1, "ChopChop_1_.png"),
         (AssetId::WoodAnim2, "chop2_lanczos.png"),
@@ -62,38 +73,56 @@ fn asset_paths() -> Vec<(AssetId, &'static str)> {
     ]
 }
 
-pub async fn load_assets() -> Assets {
-    use futures::future::join_all;
-
-    let paths = asset_paths();
-
+pub async fn load_textures() -> HashMap<AssetId, Texture2D> {
+    let paths = texture_paths();
     let futures = paths.iter().map(|(_, path)| load_texture(path));
-    let results = join_all(futures).await;
+    let results = join_all(futures).await; // only wait once
 
-    // Zip results into a HashMap<AssetId, Texture2D>
-    let texture_map: HashMap<AssetId, Texture2D> = paths
+    paths
         .into_iter()
         .zip(results)
         .map(|((assetId, _), res)| {
             let texture = res.expect("Failed to load asset");
             (assetId, texture)
         })
-        .collect();
+        .collect()
+}
+
+async fn load_fonts() -> HashMap<FontId, Font> {
+    let paths = vec![
+        (FontId::MonoBold, "Lekton-Bold.ttf"),
+        (FontId::TextRegular, "WorkSans-Regular.ttf"),
+        (FontId::TextBold, "WorkSans-SemiBold.ttf"),
+    ];
+
+    let futures = paths.iter().map(|(_, path)| load_ttf_font(path));
+    let results = join_all(futures).await;
+
+    paths.into_iter().zip(results)
+        .map(|((font_id, _), res)| {
+            let font = res.expect("Failed to load font");
+            (font_id, font)
+        })
+        .collect()
+}
+
+pub async fn load_assets() -> Assets {
+    let texture_map: HashMap<AssetId, Texture2D> = load_textures().await;
+    let font_map: HashMap<FontId, Font> = load_fonts().await;
 
     let fonts = Fonts {
-        mono: load_ttf_font("Lekton-Bold.ttf").await.expect("Couldn't load font"),
-        text: load_ttf_font("WorkSans-Regular.ttf").await.expect("Couldn't load font"),
-        text_bold: load_ttf_font("WorkSans-SemiBold.ttf").await.expect("Couldn't load font"),
+        mono: font_map.get(&FontId::MonoBold).expect("Couldn't find Mono font").clone(),
+        text: font_map.get(&FontId::TextRegular).expect("Couldn't find Text font").clone(),
+        text_bold: font_map.get(&FontId::TextBold).expect("Couldn't find Text bold font").clone(),
     };
 
-    Assets { fonts, textures: texture_map }
+    Assets {
+        fonts,
+        textures: texture_map,
+    }
 }
 
 pub struct Assets {
     pub fonts: Fonts,
-    pub textures: HashMap<AssetId, Texture2D>
-}
-
-impl Assets {
-    //
+    pub textures: HashMap<AssetId, Texture2D>,
 }
