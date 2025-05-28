@@ -253,6 +253,8 @@ impl JobType {
             JobType::Hunting => (Hunting1.texture(assets), Hunting2.texture(assets)),
             JobType::Smithing => (Smithing1.texture(assets), Smithing2.texture(assets)),
             JobType::Cooking => (CookingAnim1.texture(assets), CookingAnim2.texture(assets)),
+            JobType::Herbalism => (HerbalismAnim1.texture(assets), HerbalismAnim2.texture(assets)),
+            JobType::Alchemy => (AlchemyAnim1.texture(assets), AlchemyAnim2.texture(assets)),
             _ => (WoodAnim1.texture(assets), WoodAnim2.texture(assets)),
         }
     }

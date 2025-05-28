@@ -2,7 +2,7 @@ use crate::assets::{AssetId, Assets};
 use crate::draw::{pill, UiElement};
 use crate::game::{GameState, Intent, JobInstance, UiRect};
 use crate::palette;
-use crate::palette::Palette;
+use crate::palette::PaletteC;
 use macroquad::math::Vec2;
 
 pub const JOB_CARD_HEIGHT: f32 = 192.0;
@@ -95,7 +95,7 @@ pub fn build_job_card(
         width: card_width,
         height: card_height,
         texture: assets.textures.get(&AssetId::BackgroundParchment).unwrap().clone(),
-        color: Palette::White.get_color(),
+        color: PaletteC::White.get_color(),
     });
 
     // Job Animation background
@@ -116,7 +116,7 @@ pub fn build_job_card(
         width: image_width - image_padding * 2.0,
         height: image_height - image_padding * 2.0,
         texture: chosen_image.clone(),
-        color: Palette::White.get_color(),
+        color: PaletteC::White.get_color(),
     });
 
     let right_side_width = 64.0;
@@ -155,7 +155,7 @@ pub fn build_job_card(
         width: right_side_width - 16.0,
         height: right_side_width - 16.0,
         texture: job.job_type.get_product().get_texture(&assets),
-        color: Palette::White.get_color(),
+        color: PaletteC::White.get_color(),
     });
 
     // Draw Product Pill at the top of the rectangle
@@ -166,7 +166,7 @@ pub fn build_job_card(
             24.0,
             14.0,
             state.inventory.get_item_amount(&job.job_type.get_product()).to_string().as_str(),
-            Palette::White.get_color(),
+            PaletteC::White.get_color(),
             assets.fonts.mono.clone()
         )
     );
@@ -192,7 +192,7 @@ pub fn build_job_card(
             y: offset.y + card_padding_y + 96.0,
             width: resource_icon_size,
             height: resource_icon_size,
-            color: if player_has_enough { palette::IMAGE_BACKGROUND.get_color() } else { Palette::Coral.get_color() },
+            color: if player_has_enough { palette::IMAGE_BACKGROUND.get_color() } else { PaletteC::Coral.get_color() },
             bordered: true,
         });
 
@@ -204,7 +204,7 @@ pub fn build_job_card(
             width: inner_size,
             height: inner_size,
             texture: required_item.get_texture(&assets),
-            color: Palette::White.get_color(),
+            color: PaletteC::White.get_color(),
         });
 
         if draw_pills {
@@ -216,7 +216,7 @@ pub fn build_job_card(
                     24.0,
                     14.0,
                     state.inventory.get_item_amount(required_item).to_string().as_str(),
-                    Palette::White.get_color(),
+                    PaletteC::White.get_color(),
                     assets.fonts.mono.clone()
                 )
             );
@@ -231,7 +231,7 @@ pub fn build_job_card(
                     pill_width,
                     pill_height,
                     required_amount.to_string().as_str(),
-                    if player_has_enough { Palette::Peach.get_color() } else { Palette::Coral.get_color() },
+                    if player_has_enough { PaletteC::Peach.get_color() } else { PaletteC::Coral.get_color() },
                     assets.fonts.mono.clone(),
                 )
             )
