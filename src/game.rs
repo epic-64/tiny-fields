@@ -136,20 +136,10 @@ impl GameState {
         for job in &mut self.jobs {
             if job.running {
                 let effects = job.update_progress(&mut self.inventory, dt);
-                for effect in effects {
-                    effects_with_source.push(EffectWithSource::JobSource {
-                        job: job.clone(),
-                        effect: effect.clone(),
-                    });
-                }
-            }
-        }
 
-        // process side effects
-        for effect in &effects_with_source {
-            match effect {
-                EffectWithSource::JobSource { effect, .. } => {
-                    match effect {
+                for effect in effects {
+                    // execute side effects
+                    match &effect {
                         Effect::AddItem { item, amount } => {
                             self.inventory.add_item(*item, *amount);
                         }
@@ -157,6 +147,12 @@ impl GameState {
                             self.skills.get_skill_by_type(skill_type).increment_actions(*amount as u32);
                         }
                     }
+                    
+                    // collect effects with source
+                    effects_with_source.push(EffectWithSource::JobSource {
+                        job: job.clone(),
+                        effect: effect.clone(),
+                    });
                 }
             }
         }
