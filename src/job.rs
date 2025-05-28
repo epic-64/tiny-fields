@@ -10,7 +10,7 @@ use crate::skill::{SkillType, Skills};
 
 #[derive(Clone, PartialEq)]
 pub enum JobType {
-    Lumbering,
+    LumberingWood,
     Mining,
     Herbalism,
     Hunting,
@@ -24,7 +24,7 @@ pub enum JobType {
 impl JobType {
     pub fn get_animation_images(&self, assets: &Assets) -> (Texture2D, Texture2D) {
         match self {
-            JobType::Lumbering => (WoodAnim1.texture(assets), WoodAnim2.texture(assets)),
+            JobType::LumberingWood => (WoodAnim1.texture(assets), WoodAnim2.texture(assets)),
             JobType::Mining => (Mining1.texture(assets), Mining2.texture(assets)),
             JobType::Hunting => (Hunting1.texture(assets), Hunting2.texture(assets)),
             JobType::Smithing => (Smithing1.texture(assets), Smithing2.texture(assets)),
@@ -47,7 +47,7 @@ impl JobType {
 
     pub fn get_name(&self) -> String {
         match self {
-            JobType::Lumbering => "Lumbering".to_string(),
+            JobType::LumberingWood => "LumberingWood".to_string(),
             JobType::Mining => "Mining".to_string(),
             JobType::Hunting => "Hunting".to_string(),
             JobType::Smithing => "Smithing".to_string(),
@@ -61,7 +61,7 @@ impl JobType {
 
     pub fn get_product(&self) -> Item {
         match self {
-            JobType::Lumbering   => Item::Wood,
+            JobType::LumberingWood => Item::Wood,
             JobType::Mining      => Item::Iron,
             JobType::Hunting     => Item::Meat,
             JobType::Smithing    => Item::IronBar,
@@ -75,7 +75,7 @@ impl JobType {
 
     pub fn get_required_items(&self) -> Vec<(Item, i64)>{
         match self {
-            JobType::Lumbering => vec![(Item::Tree, 0)],
+            JobType::LumberingWood => vec![(Item::Tree, 0)],
             JobType::Cooking => vec![(Item::Wood, 4), (Item::Meat, 1), (Item::Herb, 1), (Item::ManaPotion, 1)],
             JobType::Hunting => vec![(Item::Deer, 0)],
             JobType::Alchemy => vec![(Item::Herb, 1)],
@@ -90,7 +90,7 @@ impl JobType {
 
     pub fn get_skill_type(&self) -> SkillType {
         match self {
-            JobType::Lumbering => SkillType::Lumbering,
+            JobType::LumberingWood => SkillType::Lumbering,
             JobType::Mining => SkillType::Mining,
             JobType::Hunting => SkillType::Hunting,
             JobType::Smithing => SkillType::Smithing,
@@ -482,9 +482,9 @@ pub fn build_job_card(
         });
     }
 
-    // Title Bar
+    // Skill Type and Level
     elements.push(UiElement::Text {
-        content: skill_instance.skill_type.as_str().to_string() + " Lv." + skill_instance.level.to_string().as_str(),
+        content: format!("{} Lv. {}", skill_instance.skill_type.as_str(), skill_instance.level.to_string()),
         font: assets.fonts.text_bold.clone(),
         x: offset.x + card_padding_x,
         y: offset.y + card_padding_y + font_size_large,
@@ -492,9 +492,9 @@ pub fn build_job_card(
         color: color_primary,
     });
 
-    // Job Info
+    // Job Type and Level
     elements.push(UiElement::Text {
-        content: format!("Lvl {} | {}s", job.level, job.job_type.base_duration()),
+        content: format!("{} Lv. {}", job.job_type.get_name(), job.level),
         font: assets.fonts.text.clone(),
         x: offset.x + card_padding_x,
         y: offset.y + card_padding_y + 36.,
