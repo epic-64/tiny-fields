@@ -1,10 +1,10 @@
 use macroquad::color::Color;
 
 pub const TEXT: Palette = Palette::Anthracite;
-pub const BORDER: Palette = Palette::Anthracite;
+pub const BORDER: Palette = Palette::AnthraciteLight;
 pub const GAME_BACKGROUND: Palette = Palette::Mocha;
 pub const CARD_BACKGROUND: Palette = Palette::White;
-pub const BAR_BACKGROUND: Palette = Palette::White;
+pub const BAR_BACKGROUND: Palette = Palette::WhiteTransparent;
 pub const BUTTON_BACKGROUND: Palette = Palette::WhiteTransparent;
 pub const BUTTON_HOVER: Palette = Palette::Peach;
 pub const BUTTON_TEXT: Palette = Palette::Anthracite;
@@ -13,7 +13,7 @@ pub const SKILL_COLOR: Palette = Palette::Aqua;
 pub const PILL_COLOR: Palette = Palette::AnthraciteLight;
 pub const PILL_TEXT_COLOR: Palette = Palette::White;
 pub const PRODUCT_COLOR: Palette = Palette::Peach;
-pub const PROGRESS_COLOR: Palette = Palette::Grass;
+pub const PROGRESS_COLOR: Palette = Palette::GreenTransparent;
 
 pub enum Palette {
     Anthracite,
@@ -28,6 +28,7 @@ pub enum Palette {
     Black,
     White,
     WhiteTransparent,
+    GreenTransparent,
 }
 
 impl Palette {
@@ -44,7 +45,8 @@ impl Palette {
             Palette::Mocha => Color::from_rgba(195, 157, 117, 255),
             Palette::Black => Color::from_rgba(0, 0, 0, 255),
             Palette::White => Color::from_rgba(255, 255, 255, 255),
-            Palette::WhiteTransparent => Color::from_rgba(255, 255, 255, 200),
+            Palette::WhiteTransparent => Color::from_rgba(255, 255, 255, 100),
+            Palette::GreenTransparent => Color::from_rgba(126, 217, 87, 200),
         }
     }
 }

@@ -88,21 +88,14 @@ pub fn build_job_card(
 
     let mut elements = vec![];
 
-    // Job Marker
-    elements.push(UiElement::JobParticleMarker {
-        x: offset.x + 320.0,
-        y: offset.y + 75.0,
-        job: job.clone(),
-    });
-
-    // background image
+    // background image (parchment)
     elements.push(UiElement::Image {
         x: offset.x,
         y: offset.y,
         width: card_width,
         height: card_height,
-        color: palette::CARD_BACKGROUND.get_color(),
-        texture: assets.textures.get(&AssetId::BackgroundTrees).unwrap().clone(),
+        texture: assets.textures.get(&AssetId::BackgroundParchment).unwrap().clone(),
+        color: Palette::White.get_color(),
     });
 
     // Job Animation background

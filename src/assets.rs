@@ -20,7 +20,7 @@ pub enum FontId {
 
 #[derive(Hash, Eq, PartialEq, Debug, Clone, Copy)]
 pub enum AssetId {
-    BackgroundTrees,
+    BackgroundParchment,
     WoodAnim1,
     WoodAnim2,
     CookingAnim1,
@@ -51,7 +51,7 @@ impl AssetId {
 
 fn texture_paths() -> Vec<(AssetId, &'static str)> {
     vec![
-        (AssetId::BackgroundTrees, "chatgpt/bg_trees.png"),
+        (AssetId::BackgroundParchment, "chatgpt/parchment.png"),
         (AssetId::WoodAnim1, "ChopChop_1_.png"),
         (AssetId::WoodAnim2, "chop2_lanczos.png"),
         (AssetId::CookingAnim1, "pan_1.png"),
