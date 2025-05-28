@@ -1,12 +1,12 @@
 use crate::assets::AssetId::*;
 use crate::assets::{AssetId, Assets};
-use crate::draw::UiElement;
+use crate::job::{JobInstance, JobParameters, JobType};
+use crate::skill::{SkillType, Skills};
 use macroquad::color::Color;
 use macroquad::input::MouseButton;
 use macroquad::math::Vec2;
 use macroquad::prelude::Texture2D;
 use std::collections::HashMap;
-use AssetId::{WoodAnim1, WoodAnim2};
 
 pub struct MouseInput {
     pub pressed: Vec<MouseButton>,
@@ -55,6 +55,7 @@ impl GameMeta {
 }
 
 pub struct GameState {
+    pub skills: Skills,
     pub jobs: Vec<JobInstance>,
     pub time_slots: TimeSlots,
     pub performance_flags: PerformanceFlags,
@@ -66,6 +67,7 @@ pub struct GameState {
 impl GameState {
     pub fn new() -> Self {
         Self {
+            skills: Skills::new(),
             jobs: vec![],
             time_slots: TimeSlots { total: 9, used: 0, },
             performance_flags: PerformanceFlags::new(),
@@ -85,12 +87,12 @@ impl GameState {
     }
 
     // Step logic (tick + inputs)
-    pub fn step(&mut self, actions: &[Intent], dt: f32) -> Vec<EffectWithSource>
+    pub fn step(&mut self, intents: &[Intent], dt: f32) -> Vec<EffectWithSource>
     {
         let free_timeslots = self.time_slots.get_free();
 
-        for action in actions {
-            match action {
+        for intent in intents {
+            match intent {
                 Intent::ToggleJob(index) => {
                     if let Some(job) = self.jobs.get_mut(*index) {
                         job.toggle_running(free_timeslots);
@@ -129,12 +131,13 @@ impl GameState {
 
     fn update_progress(&mut self, dt: f32) -> Vec<EffectWithSource>
     {
-        let mut effects = vec![];
+        let mut effects_with_source = vec![];
 
         for job in &mut self.jobs {
             if job.running {
-                if let Some(effect) = job.update_progress(&mut self.inventory, dt) {
-                    effects.push(EffectWithSource::JobSource {
+                let effects = job.update_progress(&mut self.inventory, dt);
+                for effect in effects {
+                    effects_with_source.push(EffectWithSource::JobSource {
                         job: job.clone(),
                         effect: effect.clone(),
                     });
@@ -143,19 +146,22 @@ impl GameState {
         }
 
         // process side effects
-        for effect in &effects {
+        for effect in &effects_with_source {
             match effect {
                 EffectWithSource::JobSource { effect, .. } => {
                     match effect {
                         Effect::AddItem { item, amount } => {
                             self.inventory.add_item(*item, *amount);
                         }
+                        Effect::IncrementActionsForSkill { skill_type, amount } => {
+                            self.skills.get_skill_by_type(skill_type).increment_actions(*amount as u32);
+                        }
                     }
                 }
             }
         }
 
-        effects
+        effects_with_source
     }
 }
 
@@ -196,7 +202,7 @@ impl UiRect {
 
 #[derive(Clone, PartialEq)]
 pub struct Progress {
-    value: f32, // Value between 0.0 and 1.0
+    pub value: f32, // Value between 0.0 and 1.0
 }
 
 impl Progress {
@@ -225,218 +231,11 @@ pub struct JobBaseValues {
 #[derive(Clone, PartialEq)]
 pub enum Effect {
     AddItem { item: Item, amount: i64 },
+    IncrementActionsForSkill { skill_type: SkillType, amount: i32 },
 }
 
 pub enum EffectWithSource {
     JobSource { job: JobInstance, effect: Effect },
-}
-
-#[derive(Clone, PartialEq)]
-pub enum JobType {
-    Lumberjacking,
-    Mining,
-    Herbalism,
-    Hunting,
-    Foraging,
-    Woodworking,
-    Smithing,
-    Cooking,
-    Alchemy,
-    Selling,
-}
-
-impl JobType {
-    pub fn get_animation_images(&self, assets: &Assets) -> (Texture2D, Texture2D) {
-        match self {
-            JobType::Lumberjacking => (WoodAnim1.texture(assets), WoodAnim2.texture(assets)),
-            JobType::Mining => (Mining1.texture(assets), Mining2.texture(assets)),
-            JobType::Hunting => (Hunting1.texture(assets), Hunting2.texture(assets)),
-            JobType::Smithing => (Smithing1.texture(assets), Smithing2.texture(assets)),
-            JobType::Cooking => (CookingAnim1.texture(assets), CookingAnim2.texture(assets)),
-            JobType::Herbalism => (HerbalismAnim1.texture(assets), HerbalismAnim2.texture(assets)),
-            JobType::Alchemy => (AlchemyAnim1.texture(assets), AlchemyAnim2.texture(assets)),
-            _ => (WoodAnim1.texture(assets), WoodAnim2.texture(assets)),
-        }
-    }
-
-    pub fn base_actions_to_level_up(&self) -> i32 {
-        10
-    }
-
-    pub fn base_duration(&self) -> f32 {
-        match self {
-            _ => 4.0,
-        }
-    }
-
-    pub fn get_name(&self) -> String {
-        match self {
-            JobType::Lumberjacking => "Lumberjacking".to_string(),
-            JobType::Mining => "Mining".to_string(),
-            JobType::Hunting => "Hunting".to_string(),
-            JobType::Smithing => "Smithing".to_string(),
-            JobType::Herbalism => "Herbalism".to_string(),
-            JobType::Foraging => "Foraging".to_string(),
-            JobType::Woodworking => "Woodworking".to_string(),
-            JobType::Cooking => "Cooking".to_string(),
-            JobType::Alchemy => "Alchemy".to_string(),
-            JobType::Selling => "Selling".to_string(),
-        }
-    }
-
-    pub fn get_product(&self) -> Item {
-        match self {
-            JobType::Lumberjacking => Item::Wood,
-            JobType::Mining      => Item::Iron,
-            JobType::Hunting     => Item::Meat,
-            JobType::Smithing    => Item::IronBar,
-            JobType::Herbalism   => Item::Herb,
-            JobType::Foraging    => Item::Berry,
-            JobType::Woodworking => Item::Wood, // todo: change to correct item
-            JobType::Cooking     => Item::Sandwich,
-            JobType::Alchemy     => Item::ManaPotion, // todo: change to correct item
-            JobType::Selling     => Item::Coin,
-        }
-    }
-
-    pub fn get_required_items(&self) -> Vec<(Item, i64)>{
-        match self {
-            JobType::Lumberjacking => vec![(Item::Tree, 0)],
-            JobType::Cooking => vec![(Item::Wood, 4), (Item::Meat, 1), (Item::Herb, 1), (Item::ManaPotion, 1)],
-            JobType::Hunting => vec![(Item::Deer, 0)],
-            JobType::Alchemy => vec![(Item::Herb, 1)],
-            JobType::Herbalism => vec![(Item::Herb, 0)], // todo: change to correct item
-            _ => vec![],
-        }
-    }
-
-    pub fn get_completion_effect(&self) -> Effect {
-        Effect::AddItem { item: self.get_product(), amount: 1 }
-    }
-}
-
-#[derive(Clone, PartialEq)]
-pub struct JobInstance {
-    pub instance_id: i32,
-    pub job_type: JobType,
-    pub action_progress: Progress,
-    pub level_up_progress: Progress,
-    pub level: i32,
-    pub time_accumulator: f32,
-    pub running: bool,
-    pub actions_done: i32,
-    pub timeslot_cost: i32,
-    pub has_paid_resources: bool,
-}
-
-pub struct JobParameters {
-    pub instance_id: i32,
-    pub job_type: JobType,
-}
-
-impl JobInstance {
-    pub fn new(p: JobParameters) -> Self {
-        Self {
-            instance_id: p.instance_id,
-            level: 1,
-            running: false,
-            action_progress: Progress{value: 0.0},
-            level_up_progress: Progress{value: 0.0},
-            time_accumulator: 0.0,
-            actions_done: 0,
-            timeslot_cost: 1,
-            job_type: p.job_type,
-            has_paid_resources: false,
-        }
-    }
-
-    pub fn toggle_running(&mut self, free_timeslots: i32) -> () {
-        if self.running {
-            self.running = false;
-        } else if free_timeslots >= self.timeslot_cost {
-            self.running = true;
-        }
-    }
-
-    pub fn update_progress(&mut self, inventory: &mut Inventory, dt: f32) -> Option<Effect> {
-        let duration = self.job_type.base_duration();
-
-        if !self.has_paid_resources {
-            // Check if we have the required items to start the job
-            let required_items = self.job_type.get_required_items();
-
-            for (item, amount) in &required_items {
-                if inventory.get_item_amount(&item) < *amount {
-                    // Not enough resources to start the job
-                    return None;
-                }
-            }
-
-            // Deduct the required items from the inventory
-            for (item, amount) in required_items {
-                inventory.add_item(item, -amount);
-            }
-
-            self.has_paid_resources = true; // Mark that we've paid resources
-        }
-
-        self.time_accumulator += dt;
-        self.action_progress.set(self.time_accumulator / duration);
-
-        if self.time_accumulator >= duration {
-            // reset job instance
-            self.time_accumulator -= duration;
-            self.has_paid_resources = false;
-            self.actions_done += 1;
-
-            // update level up progress bar
-            self.level_up_progress.set(
-                self.actions_done as f32 / self.actions_to_level_up() as f32
-            );
-
-            // level up if enough actions done
-            if self.actions_done >= self.actions_to_level_up() {
-                self.level_up();
-            }
-
-            Some(self.job_type.get_completion_effect())
-        } else {
-            None
-        }
-    }
-
-    fn level_up(&mut self) {
-        self.level += 1;
-        self.actions_done = 0;
-        self.level_up_progress.reset();
-    }
-
-    pub fn actions_to_level_up(&self) -> i32 {
-        let base_actions = self.job_type.base_actions_to_level_up();
-        let growth_factor: f32 = 1.5;
-
-        (base_actions as f32 * growth_factor.powi(self.level - 1)) as i32
-    }
-
-    pub fn get_particle_marker(&self, elements: &Vec<UiElement>) -> (f32, f32) {
-        let mut found_x = 0.0;
-        let mut found_y = 0.0;
-
-        for element in elements {
-            match element {
-                UiElement::JobParticleMarker { x, y, job } => {
-                    if job.instance_id == self.instance_id {
-                        found_x = *x;
-                        found_y = *y;
-                        break;
-                    }
-                }
-                _ => {}
-            }
-        }
-
-        (found_x, found_y)
-    }
 }
 
 pub fn pretty_number(num: i64) -> String {

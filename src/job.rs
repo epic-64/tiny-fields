@@ -1,9 +1,217 @@
 use crate::assets::{AssetId, Assets};
 use crate::draw::{pill, UiElement};
-use crate::game::{GameState, Intent, JobInstance, UiRect};
+use crate::game::{Effect, GameState, Intent, Inventory, Item, Progress, UiRect};
 use crate::palette;
 use crate::palette::PaletteC;
 use macroquad::math::Vec2;
+use macroquad::prelude::Texture2D;
+use crate::assets::AssetId::{AlchemyAnim1, AlchemyAnim2, CookingAnim1, CookingAnim2, HerbalismAnim1, HerbalismAnim2, Hunting1, Hunting2, Mining1, Mining2, Smithing1, Smithing2, WoodAnim1, WoodAnim2};
+use crate::skill::{SkillType, Skills};
+
+#[derive(Clone, PartialEq)]
+pub enum JobType {
+    Lumbering,
+    Mining,
+    Herbalism,
+    Hunting,
+    Foraging,
+    Woodworking,
+    Smithing,
+    Cooking,
+    Alchemy,
+}
+
+impl JobType {
+    pub fn get_animation_images(&self, assets: &Assets) -> (Texture2D, Texture2D) {
+        match self {
+            JobType::Lumbering => (WoodAnim1.texture(assets), WoodAnim2.texture(assets)),
+            JobType::Mining => (Mining1.texture(assets), Mining2.texture(assets)),
+            JobType::Hunting => (Hunting1.texture(assets), Hunting2.texture(assets)),
+            JobType::Smithing => (Smithing1.texture(assets), Smithing2.texture(assets)),
+            JobType::Cooking => (CookingAnim1.texture(assets), CookingAnim2.texture(assets)),
+            JobType::Herbalism => (HerbalismAnim1.texture(assets), HerbalismAnim2.texture(assets)),
+            JobType::Alchemy => (AlchemyAnim1.texture(assets), AlchemyAnim2.texture(assets)),
+            _ => (WoodAnim1.texture(assets), WoodAnim2.texture(assets)),
+        }
+    }
+
+    pub fn base_actions_to_level_up(&self) -> i32 {
+        10
+    }
+
+    pub fn base_duration(&self) -> f32 {
+        match self {
+            _ => 4.0,
+        }
+    }
+
+    pub fn get_name(&self) -> String {
+        match self {
+            JobType::Lumbering => "Lumbering".to_string(),
+            JobType::Mining => "Mining".to_string(),
+            JobType::Hunting => "Hunting".to_string(),
+            JobType::Smithing => "Smithing".to_string(),
+            JobType::Herbalism => "Herbalism".to_string(),
+            JobType::Foraging => "Foraging".to_string(),
+            JobType::Woodworking => "Woodworking".to_string(),
+            JobType::Cooking => "Cooking".to_string(),
+            JobType::Alchemy => "Alchemy".to_string(),
+        }
+    }
+
+    pub fn get_product(&self) -> Item {
+        match self {
+            JobType::Lumbering   => Item::Wood,
+            JobType::Mining      => Item::Iron,
+            JobType::Hunting     => Item::Meat,
+            JobType::Smithing    => Item::IronBar,
+            JobType::Herbalism   => Item::Herb,
+            JobType::Foraging    => Item::Berry,
+            JobType::Woodworking => Item::Wood, // todo: change to correct item
+            JobType::Cooking     => Item::Sandwich,
+            JobType::Alchemy     => Item::ManaPotion, // todo: change to correct item
+        }
+    }
+
+    pub fn get_required_items(&self) -> Vec<(Item, i64)>{
+        match self {
+            JobType::Lumbering => vec![(Item::Tree, 0)],
+            JobType::Cooking => vec![(Item::Wood, 4), (Item::Meat, 1), (Item::Herb, 1), (Item::ManaPotion, 1)],
+            JobType::Hunting => vec![(Item::Deer, 0)],
+            JobType::Alchemy => vec![(Item::Herb, 1)],
+            JobType::Herbalism => vec![(Item::Herb, 0)], // todo: change to correct item
+            _ => vec![],
+        }
+    }
+
+    pub fn get_completion_effect(&self) -> Effect {
+        Effect::AddItem { item: self.get_product(), amount: 1 }
+    }
+
+    pub fn get_skill_type(&self) -> SkillType {
+        match self {
+            JobType::Lumbering => SkillType::Lumbering,
+            JobType::Mining => SkillType::Mining,
+            JobType::Hunting => SkillType::Hunting,
+            JobType::Smithing => SkillType::Smithing,
+            JobType::Herbalism => SkillType::Herbalism,
+            JobType::Foraging => SkillType::Foraging,
+            JobType::Woodworking => SkillType::Woodworking,
+            JobType::Cooking => SkillType::Cooking,
+            JobType::Alchemy => SkillType::Alchemy,
+        }
+    }
+}
+
+#[derive(Clone, PartialEq)]
+pub struct JobInstance {
+    pub instance_id: i32,
+    pub job_type: JobType,
+    pub action_progress: Progress,
+    pub level_up_progress: Progress,
+    pub level: i32,
+    pub time_accumulator: f32,
+    pub running: bool,
+    pub actions_done: i32,
+    pub timeslot_cost: i32,
+    pub has_paid_resources: bool,
+}
+
+pub struct JobParameters {
+    pub instance_id: i32,
+    pub job_type: JobType,
+}
+
+impl JobInstance {
+    pub fn new(p: JobParameters) -> Self {
+        Self {
+            instance_id: p.instance_id,
+            level: 1,
+            running: false,
+            action_progress: Progress{value: 0.0},
+            level_up_progress: Progress{value: 0.0},
+            time_accumulator: 0.0,
+            actions_done: 0,
+            timeslot_cost: 1,
+            job_type: p.job_type,
+            has_paid_resources: false,
+        }
+    }
+
+    pub fn toggle_running(&mut self, free_timeslots: i32) -> () {
+        if self.running {
+            self.running = false;
+        } else if free_timeslots >= self.timeslot_cost {
+            self.running = true;
+        }
+    }
+
+    pub fn update_progress(&mut self, inventory: &mut Inventory, dt: f32) -> Vec<Effect> {
+        let duration = self.job_type.base_duration();
+
+        if !self.has_paid_resources {
+            // Check if we have the required items to start the job
+            let required_items = self.job_type.get_required_items();
+
+            for (item, amount) in &required_items {
+                if inventory.get_item_amount(&item) < *amount {
+                    // Not enough resources to start the job
+                    return vec![];
+                }
+            }
+
+            // Deduct the required items from the inventory
+            for (item, amount) in required_items {
+                inventory.add_item(item, -amount);
+            }
+
+            self.has_paid_resources = true; // Mark that we've paid resources
+        }
+
+        self.time_accumulator += dt;
+        self.action_progress.set(self.time_accumulator / duration);
+
+        if self.time_accumulator >= duration {
+            // reset job instance
+            self.time_accumulator -= duration;
+            self.has_paid_resources = false;
+            self.actions_done += 1;
+
+            // update level up progress bar
+            self.level_up_progress.set(
+                self.actions_done as f32 / self.actions_to_level_up() as f32
+            );
+
+            // level up if enough actions done
+            if self.actions_done >= self.actions_to_level_up() {
+                self.level_up();
+            }
+
+            vec![
+                self.job_type.get_completion_effect(),
+                Effect::IncrementActionsForSkill {
+                    skill_type: self.job_type.get_skill_type(),
+                    amount: 1,
+                },
+            ]
+        } else {
+            vec![]
+        }
+    }
+
+    fn level_up(&mut self) {
+        self.level += 1;
+        self.actions_done = 0;
+        self.level_up_progress.reset();
+    }
+
+    pub fn actions_to_level_up(&self) -> i32 {
+        let base_actions = self.job_type.base_actions_to_level_up();
+        let growth_factor: f32 = 1.5;
+
+        (base_actions as f32 * growth_factor.powi(self.level - 1)) as i32
+    }
+}
 
 pub const JOB_CARD_HEIGHT: f32 = 192.0;
 pub const JOB_CARD_WIDTH: f32 = 404.0;

@@ -8,10 +8,12 @@ pub mod job;
 pub mod ui;
 pub mod palette;
 pub mod assets;
+pub mod skill;
 
 use crate::draw::{draw, UiElement};
-use crate::game::{Effect, EffectWithSource, GameState, Intent, JobType, MouseInput, TextParticle, UiRect};
+use crate::game::{Effect, EffectWithSource, GameState, Intent, MouseInput, TextParticle, UiRect};
 use crate::job::build_job_cards;
+use crate::job::JobType;
 
 pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
     vec![MouseButton::Left, MouseButton::Right, MouseButton::Middle]
@@ -29,10 +31,10 @@ async fn main() {
     let mut state = GameState::new();
     let mut is_fullscreen = false;
 
-    state.add_job_instance(JobType::Lumberjacking);
-    state.add_job_instance(JobType::Lumberjacking);
-    state.add_job_instance(JobType::Lumberjacking);
-    state.add_job_instance(JobType::Lumberjacking);
+    state.add_job_instance(JobType::Lumbering);
+    state.add_job_instance(JobType::Lumbering);
+    state.add_job_instance(JobType::Lumbering);
+    state.add_job_instance(JobType::Lumbering);
     state.add_job_instance(JobType::Herbalism);
     state.add_job_instance(JobType::Herbalism);
     state.add_job_instance(JobType::Alchemy);
@@ -81,26 +83,7 @@ async fn main() {
         all_intents.extend(get_intents(&job_elements, &mouse_input));
 
         // Update game state
-        let effects = state.step(&all_intents, dt);
-
-        // trigger new text particles
-        for effect in &effects {
-            match effect {
-                EffectWithSource::JobSource { job, effect } => {
-                    match effect {
-                        Effect::AddItem { item, amount } => {
-                            state.text_particles.push(TextParticle {
-                                text: format!("{} +{}", item.to_string(), amount),
-                                position: Vec2::from(job.get_particle_marker(&job_elements)),
-                                velocity: Vec2::new(0.0, -15.0),
-                                color: SKYBLUE,
-                                lifetime: 1.5
-                            });
-                        }
-                    }
-                }
-            }
-        }
+        let effects = state.step(&all_intents, dt); 
 
         // remove expired text particles
         state.text_particles.retain(|particle| { particle.is_alive() });
