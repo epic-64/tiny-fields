@@ -32,10 +32,10 @@ async fn main() {
     state.add_job_instance(JobType::Woodcutting);
     state.add_job_instance(JobType::Woodcutting);
     state.add_job_instance(JobType::Woodcutting);
+    state.add_job_instance(JobType::Woodcutting);
     state.add_job_instance(JobType::Herbalism);
     state.add_job_instance(JobType::Herbalism);
     state.add_job_instance(JobType::Alchemy);
-    state.add_job_instance(JobType::Hunting);
     state.add_job_instance(JobType::Hunting);
     state.add_job_instance(JobType::Cooking);
 

@@ -1,4 +1,4 @@
-use crate::assets::Assets;
+use crate::assets::{AssetId, Assets};
 use crate::draw::{pill, UiElement};
 use crate::game::{GameState, Intent, JobInstance, UiRect};
 use crate::palette;
@@ -94,15 +94,15 @@ pub fn build_job_card(
         y: offset.y + 75.0,
         job: job.clone(),
     });
-    
-    // Background
-    elements.push(UiElement::Rectangle {
+
+    // background image
+    elements.push(UiElement::Image {
         x: offset.x,
         y: offset.y,
         width: card_width,
         height: card_height,
         color: palette::CARD_BACKGROUND.get_color(),
-        bordered: false,
+        texture: assets.textures.get(&AssetId::BackgroundTrees).unwrap().clone(),
     });
 
     // Job Animation background

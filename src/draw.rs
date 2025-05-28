@@ -2,10 +2,9 @@ use crate::game::{Intent, JobInstance, MouseInput, UiRect};
 use crate::palette;
 use macroquad::color::{Color, SKYBLUE, WHITE};
 use macroquad::math::Vec2;
-use macroquad::prelude::{draw_rectangle, draw_text_ex, draw_texture, draw_texture_ex, get_internal_gl, measure_text, DrawTextureParams, QuadGl, Texture2D};
-use macroquad::shapes::draw_circle;
+use macroquad::prelude::{draw_rectangle, draw_text_ex, draw_texture_ex, get_internal_gl, measure_text, DrawTextureParams, QuadGl, Texture2D};
+use macroquad::shapes::{draw_circle, draw_rectangle_lines};
 use macroquad::text::{Font, TextParams};
-use macroquad::texture::set_default_filter_mode;
 
 #[derive(Clone)]
 pub enum UiElement {
@@ -85,23 +84,19 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
             });
         }
         UiElement::ProgressBar { x, y, width, height, progress, background_color, foreground_color, with_border } => {
+            draw_rectangle(*x, *y, *width, *height, *background_color);
+            draw_rectangle(*x, *y, *width * *progress, *height, *foreground_color);
+
             if *with_border {
-                let strength = 2.0;
-                draw_rectangle(*x, *y, *width, *height, palette::BORDER.get_color());
-                draw_rectangle(*x + strength, *y + strength, *width - strength * 2., *height - strength * 2., *background_color);
-                draw_rectangle(*x + strength, *y + strength, (*width - strength * 2.) * *progress, *height - strength * 2., *foreground_color);
-            } else {
-                draw_rectangle(*x, *y, *width, *height, *background_color);
-                draw_rectangle(*x, *y, *width * *progress, *height, *foreground_color);
+                let strength = 1.0;
+                draw_rectangle_lines(*x, *y, *width, *height, strength * 2.0, palette::BORDER.get_color());
             }
         }
         UiElement::Rectangle { x, y, width, height, color, bordered } => {
+            draw_rectangle(*x, *y, *width, *height, *color);
             if *bordered {
-                let strength = 2.0;
-                draw_rectangle(*x, *y, *width, *height, palette::BORDER.get_color());
-                draw_rectangle(*x + strength, *y + strength, *width - strength * 2., *height - strength * 2., *color);
-            } else {
-                draw_rectangle(*x, *y, *width, *height, *color);
+                let strength = 1.0;
+                draw_rectangle_lines(*x, *y, *width, *height, strength * 2.0, palette::BORDER.get_color());
             }
         }
         UiElement::Circle { x, y, radius, color } => {
@@ -116,7 +111,7 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
         }
         UiElement::RectButton { rectangle: r, font_size, text, background_color, text_color, font, .. } => {
             if is_hovered(command, mouse_input) {
-                draw_rectangle(r.x - 2.0, r.y - 2.0, r.w + 4.0, r.h + 4.0, SKYBLUE);
+                draw_rectangle(r.x - 2.0, r.y - 2.0, r.w + 4.0, r.h + 4.0, palette::BUTTON_HOVER.get_color());
             }
 
             draw_rectangle(r.x, r.y, r.w, r.h, *background_color);
@@ -135,7 +130,7 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
         }
         UiElement::ImgButton { rectangle: r, texture, .. } => {
             if is_hovered(command, mouse_input) {
-                draw_rectangle(r.x - 2.0, r.y - 2.0, r.w + 4.0, r.h + 4.0, SKYBLUE);
+                draw_rectangle(r.x - 2.0, r.y - 2.0, r.w + 4.0, r.h + 4.0, palette::BUTTON_HOVER.get_color());
             }
 
             let params = DrawTextureParams {
