@@ -233,7 +233,7 @@ pub enum EffectWithSource {
 
 #[derive(Clone, PartialEq)]
 pub enum JobType {
-    Woodcutting,
+    Lumberjacking,
     Mining,
     Herbalism,
     Hunting,
@@ -248,7 +248,7 @@ pub enum JobType {
 impl JobType {
     pub fn get_animation_images(&self, assets: &Assets) -> (Texture2D, Texture2D) {
         match self {
-            JobType::Woodcutting => (WoodAnim1.texture(assets), WoodAnim2.texture(assets)),
+            JobType::Lumberjacking => (WoodAnim1.texture(assets), WoodAnim2.texture(assets)),
             JobType::Mining => (Mining1.texture(assets), Mining2.texture(assets)),
             JobType::Hunting => (Hunting1.texture(assets), Hunting2.texture(assets)),
             JobType::Smithing => (Smithing1.texture(assets), Smithing2.texture(assets)),
@@ -271,22 +271,22 @@ impl JobType {
 
     pub fn get_name(&self) -> String {
         match self {
-            JobType::Woodcutting => "Lumberjacking".to_string(),
-            JobType::Mining      => "Mining".to_string(),
-            JobType::Hunting     => "Hunting".to_string(),
-            JobType::Smithing    => "Smithing".to_string(),
-            JobType::Herbalism   => "Herbalism".to_string(),
-            JobType::Foraging    => "Foraging".to_string(),
+            JobType::Lumberjacking => "Lumberjacking".to_string(),
+            JobType::Mining => "Mining".to_string(),
+            JobType::Hunting => "Hunting".to_string(),
+            JobType::Smithing => "Smithing".to_string(),
+            JobType::Herbalism => "Herbalism".to_string(),
+            JobType::Foraging => "Foraging".to_string(),
             JobType::Woodworking => "Woodworking".to_string(),
-            JobType::Cooking     => "Cooking".to_string(),
-            JobType::Alchemy     => "Alchemy".to_string(),
-            JobType::Selling     => "Selling".to_string(),
+            JobType::Cooking => "Cooking".to_string(),
+            JobType::Alchemy => "Alchemy".to_string(),
+            JobType::Selling => "Selling".to_string(),
         }
     }
 
     pub fn get_product(&self) -> Item {
         match self {
-            JobType::Woodcutting => Item::Wood,
+            JobType::Lumberjacking => Item::Wood,
             JobType::Mining      => Item::Iron,
             JobType::Hunting     => Item::Meat,
             JobType::Smithing    => Item::IronBar,
@@ -301,7 +301,7 @@ impl JobType {
 
     pub fn get_required_items(&self) -> Vec<(Item, i64)>{
         match self {
-            JobType::Woodcutting => vec![(Item::Tree, 0)],
+            JobType::Lumberjacking => vec![(Item::Tree, 0)],
             JobType::Cooking => vec![(Item::Wood, 4), (Item::Meat, 1), (Item::Herb, 1), (Item::ManaPotion, 1)],
             JobType::Hunting => vec![(Item::Deer, 0)],
             JobType::Alchemy => vec![(Item::Herb, 1)],

@@ -29,10 +29,10 @@ async fn main() {
     let mut state = GameState::new();
     let mut is_fullscreen = false;
 
-    state.add_job_instance(JobType::Woodcutting);
-    state.add_job_instance(JobType::Woodcutting);
-    state.add_job_instance(JobType::Woodcutting);
-    state.add_job_instance(JobType::Woodcutting);
+    state.add_job_instance(JobType::Lumberjacking);
+    state.add_job_instance(JobType::Lumberjacking);
+    state.add_job_instance(JobType::Lumberjacking);
+    state.add_job_instance(JobType::Lumberjacking);
     state.add_job_instance(JobType::Herbalism);
     state.add_job_instance(JobType::Herbalism);
     state.add_job_instance(JobType::Alchemy);
