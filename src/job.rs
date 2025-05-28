@@ -484,7 +484,7 @@ pub fn build_job_card(
 
     // Title Bar
     elements.push(UiElement::Text {
-        content: job.job_type.get_name(),
+        content: skill_instance.skill_type.as_str().to_string() + " Lv." + skill_instance.level.to_string().as_str(),
         font: assets.fonts.text_bold.clone(),
         x: offset.x + card_padding_x,
         y: offset.y + card_padding_y + font_size_large,
