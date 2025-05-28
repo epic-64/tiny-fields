@@ -146,8 +146,9 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
     }
 }
 
-pub fn pill(x: f32, y: f32, w: f32, h: f32, text: &str, text_color: Color, font: Font) -> Vec<UiElement> {
+pub fn pill(x: f32, y: f32, w: f32, h: f32, text: &str, text_color: Option<Color>, font: Font) -> Vec<UiElement> {
     let mut elements = Vec::new();
+    let text_color = text_color.unwrap_or_else(|| palette::PILL_TEXT_COLOR.get_color());
 
     let radius = h / 2.0;
 

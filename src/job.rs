@@ -99,17 +99,17 @@ pub fn build_job_card(
     });
 
     // Job Animation background
-    elements.push(UiElement::Rectangle {
-        x: image_x,
-        y: image_y,
-        width: image_width,
-        height: image_height,
-        color: palette::IMAGE_BACKGROUND.get_color(),
-        bordered: true,
-    });
+    // elements.push(UiElement::Rectangle {
+    //     x: image_x,
+    //     y: image_y,
+    //     width: image_width,
+    //     height: image_height,
+    //     color: palette::IMAGE_BACKGROUND.get_color(),
+    //     bordered: false,
+    // });
 
     // Job Animation Image
-    let image_padding = 12.0;
+    let image_padding = 0.0;
     elements.push(UiElement::Image {
         x: image_x + image_padding,
         y: image_y + image_padding,
@@ -166,7 +166,7 @@ pub fn build_job_card(
             24.0,
             14.0,
             state.inventory.get_item_amount(&job.job_type.get_product()).to_string().as_str(),
-            PaletteC::White.get_color(),
+            None,
             assets.fonts.mono.clone()
         )
     );
@@ -178,6 +178,7 @@ pub fn build_job_card(
 
     let required_items = job.job_type.get_required_items();
     let item_slots = required_items.len();
+    let empty_slots = 4 - item_slots;
 
     for (i, (required_item, required_amount)) in required_items.iter().enumerate() {
         let resource_x = inner_x + (i as f32 * (resource_icon_size + resource_icon_spacing));
@@ -193,7 +194,7 @@ pub fn build_job_card(
             width: resource_icon_size,
             height: resource_icon_size,
             color: if player_has_enough { palette::IMAGE_BACKGROUND.get_color() } else { PaletteC::Coral.get_color() },
-            bordered: true,
+            bordered: false,
         });
 
         // draw resource icon
@@ -216,7 +217,7 @@ pub fn build_job_card(
                     24.0,
                     14.0,
                     state.inventory.get_item_amount(required_item).to_string().as_str(),
-                    PaletteC::White.get_color(),
+                    None,
                     assets.fonts.mono.clone()
                 )
             );
@@ -231,11 +232,26 @@ pub fn build_job_card(
                     pill_width,
                     pill_height,
                     required_amount.to_string().as_str(),
-                    if player_has_enough { PaletteC::Peach.get_color() } else { PaletteC::Coral.get_color() },
+                    if player_has_enough { Some(PaletteC::Peach.get_color()) } else { Some(PaletteC::Coral.get_color()) },
                     assets.fonts.mono.clone(),
                 )
             )
         }
+    }
+
+    // Draw empty slots for resources
+    for i in 0..empty_slots {
+        let resource_x = inner_x + (item_slots as f32 + i as f32) * (resource_icon_size + resource_icon_spacing);
+
+        // draw background rectangle
+        elements.push(UiElement::Rectangle {
+            x: resource_x,
+            y: offset.y + card_padding_y + 96.0,
+            width: resource_icon_size,
+            height: resource_icon_size,
+            color: palette::IMAGE_BACKGROUND.get_color(),
+            bordered: false,
+        });
     }
 
     // Title Bar

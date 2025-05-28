@@ -10,8 +10,8 @@ pub const BUTTON_HOVER: PaletteC = PaletteC::Peach;
 pub const BUTTON_TEXT: PaletteC = PaletteC::Anthracite;
 pub const IMAGE_BACKGROUND: PaletteC = PaletteC::WhiteTransparent;
 pub const SKILL_COLOR: PaletteC = PaletteC::Aqua;
-pub const PILL_COLOR: PaletteC = PaletteC::AnthraciteLight;
-pub const PILL_TEXT_COLOR: PaletteC = PaletteC::White;
+pub const PILL_COLOR: PaletteC = PaletteC::Mocha;
+pub const PILL_TEXT_COLOR: PaletteC = PaletteC::AnthraciteLight;
 pub const PRODUCT_COLOR: PaletteC = PaletteC::Peach;
 pub const PROGRESS_COLOR: PaletteC = PaletteC::GreenTransparent;
 
