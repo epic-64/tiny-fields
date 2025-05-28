@@ -175,17 +175,7 @@ impl JobInstance {
             // reset job instance
             self.time_accumulator -= duration;
             self.has_paid_resources = false;
-            self.actions_done += 1;
-
-            // update level up progress bar
-            self.level_up_progress.set(
-                self.actions_done as f32 / self.actions_to_level_up() as f32
-            );
-
-            // level up if enough actions done
-            if self.actions_done >= self.actions_to_level_up() {
-                self.level_up();
-            }
+            self.increment_actions();
 
             vec![
                 self.job_type.get_completion_effect(),
@@ -210,6 +200,18 @@ impl JobInstance {
         let growth_factor: f32 = 1.5;
 
         (base_actions as f32 * growth_factor.powi(self.level - 1)) as i32
+    }
+
+    fn increment_actions(&mut self) {
+        self.actions_done += 1;
+
+        self.level_up_progress.set(
+            self.actions_done as f32 / self.actions_to_level_up() as f32
+        );
+
+        if self.actions_done >= self.actions_to_level_up() {
+            self.level_up();
+        }
     }
 }
 
@@ -306,16 +308,6 @@ pub fn build_job_card(
         color: PaletteC::White.get_color(),
     });
 
-    // Job Animation background
-    // elements.push(UiElement::Rectangle {
-    //     x: image_x,
-    //     y: image_y,
-    //     width: image_width,
-    //     height: image_height,
-    //     color: palette::IMAGE_BACKGROUND.get_color(),
-    //     bordered: false,
-    // });
-
     // Job Animation Image
     let image_padding = 0.0;
     elements.push(UiElement::Image {
@@ -378,6 +370,34 @@ pub fn build_job_card(
             assets.fonts.mono.clone()
         )
     );
+
+    // Draw Skill instance level up progress bar
+    let skill_progress_bar_width = card_width - card_padding_x - image_width - card_spacing - card_padding_x - right_side_width - card_spacing;
+    let skill_progress_bar_height = 10.0;
+    let skill_progress_bar_y = image_y;
+    let skill_instance = state.skills.get_skill_by_type(&job.job_type.get_skill_type());
+    elements.push(UiElement::ProgressBar {
+        x: inner_x,
+        y: skill_progress_bar_y,
+        width: skill_progress_bar_width,
+        height: skill_progress_bar_height,
+        progress: skill_instance.level_up_progress.get(),
+        background_color: palette::BAR_BACKGROUND.get_color(),
+        foreground_color: palette::SKILL_COLOR.get_color(),
+        with_border: true,
+    });
+
+    // Draw Job instance level up progress bar
+    elements.push(UiElement::ProgressBar {
+        x: inner_x,
+        y: skill_progress_bar_y + skill_progress_bar_height + 8.0,
+        width: skill_progress_bar_width,
+        height: skill_progress_bar_height,
+        progress: job.level_up_progress.get(),
+        background_color: palette::BAR_BACKGROUND.get_color(),
+        foreground_color: palette::PRODUCT_COLOR.get_color(),
+        with_border: true,
+    });
 
     // Draw 4 resource icons in the middle
     let resource_icon_size = 50.0;

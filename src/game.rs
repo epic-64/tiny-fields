@@ -144,10 +144,10 @@ impl GameState {
                             self.inventory.add_item(*item, *amount);
                         }
                         Effect::IncrementActionsForSkill { skill_type, amount } => {
-                            self.skills.get_skill_by_type(skill_type).increment_actions(*amount as u32);
+                            self.skills.get_skill_by_type_mut(skill_type).increment_actions(*amount as u32);
                         }
                     }
-                    
+
                     // collect effects with source
                     effects_with_source.push(EffectWithSource::JobSource {
                         job: job.clone(),

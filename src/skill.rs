@@ -1,3 +1,5 @@
+use crate::game::Progress;
+
 pub fn cumulative_actions_to_level(level: u8) -> u32 {
     let first_portion = level * (level + 1) / 2;
 
@@ -99,6 +101,7 @@ pub struct SkillInstance {
     pub skill_type: SkillType,
     pub actions_done_current_level: u32,
     pub level: u32,
+    pub level_up_progress: Progress,
 }
 
 impl SkillInstance {
@@ -107,6 +110,7 @@ impl SkillInstance {
             skill_type,
             level: 1,
             actions_done_current_level: 0,
+            level_up_progress: Progress::new(),
         }
     }
 
@@ -114,16 +118,23 @@ impl SkillInstance {
         actions_to_reach(self.level as u8, self.level as u8 + 1)
     }
 
-    pub fn level_up_maybe(&mut self) {
-        if self.actions_done_current_level >= self.actions_to_next_level() {
-            self.level += 1;
-            self.actions_done_current_level = 0; // Reset actions after leveling up
-        }
+    pub fn level_up(&mut self) {
+        self.level += 1;
+        self.actions_done_current_level = 0; // Reset actions after leveling up
+        self.level_up_progress.reset();
     }
-    
+
     pub fn increment_actions(&mut self, amount: u32) {
         self.actions_done_current_level += amount;
-        self.level_up_maybe();
+
+        // update level up progress bar
+        self.level_up_progress.set(
+            self.actions_done_current_level as f32 / self.actions_to_next_level() as f32
+        );
+
+        if self.actions_done_current_level >= self.actions_to_next_level() {
+            self.level_up();
+        }
     }
 }
 
@@ -184,7 +195,7 @@ impl Skills {
         }
     }
 
-    pub fn get_skill_by_type(&mut self, skill_type: &SkillType) -> &mut SkillInstance {
+    pub fn get_skill_by_type_mut(&mut self, skill_type: &SkillType) -> &mut SkillInstance {
         match skill_type {
             SkillType::Lumbering => &mut self.gathering.lumbering,
             SkillType::Mining => &mut self.gathering.mining,
@@ -198,6 +209,23 @@ impl Skills {
             SkillType::Tailoring => &mut self.crafting.tailoring,
             SkillType::Alchemy => &mut self.crafting.alchemy,
             SkillType::Cooking => &mut self.crafting.cooking,
+        }
+    }
+    
+    pub fn get_skill_by_type(&self, skill_type: &SkillType) -> &SkillInstance {
+        match skill_type {
+            SkillType::Lumbering => &self.gathering.lumbering,
+            SkillType::Mining => &self.gathering.mining,
+            SkillType::Fishing => &self.gathering.fishing,
+            SkillType::Hunting => &self.gathering.hunting,
+            SkillType::Foraging => &self.gathering.foraging,
+            SkillType::Herbalism => &self.gathering.herbalism,
+            SkillType::Thieving => &self.gathering.thieving,
+            SkillType::Woodworking => &self.crafting.woodworking,
+            SkillType::Smithing => &self.crafting.smithing,
+            SkillType::Tailoring => &self.crafting.tailoring,
+            SkillType::Alchemy => &self.crafting.alchemy,
+            SkillType::Cooking => &self.crafting.cooking,
         }
     }
 }
