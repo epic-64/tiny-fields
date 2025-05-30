@@ -1,6 +1,6 @@
 use crate::game::Progress;
 
-pub fn cumulative_actions_to_level(level: u8) -> i64 {
+pub fn skill_cumulative_actions_to_level(level: u8) -> i64 {
     let first_portion = level * (level + 1) / 2;
 
     let a = 6.95622e-7;
@@ -10,13 +10,13 @@ pub fn cumulative_actions_to_level(level: u8) -> i64 {
     first_portion as i64 + c as i64
 }
 
-pub fn actions_to_reach(current_level: u8, target_level: u8) -> i64 {
+pub fn skill_actions_to_reach(current_level: u8, target_level: u8) -> i64 {
     if target_level <= current_level {
         return 0;
     }
 
-    let current_actions = cumulative_actions_to_level(current_level);
-    let target_actions = cumulative_actions_to_level(target_level);
+    let current_actions = skill_cumulative_actions_to_level(current_level);
+    let target_actions = skill_cumulative_actions_to_level(target_level);
 
     target_actions - current_actions
 }
@@ -115,7 +115,7 @@ impl SkillArchetypeInstance {
     }
 
     pub fn actions_to_next_level(&self) -> i64 {
-        actions_to_reach(self.level as u8, self.level as u8 + 1)
+        skill_actions_to_reach(self.level as u8, self.level as u8 + 1)
     }
 
     pub fn level_up(&mut self) {

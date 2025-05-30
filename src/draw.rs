@@ -5,7 +5,8 @@ use macroquad::math::Vec2;
 use macroquad::prelude::{draw_rectangle, draw_text_ex, draw_texture_ex, get_internal_gl, measure_text, DrawTextureParams, QuadGl, Texture2D};
 use macroquad::shapes::{draw_circle, draw_rectangle_lines};
 use macroquad::text::{Font, TextParams};
-use crate::job::JobInstance;
+
+const BORDER_STRENGTH: f32 = 2.0;
 
 #[derive(Clone)]
 pub enum UiElement {
@@ -88,14 +89,14 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
             draw_rectangle(*x, *y, *width * *progress, *height, *foreground_color);
 
             if *with_border {
-                let strength = 1.0;
+                let strength = BORDER_STRENGTH;
                 draw_rectangle_lines(*x, *y, *width, *height, strength * 2.0, palette::BORDER.get_color());
             }
         }
         UiElement::Rectangle { x, y, width, height, color, bordered } => {
             draw_rectangle(*x, *y, *width, *height, *color);
             if *bordered {
-                let strength = 1.0;
+                let strength = BORDER_STRENGTH;
                 draw_rectangle_lines(*x, *y, *width, *height, strength * 2.0, palette::BORDER.get_color());
             }
         }

@@ -9,9 +9,9 @@ use macroquad::math::Vec2;
 use macroquad::prelude::Texture2D;
 
 pub fn job_cumulative_actions_to_level(level: u8) -> i64 {
-    let first_portion = level * (level + 1) / 2;
+    let first_portion = (level - 1) * (level) / 2;
 
-    let a = 6.95622e-7;
+    let a = 6.95622e-9;
     let b = 6.57881;
     let c = a * (level as f64).powf(b);
 
@@ -125,16 +125,16 @@ impl JobArchetype {
 }
 
 pub struct JobArchetypeInstance {
-    pub job_type: JobArchetype,
+    pub job_archetype: JobArchetype,
     pub level: i32,
     pub actions_done_current_level: i32,
     pub level_up_progress: Progress,
 }
 
 impl JobArchetypeInstance {
-    pub fn new(job_type: JobArchetype) -> Self {
+    pub fn new(job_archetype: JobArchetype) -> Self {
         Self {
-            job_type,
+            job_archetype,
             level: 1,
             actions_done_current_level: 0,
             level_up_progress: Progress::new(),
@@ -168,7 +168,7 @@ impl JobArchetypeInstance {
 #[derive(Clone, PartialEq)]
 pub struct JobInstance {
     pub instance_id: i32,
-    pub job_type: JobArchetype,
+    pub job_archetype: JobArchetype,
     pub action_progress: Progress,
     pub time_accumulator: f32,
     pub running: bool,
@@ -178,18 +178,18 @@ pub struct JobInstance {
 
 pub struct JobParameters {
     pub instance_id: i32,
-    pub job_type: JobArchetype,
+    pub job_archetype: JobArchetype,
 }
 
 impl JobInstance {
     pub fn new(p: JobParameters) -> Self {
         Self {
+            job_archetype: p.job_archetype,
             instance_id: p.instance_id,
             running: false,
             action_progress: Progress{value: 0.0},
             time_accumulator: 0.0,
             timeslot_cost: 1,
-            job_type: p.job_type,
             has_paid_resources: false,
         }
     }
@@ -203,11 +203,11 @@ impl JobInstance {
     }
 
     pub fn update_progress(&mut self, inventory: &mut Inventory, dt: f32) -> Vec<Effect> {
-        let duration = self.job_type.base_duration();
+        let duration = self.job_archetype.base_duration();
 
         if !self.has_paid_resources {
             // Check if we have the required items to start the job
-            let required_items = self.job_type.get_required_items();
+            let required_items = self.job_archetype.get_required_items();
 
             for (item, amount) in &required_items {
                 if inventory.get_item_amount(&item) < *amount {
@@ -233,9 +233,9 @@ impl JobInstance {
             self.has_paid_resources = false;
 
             vec![
-                self.job_type.get_completion_effect(),
-                Effect::IncrementActionsForSkill { skill_type: self.job_type.get_skill_type() },
-                Effect::IncrementActionsForJobType { job_type: self.job_type.clone() },
+                self.job_archetype.get_completion_effect(),
+                Effect::IncrementActionsForSkill { skill_type: self.job_archetype.get_skill_type() },
+                Effect::IncrementActionsForJobType { job_type: self.job_archetype.clone() },
             ]
         } else {
             vec![]
@@ -305,8 +305,8 @@ pub fn build_job_card(
     card_spacing: f32,
 ) -> Vec<UiElement>
 {
-    let skill_instance = state.skill_archetype_instances.get_skill_by_type(&job.job_type.get_skill_type());
-    let job_archetype_instance = state.job_archetype_instances.get_archetype(&job.job_type);
+    let skill_instance = state.skill_archetype_instances.get_skill_by_type(&job.job_archetype.get_skill_type());
+    let job_archetype_instance = state.job_archetype_instances.get_archetype(&job.job_archetype);
 
     let color_primary = palette::TEXT.get_color();
     let color_secondary = palette::BORDER.get_color();
@@ -319,7 +319,7 @@ pub fn build_job_card(
     let image_y = offset.y + card_height - image_height - card_padding_y;
     let inner_x = offset.x + card_padding_x + image_width + card_spacing;
 
-    let (image1, image2) = job.job_type.get_animation_images(assets);
+    let (image1, image2) = job.job_archetype.get_animation_images(assets);
 
     let chosen_image = if job.running && job.time_accumulator % 2.0 < 1.0 {
         image1
@@ -385,7 +385,7 @@ pub fn build_job_card(
         y: image_y + 40.0 + 8.0,
         width: right_side_width - 16.0,
         height: right_side_width - 16.0,
-        texture: job.job_type.get_product().get_texture(&assets),
+        texture: job.job_archetype.get_product().get_texture(&assets),
         color: PaletteC::White.get_color(),
     });
 
@@ -396,7 +396,7 @@ pub fn build_job_card(
             image_y + 40.0 - 14.0 / 2.0,
             24.0,
             14.0,
-            state.inventory.get_item_amount(&job.job_type.get_product()).to_string().as_str(),
+            state.inventory.get_item_amount(&job.job_archetype.get_product()).to_string().as_str(),
             None,
             assets.fonts.mono.clone()
         )
@@ -434,7 +434,7 @@ pub fn build_job_card(
     let resource_icon_padding = 4.0;
     let resource_icon_spacing = 4.0;
 
-    let required_items = job.job_type.get_required_items();
+    let required_items = job.job_archetype.get_required_items();
     let item_slots = required_items.len();
     let empty_slots = 4 - item_slots;
 
@@ -452,7 +452,7 @@ pub fn build_job_card(
             width: resource_icon_size,
             height: resource_icon_size,
             color: if player_has_enough { palette::IMAGE_BACKGROUND.get_color() } else { PaletteC::Coral.get_color() },
-            bordered: false,
+            bordered: true,
         });
 
         // draw resource icon
@@ -530,7 +530,7 @@ pub fn build_job_card(
 
     // Job Type and Level
     elements.push(UiElement::Text {
-        content: format!("{} Lv. {}", job.job_type.get_name(), job_archetype_instance.level),
+        content: format!("{} Lv. {}", job.job_archetype.get_name(), job_archetype_instance.level),
         font: assets.fonts.text.clone(),
         x: offset.x + card_padding_x,
         y: offset.y + card_padding_y + 36.,
@@ -615,10 +615,10 @@ impl JobArchetypeInstances {
     }
 
     pub fn get_archetype(&self, job_type: &JobArchetype) -> &JobArchetypeInstance {
-        self.instances.iter().find(|i| i.job_type == *job_type).unwrap()
+        self.instances.iter().find(|i| i.job_archetype == *job_type).unwrap()
     }
 
     pub fn get_archetype_mut(&mut self, job_type: &JobArchetype) -> &mut JobArchetypeInstance {
-        self.instances.iter_mut().find(|i| i.job_type == *job_type).unwrap()
+        self.instances.iter_mut().find(|i| i.job_archetype == *job_type).unwrap()
     }
 }

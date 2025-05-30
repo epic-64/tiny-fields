@@ -83,7 +83,7 @@ impl GameState {
         self.jobs.push(
             JobInstance::new(JobParameters {
                 instance_id: self.jobs.iter().map(|j| j.instance_id).max().unwrap_or(0) + 1,
-                job_type: job_type.clone(),
+                job_archetype: job_type.clone(),
             })
         );
     }
