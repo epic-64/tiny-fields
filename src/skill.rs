@@ -1,16 +1,16 @@
 use crate::game::Progress;
 
-pub fn cumulative_actions_to_level(level: u8) -> u32 {
+pub fn cumulative_actions_to_level(level: u8) -> i64 {
     let first_portion = level * (level + 1) / 2;
 
     let a = 6.95622e-7;
     let b = 6.57881;
     let c = a * (level as f64).powf(b);
 
-    first_portion as u32 + c as u32
+    first_portion as i64 + c as i64
 }
 
-pub fn actions_to_reach(current_level: u8, target_level: u8) -> u32 {
+pub fn actions_to_reach(current_level: u8, target_level: u8) -> i64 {
     if target_level <= current_level {
         return 0;
     }
@@ -99,7 +99,7 @@ impl SkillType {
 
 pub struct SkillInstance {
     pub skill_type: SkillType,
-    pub actions_done_current_level: u32,
+    pub actions_done_current_level: i32,
     pub level: u32,
     pub level_up_progress: Progress,
 }
@@ -114,7 +114,7 @@ impl SkillInstance {
         }
     }
 
-    pub fn actions_to_next_level(&self) -> u32 {
+    pub fn actions_to_next_level(&self) -> i64 {
         actions_to_reach(self.level as u8, self.level as u8 + 1)
     }
 
@@ -124,7 +124,7 @@ impl SkillInstance {
         self.level_up_progress.reset();
     }
 
-    pub fn increment_actions(&mut self, amount: u32) {
+    pub fn increment_actions(&mut self, amount: i32) {
         self.actions_done_current_level += amount;
 
         // update level up progress bar
@@ -132,7 +132,7 @@ impl SkillInstance {
             self.actions_done_current_level as f32 / self.actions_to_next_level() as f32
         );
 
-        if self.actions_done_current_level >= self.actions_to_next_level() {
+        if self.actions_done_current_level as i64 >= self.actions_to_next_level() {
             self.level_up();
         }
     }

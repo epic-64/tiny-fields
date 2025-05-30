@@ -484,7 +484,13 @@ pub fn build_job_card(
 
     // Skill Type and Level
     elements.push(UiElement::Text {
-        content: format!("{} Lv. {}", skill_instance.skill_type.as_str(), skill_instance.level.to_string()),
+        content: format!(
+            "{} Lv. {} ({} / {})",
+            skill_instance.skill_type.as_str(),
+            skill_instance.level.to_string(),
+            skill_instance.actions_done_current_level,
+            skill_instance.actions_to_next_level(),
+        ),
         font: assets.fonts.text_bold.clone(),
         x: offset.x + card_padding_x,
         y: offset.y + card_padding_y + font_size_large,

@@ -77,10 +77,12 @@ async fn main() {
         // build all ui elements (draw commands)
         let job_elements = build_job_cards(&state, &assets, Vec2::new(25.0, 100.0) + resolution_offset);
         let debug_elements = build_debug_elements(&state, &assets, UiRect { x: 700.0, y: 25.0, w: 200.0, h: 40.0 });
+        let cheat_buttons = get_cheat_buttons(&assets, UiRect { x: 25.0, y: 25.0, w: 400.0, h: 40.0 });
 
         // collect all intents from UI interactions
         let mut all_intents: Vec<Intent> = vec![];
         all_intents.extend(get_intents(&job_elements, &mouse_input));
+        all_intents.extend(get_intents(&cheat_buttons, &mouse_input));
 
         // Update game state
         let effects = state.step(&all_intents, dt); 
@@ -107,6 +109,7 @@ async fn main() {
         clear_background(palette::GAME_BACKGROUND.get_color());
         job_elements.iter().for_each(|el|draw(el, &mouse_input));
         debug_elements.iter().for_each(|el|draw(el, &mouse_input));
+        cheat_buttons.iter().for_each(|el|draw(el, &mouse_input));
 
         // Keep track of FPS
         let elapsed = now() - frame_start;
