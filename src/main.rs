@@ -13,7 +13,7 @@ pub mod skill;
 use crate::draw::{draw, UiElement};
 use crate::game::{Effect, EffectWithSource, GameState, Intent, MouseInput, TextParticle, UiRect};
 use crate::job::build_job_cards;
-use crate::job::JobType;
+use crate::job::JobArchetype;
 
 pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
     vec![MouseButton::Left, MouseButton::Right, MouseButton::Middle]
@@ -31,15 +31,15 @@ async fn main() {
     let mut state = GameState::new();
     let mut is_fullscreen = false;
 
-    state.add_job_instance(JobType::LumberingWood);
-    state.add_job_instance(JobType::LumberingWood);
-    state.add_job_instance(JobType::LumberingWood);
-    state.add_job_instance(JobType::LumberingWood);
-    state.add_job_instance(JobType::Herbalism);
-    state.add_job_instance(JobType::Herbalism);
-    state.add_job_instance(JobType::Alchemy);
-    state.add_job_instance(JobType::Hunting);
-    state.add_job_instance(JobType::Cooking);
+    state.add_job_instance(JobArchetype::LumberingWood);
+    state.add_job_instance(JobArchetype::LumberingWood);
+    state.add_job_instance(JobArchetype::LumberingWood);
+    state.add_job_instance(JobArchetype::LumberingWood);
+    state.add_job_instance(JobArchetype::HerbalismCamomille);
+    state.add_job_instance(JobArchetype::HerbalismCamomille);
+    state.add_job_instance(JobArchetype::AlchemyManaPotion);
+    state.add_job_instance(JobArchetype::HuntingDeer);
+    state.add_job_instance(JobArchetype::CookingSandwich);
 
     let assets: Assets = load_assets().await;
 

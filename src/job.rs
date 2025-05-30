@@ -1,36 +1,57 @@
+use crate::assets::AssetId::{AlchemyAnim1, AlchemyAnim2, CookingAnim1, CookingAnim2, HerbalismAnim1, HerbalismAnim2, Hunting1, Hunting2, Mining1, Mining2, Smithing1, Smithing2, WoodAnim1, WoodAnim2};
 use crate::assets::{AssetId, Assets};
 use crate::draw::{pill, UiElement};
 use crate::game::{Effect, GameState, Intent, Inventory, Item, Progress, UiRect};
 use crate::palette;
 use crate::palette::PaletteC;
+use crate::skill::SkillArchetype;
 use macroquad::math::Vec2;
 use macroquad::prelude::Texture2D;
-use crate::assets::AssetId::{AlchemyAnim1, AlchemyAnim2, CookingAnim1, CookingAnim2, HerbalismAnim1, HerbalismAnim2, Hunting1, Hunting2, Mining1, Mining2, Smithing1, Smithing2, WoodAnim1, WoodAnim2};
-use crate::skill::{SkillType, Skills};
 
-#[derive(Clone, PartialEq)]
-pub enum JobType {
-    LumberingWood,
-    Mining,
-    Herbalism,
-    Hunting,
-    Foraging,
-    Woodworking,
-    Smithing,
-    Cooking,
-    Alchemy,
+pub fn job_cumulative_actions_to_level(level: u8) -> i64 {
+    let first_portion = level * (level + 1) / 2;
+
+    let a = 6.95622e-7;
+    let b = 6.57881;
+    let c = a * (level as f64).powf(b);
+
+    first_portion as i64 + c as i64
 }
 
-impl JobType {
+pub fn job_actions_to_reach(current_level: u8, target_level: u8) -> i64 {
+    if target_level <= current_level {
+        return 0;
+    }
+
+    let current_actions = job_cumulative_actions_to_level(current_level);
+    let target_actions = job_cumulative_actions_to_level(target_level);
+
+    target_actions - current_actions
+}
+
+#[derive(Clone, PartialEq)]
+pub enum JobArchetype {
+    LumberingWood,
+    MiningIron,
+    HerbalismCamomille,
+    HuntingDeer,
+    Foraging,
+    WoodworkingPlanks,
+    SmithingIronBar,
+    CookingSandwich,
+    AlchemyManaPotion,
+}
+
+impl JobArchetype {
     pub fn get_animation_images(&self, assets: &Assets) -> (Texture2D, Texture2D) {
         match self {
-            JobType::LumberingWood => (WoodAnim1.texture(assets), WoodAnim2.texture(assets)),
-            JobType::Mining => (Mining1.texture(assets), Mining2.texture(assets)),
-            JobType::Hunting => (Hunting1.texture(assets), Hunting2.texture(assets)),
-            JobType::Smithing => (Smithing1.texture(assets), Smithing2.texture(assets)),
-            JobType::Cooking => (CookingAnim1.texture(assets), CookingAnim2.texture(assets)),
-            JobType::Herbalism => (HerbalismAnim1.texture(assets), HerbalismAnim2.texture(assets)),
-            JobType::Alchemy => (AlchemyAnim1.texture(assets), AlchemyAnim2.texture(assets)),
+            JobArchetype::LumberingWood => (WoodAnim1.texture(assets), WoodAnim2.texture(assets)),
+            JobArchetype::MiningIron => (Mining1.texture(assets), Mining2.texture(assets)),
+            JobArchetype::HuntingDeer => (Hunting1.texture(assets), Hunting2.texture(assets)),
+            JobArchetype::SmithingIronBar => (Smithing1.texture(assets), Smithing2.texture(assets)),
+            JobArchetype::CookingSandwich => (CookingAnim1.texture(assets), CookingAnim2.texture(assets)),
+            JobArchetype::HerbalismCamomille => (HerbalismAnim1.texture(assets), HerbalismAnim2.texture(assets)),
+            JobArchetype::AlchemyManaPotion => (AlchemyAnim1.texture(assets), AlchemyAnim2.texture(assets)),
             _ => (WoodAnim1.texture(assets), WoodAnim2.texture(assets)),
         }
     }
@@ -47,39 +68,39 @@ impl JobType {
 
     pub fn get_name(&self) -> String {
         match self {
-            JobType::LumberingWood => "LumberingWood".to_string(),
-            JobType::Mining => "Mining".to_string(),
-            JobType::Hunting => "Hunting".to_string(),
-            JobType::Smithing => "Smithing".to_string(),
-            JobType::Herbalism => "Herbalism".to_string(),
-            JobType::Foraging => "Foraging".to_string(),
-            JobType::Woodworking => "Woodworking".to_string(),
-            JobType::Cooking => "Cooking".to_string(),
-            JobType::Alchemy => "Alchemy".to_string(),
+            JobArchetype::LumberingWood => "LumberingWood".to_string(),
+            JobArchetype::MiningIron => "Mining".to_string(),
+            JobArchetype::HuntingDeer => "Hunting".to_string(),
+            JobArchetype::SmithingIronBar => "Smithing".to_string(),
+            JobArchetype::HerbalismCamomille => "Herbalism".to_string(),
+            JobArchetype::Foraging => "Foraging".to_string(),
+            JobArchetype::WoodworkingPlanks => "Woodworking".to_string(),
+            JobArchetype::CookingSandwich => "Cooking".to_string(),
+            JobArchetype::AlchemyManaPotion => "Alchemy".to_string(),
         }
     }
 
     pub fn get_product(&self) -> Item {
         match self {
-            JobType::LumberingWood => Item::Wood,
-            JobType::Mining      => Item::Iron,
-            JobType::Hunting     => Item::Meat,
-            JobType::Smithing    => Item::IronBar,
-            JobType::Herbalism   => Item::Herb,
-            JobType::Foraging    => Item::Berry,
-            JobType::Woodworking => Item::Wood, // todo: change to correct item
-            JobType::Cooking     => Item::Sandwich,
-            JobType::Alchemy     => Item::ManaPotion, // todo: change to correct item
+            JobArchetype::LumberingWood => Item::Wood,
+            JobArchetype::MiningIron => Item::Iron,
+            JobArchetype::HuntingDeer => Item::Meat,
+            JobArchetype::SmithingIronBar => Item::IronBar,
+            JobArchetype::HerbalismCamomille => Item::Herb,
+            JobArchetype::Foraging    => Item::Berry,
+            JobArchetype::WoodworkingPlanks => Item::Wood, // todo: change to correct item
+            JobArchetype::CookingSandwich => Item::Sandwich,
+            JobArchetype::AlchemyManaPotion => Item::ManaPotion, // todo: change to correct item
         }
     }
 
     pub fn get_required_items(&self) -> Vec<(Item, i64)>{
         match self {
-            JobType::LumberingWood => vec![(Item::Tree, 0)],
-            JobType::Cooking => vec![(Item::Wood, 4), (Item::Meat, 1), (Item::Herb, 1), (Item::ManaPotion, 1)],
-            JobType::Hunting => vec![(Item::Deer, 0)],
-            JobType::Alchemy => vec![(Item::Herb, 1)],
-            JobType::Herbalism => vec![(Item::Herb, 0)], // todo: change to correct item
+            JobArchetype::LumberingWood => vec![(Item::Tree, 0)],
+            JobArchetype::CookingSandwich => vec![(Item::Wood, 4), (Item::Meat, 1), (Item::Herb, 1), (Item::ManaPotion, 1)],
+            JobArchetype::HuntingDeer => vec![(Item::Deer, 0)],
+            JobArchetype::AlchemyManaPotion => vec![(Item::Herb, 1)],
+            JobArchetype::HerbalismCamomille => vec![(Item::Herb, 0)], // todo: change to correct item
             _ => vec![],
         }
     }
@@ -88,17 +109,58 @@ impl JobType {
         Effect::AddItem { item: self.get_product(), amount: 1 }
     }
 
-    pub fn get_skill_type(&self) -> SkillType {
+    pub fn get_skill_type(&self) -> SkillArchetype {
         match self {
-            JobType::LumberingWood => SkillType::Lumbering,
-            JobType::Mining => SkillType::Mining,
-            JobType::Hunting => SkillType::Hunting,
-            JobType::Smithing => SkillType::Smithing,
-            JobType::Herbalism => SkillType::Herbalism,
-            JobType::Foraging => SkillType::Foraging,
-            JobType::Woodworking => SkillType::Woodworking,
-            JobType::Cooking => SkillType::Cooking,
-            JobType::Alchemy => SkillType::Alchemy,
+            JobArchetype::LumberingWood => SkillArchetype::Lumbering,
+            JobArchetype::MiningIron => SkillArchetype::Mining,
+            JobArchetype::HuntingDeer => SkillArchetype::Hunting,
+            JobArchetype::SmithingIronBar => SkillArchetype::Smithing,
+            JobArchetype::HerbalismCamomille => SkillArchetype::Herbalism,
+            JobArchetype::Foraging => SkillArchetype::Foraging,
+            JobArchetype::WoodworkingPlanks => SkillArchetype::Woodworking,
+            JobArchetype::CookingSandwich => SkillArchetype::Cooking,
+            JobArchetype::AlchemyManaPotion => SkillArchetype::Alchemy,
+        }
+    }
+}
+
+pub struct JobArchetypeInstance {
+    pub job_type: JobArchetype,
+    pub level: i32,
+    pub actions_done_current_level: i32,
+    pub level_up_progress: Progress,
+}
+
+impl JobArchetypeInstance {
+    pub fn new(job_type: JobArchetype) -> Self {
+        Self {
+            job_type,
+            level: 1,
+            actions_done_current_level: 0,
+            level_up_progress: Progress::new(),
+        }
+    }
+
+    pub fn actions_to_next_level(&self) -> i64 {
+        job_actions_to_reach(self.level as u8, self.level as u8 + 1)
+    }
+
+    pub fn level_up(&mut self) {
+        self.level += 1;
+        self.actions_done_current_level = 0; // Reset actions after leveling up
+        self.level_up_progress.reset();
+    }
+
+    pub fn increment_actions(&mut self) {
+        self.actions_done_current_level += 1;
+
+        // update level up progress bar
+        self.level_up_progress.set(
+            self.actions_done_current_level as f32 / self.actions_to_next_level() as f32
+        );
+
+        if self.actions_done_current_level as i64 >= self.actions_to_next_level() {
+            self.level_up();
         }
     }
 }
@@ -106,32 +168,26 @@ impl JobType {
 #[derive(Clone, PartialEq)]
 pub struct JobInstance {
     pub instance_id: i32,
-    pub job_type: JobType,
+    pub job_type: JobArchetype,
     pub action_progress: Progress,
-    pub level_up_progress: Progress,
-    pub level: i32,
     pub time_accumulator: f32,
     pub running: bool,
-    pub actions_done: i32,
     pub timeslot_cost: i32,
     pub has_paid_resources: bool,
 }
 
 pub struct JobParameters {
     pub instance_id: i32,
-    pub job_type: JobType,
+    pub job_type: JobArchetype,
 }
 
 impl JobInstance {
     pub fn new(p: JobParameters) -> Self {
         Self {
             instance_id: p.instance_id,
-            level: 1,
             running: false,
             action_progress: Progress{value: 0.0},
-            level_up_progress: Progress{value: 0.0},
             time_accumulator: 0.0,
-            actions_done: 0,
             timeslot_cost: 1,
             job_type: p.job_type,
             has_paid_resources: false,
@@ -175,42 +231,14 @@ impl JobInstance {
             // reset job instance
             self.time_accumulator -= duration;
             self.has_paid_resources = false;
-            self.increment_actions();
 
             vec![
                 self.job_type.get_completion_effect(),
-                Effect::IncrementActionsForSkill {
-                    skill_type: self.job_type.get_skill_type(),
-                    amount: 1,
-                },
+                Effect::IncrementActionsForSkill { skill_type: self.job_type.get_skill_type() },
+                Effect::IncrementActionsForJobType { job_type: self.job_type.clone() },
             ]
         } else {
             vec![]
-        }
-    }
-
-    fn level_up(&mut self) {
-        self.level += 1;
-        self.actions_done = 0;
-        self.level_up_progress.reset();
-    }
-
-    pub fn actions_to_level_up(&self) -> i32 {
-        let base_actions = self.job_type.base_actions_to_level_up();
-        let growth_factor: f32 = 1.5;
-
-        (base_actions as f32 * growth_factor.powi(self.level - 1)) as i32
-    }
-
-    fn increment_actions(&mut self) {
-        self.actions_done += 1;
-
-        self.level_up_progress.set(
-            self.actions_done as f32 / self.actions_to_level_up() as f32
-        );
-
-        if self.actions_done >= self.actions_to_level_up() {
-            self.level_up();
         }
     }
 }
@@ -277,6 +305,9 @@ pub fn build_job_card(
     card_spacing: f32,
 ) -> Vec<UiElement>
 {
+    let skill_instance = state.skill_archetype_instances.get_skill_by_type(&job.job_type.get_skill_type());
+    let job_archetype_instance = state.job_archetype_instances.get_archetype(&job.job_type);
+
     let color_primary = palette::TEXT.get_color();
     let color_secondary = palette::BORDER.get_color();
     let font_size_large = 16.0;
@@ -375,7 +406,6 @@ pub fn build_job_card(
     let skill_progress_bar_width = card_width - card_padding_x - image_width - card_spacing - card_padding_x - right_side_width - card_spacing;
     let skill_progress_bar_height = 10.0;
     let skill_progress_bar_y = image_y;
-    let skill_instance = state.skills.get_skill_by_type(&job.job_type.get_skill_type());
     elements.push(UiElement::ProgressBar {
         x: inner_x,
         y: skill_progress_bar_y,
@@ -393,7 +423,7 @@ pub fn build_job_card(
         y: skill_progress_bar_y + skill_progress_bar_height + 8.0,
         width: skill_progress_bar_width,
         height: skill_progress_bar_height,
-        progress: job.level_up_progress.get(),
+        progress: job_archetype_instance.level_up_progress.get(),
         background_color: palette::BAR_BACKGROUND.get_color(),
         foreground_color: palette::PRODUCT_COLOR.get_color(),
         with_border: true,
@@ -500,7 +530,7 @@ pub fn build_job_card(
 
     // Job Type and Level
     elements.push(UiElement::Text {
-        content: format!("{} Lv. {}", job.job_type.get_name(), job.level),
+        content: format!("{} Lv. {}", job.job_type.get_name(), job_archetype_instance.level),
         font: assets.fonts.text.clone(),
         x: offset.x + card_padding_x,
         y: offset.y + card_padding_y + 36.,
@@ -561,4 +591,34 @@ pub fn build_job_card(
     });
 
     elements
+}
+
+pub struct JobArchetypeInstances {
+    pub instances: Vec<JobArchetypeInstance>,
+}
+
+impl JobArchetypeInstances {
+    pub fn new() -> Self {
+        Self {
+            instances: vec![
+                JobArchetypeInstance::new(JobArchetype::LumberingWood),
+                JobArchetypeInstance::new(JobArchetype::MiningIron),
+                JobArchetypeInstance::new(JobArchetype::HerbalismCamomille),
+                JobArchetypeInstance::new(JobArchetype::HuntingDeer),
+                JobArchetypeInstance::new(JobArchetype::Foraging),
+                JobArchetypeInstance::new(JobArchetype::WoodworkingPlanks),
+                JobArchetypeInstance::new(JobArchetype::SmithingIronBar),
+                JobArchetypeInstance::new(JobArchetype::CookingSandwich),
+                JobArchetypeInstance::new(JobArchetype::AlchemyManaPotion),
+            ],
+        }
+    }
+
+    pub fn get_archetype(&self, job_type: &JobArchetype) -> &JobArchetypeInstance {
+        self.instances.iter().find(|i| i.job_type == *job_type).unwrap()
+    }
+
+    pub fn get_archetype_mut(&mut self, job_type: &JobArchetype) -> &mut JobArchetypeInstance {
+        self.instances.iter_mut().find(|i| i.job_type == *job_type).unwrap()
+    }
 }

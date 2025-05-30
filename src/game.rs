@@ -1,7 +1,7 @@
 use crate::assets::AssetId::*;
 use crate::assets::{AssetId, Assets};
-use crate::job::{JobInstance, JobParameters, JobType};
-use crate::skill::{SkillType, Skills};
+use crate::job::{JobInstance, JobParameters, JobArchetype, JobArchetypeInstance, JobArchetypeInstances};
+use crate::skill::{SkillArchetype, SkillArchetypeInstances};
 use macroquad::color::Color;
 use macroquad::input::MouseButton;
 use macroquad::math::Vec2;
@@ -55,7 +55,8 @@ impl GameMeta {
 }
 
 pub struct GameState {
-    pub skills: Skills,
+    pub skill_archetype_instances: SkillArchetypeInstances,
+    pub job_archetype_instances: JobArchetypeInstances,
     pub jobs: Vec<JobInstance>,
     pub time_slots: TimeSlots,
     pub performance_flags: PerformanceFlags,
@@ -67,7 +68,8 @@ pub struct GameState {
 impl GameState {
     pub fn new() -> Self {
         Self {
-            skills: Skills::new(),
+            skill_archetype_instances: SkillArchetypeInstances::new(),
+            job_archetype_instances: JobArchetypeInstances::new(),
             jobs: vec![],
             time_slots: TimeSlots { total: 9, used: 0, },
             performance_flags: PerformanceFlags::new(),
@@ -77,7 +79,7 @@ impl GameState {
         }
     }
 
-    pub fn add_job_instance(&mut self, job_type: JobType) {
+    pub fn add_job_instance(&mut self, job_type: JobArchetype) {
         self.jobs.push(
             JobInstance::new(JobParameters {
                 instance_id: self.jobs.iter().map(|j| j.instance_id).max().unwrap_or(0) + 1,
@@ -143,8 +145,11 @@ impl GameState {
                         Effect::AddItem { item, amount } => {
                             self.inventory.add_item(*item, *amount);
                         }
-                        Effect::IncrementActionsForSkill { skill_type, amount } => {
-                            self.skills.get_skill_by_type_mut(skill_type).increment_actions(*amount);
+                        Effect::IncrementActionsForSkill { skill_type } => {
+                            self.skill_archetype_instances.get_skill_by_type_mut(skill_type).increment_actions();
+                        }
+                        Effect::IncrementActionsForJobType { job_type } => {
+                            self.job_archetype_instances.get_archetype_mut(job_type).increment_actions();
                         }
                     }
 
@@ -227,7 +232,8 @@ pub struct JobBaseValues {
 #[derive(Clone, PartialEq)]
 pub enum Effect {
     AddItem { item: Item, amount: i64 },
-    IncrementActionsForSkill { skill_type: SkillType, amount: i32 },
+    IncrementActionsForSkill { skill_type: SkillArchetype },
+    IncrementActionsForJobType { job_type: JobArchetype },
 }
 
 pub enum EffectWithSource {
