@@ -110,9 +110,7 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
 
             if *border_style == BorderStyle::Dotted {
                 let strength = BORDER_STRENGTH;
-                draw_line(*x, *y, *x + *width / 4.0, *y, strength, palette::BORDER.get_color());
-                draw_line(*x + *width / 2.0, *y, *x + *width * 3.0 / 4.0, *y, strength, palette::BORDER.get_color());
-
+                draw_dotted_rectangle(*x + strength / 2.0, *y + strength / 2.0, *width - strength, *height - strength, palette::BORDER.get_color(), strength, 10);
             }
         }
         UiElement::Circle { x, y, radius, color } => {
@@ -208,4 +206,29 @@ pub fn pill(x: f32, y: f32, w: f32, h: f32, text: &str, text_color: Option<Color
     });
 
     elements
+}
+
+fn draw_dotted_line(x1: f32, y1: f32, x2: f32, y2: f32, color: Color, strength: f32, segments: u8) {
+    let dx = (x2 - x1) / segments as f32;
+    let dy = (y2 - y1) / segments as f32;
+
+    for i in 0..segments {
+        if i % 2 == 0 {
+            draw_line(
+                x1 + i as f32 * dx,
+                y1 + i as f32 * dy,
+                x1 + (i + 1) as f32 * dx,
+                y1 + (i + 1) as f32 * dy,
+                strength,
+                color,
+            );
+        }
+    }
+}
+
+fn draw_dotted_rectangle(x: f32, y: f32, width: f32, height: f32, color: Color, strength: f32, segments: u8) {
+    draw_dotted_line(x, y, x + width, y, color, strength, segments);
+    draw_dotted_line(x + width, y, x + width, y + height, color, strength, segments);
+    draw_dotted_line(x + width, y + height, x, y + height, color, strength, segments);
+    draw_dotted_line(x, y + height, x, y, color, strength, segments);
 }
