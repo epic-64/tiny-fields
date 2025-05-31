@@ -1,3 +1,5 @@
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
 use crate::game::Progress;
 
 pub fn skill_cumulative_actions_to_level(level: u8) -> i64 {
@@ -27,7 +29,7 @@ pub enum SkillCategory {
     Selling,
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(EnumIter, Clone, PartialEq)]
 pub enum SkillArchetype {
     // Gathering Skills
     Lumbering,
@@ -138,94 +140,26 @@ impl SkillArchetypeInstance {
     }
 }
 
-pub struct GatheringSkills {
-    pub lumbering: SkillArchetypeInstance,
-    pub mining: SkillArchetypeInstance,
-    pub fishing: SkillArchetypeInstance,
-    pub hunting: SkillArchetypeInstance,
-    pub foraging: SkillArchetypeInstance,
-    pub herbalism: SkillArchetypeInstance,
-    pub thieving: SkillArchetypeInstance,
-}
-
-impl GatheringSkills {
-    pub fn new() -> Self {
-        Self {
-            lumbering: SkillArchetypeInstance::new(SkillArchetype::Lumbering),
-            mining: SkillArchetypeInstance::new(SkillArchetype::Mining),
-            fishing: SkillArchetypeInstance::new(SkillArchetype::Fishing),
-            hunting: SkillArchetypeInstance::new(SkillArchetype::Hunting),
-            foraging: SkillArchetypeInstance::new(SkillArchetype::Foraging),
-            herbalism: SkillArchetypeInstance::new(SkillArchetype::Herbalism),
-            thieving: SkillArchetypeInstance::new(SkillArchetype::Thieving),
-        }
-    }
-}
-
-pub struct CraftingSkills {
-    pub woodworking: SkillArchetypeInstance,
-    pub smithing: SkillArchetypeInstance,
-    pub tailoring: SkillArchetypeInstance,
-    pub alchemy: SkillArchetypeInstance,
-    pub cooking: SkillArchetypeInstance,
-}
-
-impl CraftingSkills {
-    pub fn new() -> Self {
-        Self {
-            woodworking: SkillArchetypeInstance::new(SkillArchetype::Woodworking),
-            smithing: SkillArchetypeInstance::new(SkillArchetype::Smithing),
-            tailoring: SkillArchetypeInstance::new(SkillArchetype::Tailoring),
-            alchemy: SkillArchetypeInstance::new(SkillArchetype::Alchemy),
-            cooking: SkillArchetypeInstance::new(SkillArchetype::Cooking),
-        }
-    }
-}
-
 pub struct SkillArchetypeInstances {
-    pub gathering: GatheringSkills,
-    pub crafting: CraftingSkills,
+    pub instances: Vec<SkillArchetypeInstance>,
 }
 
 impl SkillArchetypeInstances {
     pub fn new() -> Self {
         Self {
-            gathering: GatheringSkills::new(),
-            crafting: CraftingSkills::new(),
+            instances: SkillArchetype::iter()
+                .map(SkillArchetypeInstance::new)
+                .collect(),
         }
     }
 
     pub fn get_skill_by_type_mut(&mut self, skill_type: &SkillArchetype) -> &mut SkillArchetypeInstance {
-        match skill_type {
-            SkillArchetype::Lumbering => &mut self.gathering.lumbering,
-            SkillArchetype::Mining => &mut self.gathering.mining,
-            SkillArchetype::Fishing => &mut self.gathering.fishing,
-            SkillArchetype::Hunting => &mut self.gathering.hunting,
-            SkillArchetype::Foraging => &mut self.gathering.foraging,
-            SkillArchetype::Herbalism => &mut self.gathering.herbalism,
-            SkillArchetype::Thieving => &mut self.gathering.thieving,
-            SkillArchetype::Woodworking => &mut self.crafting.woodworking,
-            SkillArchetype::Smithing => &mut self.crafting.smithing,
-            SkillArchetype::Tailoring => &mut self.crafting.tailoring,
-            SkillArchetype::Alchemy => &mut self.crafting.alchemy,
-            SkillArchetype::Cooking => &mut self.crafting.cooking,
-        }
+        self.instances.iter_mut().find(|s| s.skill_type == *skill_type)
+            .expect("Skill type not found in instances")
     }
     
     pub fn get_skill_by_type(&self, skill_type: &SkillArchetype) -> &SkillArchetypeInstance {
-        match skill_type {
-            SkillArchetype::Lumbering => &self.gathering.lumbering,
-            SkillArchetype::Mining => &self.gathering.mining,
-            SkillArchetype::Fishing => &self.gathering.fishing,
-            SkillArchetype::Hunting => &self.gathering.hunting,
-            SkillArchetype::Foraging => &self.gathering.foraging,
-            SkillArchetype::Herbalism => &self.gathering.herbalism,
-            SkillArchetype::Thieving => &self.gathering.thieving,
-            SkillArchetype::Woodworking => &self.crafting.woodworking,
-            SkillArchetype::Smithing => &self.crafting.smithing,
-            SkillArchetype::Tailoring => &self.crafting.tailoring,
-            SkillArchetype::Alchemy => &self.crafting.alchemy,
-            SkillArchetype::Cooking => &self.crafting.cooking,
-        }
+        self.instances.iter().find(|s| s.skill_type == *skill_type)
+            .expect("Skill type not found in instances")
     }
 }
