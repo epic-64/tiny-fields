@@ -1,6 +1,6 @@
 use crate::assets::AssetId::{AlchemyAnim1, AlchemyAnim2, CookingAnim1, CookingAnim2, HerbalismAnim1, HerbalismAnim2, Hunting1, Hunting2, Mining1, Mining2, Smithing1, Smithing2, WoodAnim1, WoodAnim2};
 use crate::assets::{AssetId, Assets};
-use crate::draw::{pill, UiElement};
+use crate::draw::{pill, BorderStyle, UiElement};
 use crate::game::{Effect, GameState, Intent, Inventory, Item, Progress, UiRect};
 use crate::palette;
 use crate::palette::PaletteC;
@@ -377,6 +377,7 @@ pub fn build_job_card(
         height: right_side_width,
         color: palette::PRODUCT_COLOR.get_color(),
         bordered: true,
+        border_style: BorderStyle::Solid,
     });
 
     // Draw Product Image
@@ -453,6 +454,7 @@ pub fn build_job_card(
             height: resource_icon_size,
             color: if player_has_enough { palette::IMAGE_BACKGROUND.get_color() } else { PaletteC::Coral.get_color() },
             bordered: true,
+            border_style: BorderStyle::Solid,
         });
 
         // draw resource icon
@@ -471,7 +473,7 @@ pub fn build_job_card(
             elements.extend(
                 pill(
                     resource_x + resource_icon_size / 2.0 - 24.0 / 2.0,
-                    offset.y + card_padding_y + 96.0 - 14.0 / 2.0,
+                    offset.y + card_padding_y + 96.0 - 14.0 / 2.0 - 2.0,
                     24.0,
                     14.0,
                     state.inventory.get_item_amount(required_item).to_string().as_str(),
@@ -486,7 +488,7 @@ pub fn build_job_card(
             elements.extend(
                 pill(
                     resource_x + resource_icon_size / 2.0 - pill_width / 2.0,
-                    offset.y + card_padding_y + 96.0 + resource_icon_size - pill_height / 2.0,
+                    offset.y + card_padding_y + 96.0 + resource_icon_size - pill_height / 2.0 + 2.0,
                     pill_width,
                     pill_height,
                     required_amount.to_string().as_str(),
@@ -508,7 +510,8 @@ pub fn build_job_card(
             width: resource_icon_size,
             height: resource_icon_size,
             color: palette::IMAGE_BACKGROUND.get_color(),
-            bordered: false,
+            bordered: true,
+            border_style: BorderStyle::Dotted,
         });
     }
 
@@ -530,7 +533,13 @@ pub fn build_job_card(
 
     // Job Type and Level
     elements.push(UiElement::Text {
-        content: format!("{} Lv. {}", job.job_archetype.get_name(), job_archetype_instance.level),
+        content: format!(
+            "{} Lv. {} ({} / {})",
+            job.job_archetype.get_name(),
+            job_archetype_instance.level,
+            job_archetype_instance.actions_done_current_level,
+            job_archetype_instance.actions_to_next_level(),
+        ),
         font: assets.fonts.text.clone(),
         x: offset.x + card_padding_x,
         y: offset.y + card_padding_y + 36.,

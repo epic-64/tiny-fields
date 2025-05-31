@@ -10,7 +10,7 @@ pub mod palette;
 pub mod assets;
 pub mod skill;
 
-use crate::draw::{draw, UiElement};
+use crate::draw::{draw, BorderStyle, UiElement};
 use crate::game::{Effect, EffectWithSource, GameState, Intent, MouseInput, TextParticle, UiRect};
 use crate::job::build_job_cards;
 use crate::job::JobArchetype;
@@ -189,7 +189,8 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
             width: icon_size,
             height: icon_size,
             color: palette::BUTTON_BACKGROUND.get_color(),
-            bordered: false
+            bordered: false,
+            border_style: BorderStyle::None,
         });
     }
 
@@ -201,7 +202,8 @@ pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiEl
             width: icon_size - 10.0,
             height: icon_size - 10.0,
             color: palette::PROGRESS_COLOR.get_color(),
-            bordered: false
+            bordered: false,
+            border_style: BorderStyle::None,
         });
     }
 
@@ -276,6 +278,7 @@ pub fn build_inventory_elements(state: &GameState, assets: &Assets, rect: UiRect
         height: rect.h,
         color: palette::CARD_BACKGROUND.get_color(),
         bordered: true,
+        border_style: BorderStyle::Solid,
     });
 
     let inventory = &state.inventory;
@@ -291,6 +294,7 @@ pub fn build_inventory_elements(state: &GameState, assets: &Assets, rect: UiRect
             height: item_size,
             color: palette::IMAGE_BACKGROUND.get_color(),
             bordered: true,
+            border_style: BorderStyle::Solid,
         });
 
         elements.push(UiElement::Text {
