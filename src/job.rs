@@ -7,6 +7,8 @@ use crate::palette::PaletteC;
 use crate::skill::SkillArchetype;
 use macroquad::math::Vec2;
 use macroquad::prelude::Texture2D;
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
 
 pub fn job_cumulative_actions_to_level(level: u8) -> i64 {
     let first_portion = (level - 1) * (level) / 2;
@@ -29,7 +31,7 @@ pub fn job_actions_to_reach(current_level: u8, target_level: u8) -> i64 {
     target_actions - current_actions
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(EnumIter, Clone, PartialEq, Eq)]
 pub enum JobArchetype {
     LumberingWood,
     MiningIron,
@@ -608,19 +610,11 @@ pub struct JobArchetypeInstances {
 
 impl JobArchetypeInstances {
     pub fn new() -> Self {
-        Self {
-            instances: vec![
-                JobArchetypeInstance::new(JobArchetype::LumberingWood),
-                JobArchetypeInstance::new(JobArchetype::MiningIron),
-                JobArchetypeInstance::new(JobArchetype::HerbalismCamomille),
-                JobArchetypeInstance::new(JobArchetype::HuntingDeer),
-                JobArchetypeInstance::new(JobArchetype::Foraging),
-                JobArchetypeInstance::new(JobArchetype::WoodworkingPlanks),
-                JobArchetypeInstance::new(JobArchetype::SmithingIronBar),
-                JobArchetypeInstance::new(JobArchetype::CookingSandwich),
-                JobArchetypeInstance::new(JobArchetype::AlchemyManaPotion),
-            ],
-        }
+        let instances = JobArchetype::iter()
+            .map(JobArchetypeInstance::new)
+            .collect();
+
+        Self { instances }
     }
 
     pub fn get_archetype(&self, job_type: &JobArchetype) -> &JobArchetypeInstance {
