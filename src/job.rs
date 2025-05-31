@@ -611,7 +611,7 @@ pub struct JobArchetypeInstances {
 impl JobArchetypeInstances {
     pub fn new() -> Self {
         let instances = JobArchetype::iter()
-            .map(JobArchetypeInstance::new)
+            .map(|archetype| JobArchetypeInstance::new(archetype))
             .collect();
 
         Self { instances }
