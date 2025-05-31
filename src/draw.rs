@@ -111,8 +111,8 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
             if *border_style == BorderStyle::Dotted {
                 let strength = BORDER_STRENGTH;
                 draw_dotted_rectangle(
-                    *x + strength / 2.0,
-                    *y + strength / 2.0,
+                    (*x + strength / 2.0).round(),
+                    (*y + strength / 2.0).round(),
                     *width - strength,
                     *height - strength,
                     palette::BORDER.get_color(),
