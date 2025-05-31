@@ -2,27 +2,6 @@ use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 use crate::game::Progress;
 
-pub fn skill_cumulative_actions_to_level(level: u8) -> i64 {
-    let first_portion = level * (level + 1) / 2;
-
-    let a = 6.95622e-7;
-    let b = 6.57881;
-    let c = a * (level as f64).powf(b);
-
-    first_portion as i64 + c as i64
-}
-
-pub fn skill_actions_to_reach(current_level: u8, target_level: u8) -> i64 {
-    if target_level <= current_level {
-        return 0;
-    }
-
-    let current_actions = skill_cumulative_actions_to_level(current_level);
-    let target_actions = skill_cumulative_actions_to_level(target_level);
-
-    target_actions - current_actions
-}
-
 pub enum SkillCategory {
     Gathering,
     Crafting,
@@ -116,8 +95,29 @@ impl SkillArchetypeInstance {
         }
     }
 
+    fn actions_to_level(level: u8) -> i64 {
+        let first_portion = level * (level + 1) / 2;
+
+        let a = 6.95622e-7;
+        let b = 6.57881;
+        let c = a * (level as f64).powf(b);
+
+        first_portion as i64 + c as i64
+    }
+
+    fn actions_to_reach(current_level: u8, target_level: u8) -> i64 {
+        if target_level <= current_level {
+            return 0;
+        }
+
+        let current_actions = Self::actions_to_level(current_level);
+        let target_actions = Self::actions_to_level(target_level);
+
+        target_actions - current_actions
+    }
+
     pub fn actions_to_next_level(&self) -> i64 {
-        skill_actions_to_reach(self.level as u8, self.level as u8 + 1)
+        Self::actions_to_reach(self.level as u8, self.level as u8 + 1)
     }
 
     pub fn level_up(&mut self) {

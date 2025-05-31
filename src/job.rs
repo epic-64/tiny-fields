@@ -10,32 +10,11 @@ use macroquad::prelude::Texture2D;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-pub fn job_cumulative_actions_to_level(level: u8) -> i64 {
-    let first_portion = (level - 1) * (level) / 2;
-
-    let a = 6.95622e-9;
-    let b = 6.57881;
-    let c = a * (level as f64).powf(b);
-
-    first_portion as i64 + c as i64
-}
-
-pub fn job_actions_to_reach(current_level: u8, target_level: u8) -> i64 {
-    if target_level <= current_level {
-        return 0;
-    }
-
-    let current_actions = job_cumulative_actions_to_level(current_level);
-    let target_actions = job_cumulative_actions_to_level(target_level);
-
-    target_actions - current_actions
-}
-
 #[derive(EnumIter, Clone, PartialEq, Eq, Hash, Debug, Copy)]
 pub enum JobArchetype {
     LumberingWood,
     MiningIron,
-    HerbalismCamomille,
+    HerbalismChamomile,
     HuntingDeer,
     Foraging,
     WoodworkingPlanks,
@@ -52,14 +31,10 @@ impl JobArchetype {
             JobArchetype::HuntingDeer => (Hunting1.texture(assets), Hunting2.texture(assets)),
             JobArchetype::SmithingIronBar => (Smithing1.texture(assets), Smithing2.texture(assets)),
             JobArchetype::CookingSandwich => (CookingAnim1.texture(assets), CookingAnim2.texture(assets)),
-            JobArchetype::HerbalismCamomille => (HerbalismAnim1.texture(assets), HerbalismAnim2.texture(assets)),
+            JobArchetype::HerbalismChamomile => (HerbalismAnim1.texture(assets), HerbalismAnim2.texture(assets)),
             JobArchetype::AlchemyManaPotion => (AlchemyAnim1.texture(assets), AlchemyAnim2.texture(assets)),
             _ => (WoodAnim1.texture(assets), WoodAnim2.texture(assets)),
         }
-    }
-
-    pub fn base_actions_to_level_up(&self) -> i32 {
-        10
     }
 
     pub fn base_duration(&self) -> f32 {
@@ -74,7 +49,7 @@ impl JobArchetype {
             JobArchetype::MiningIron => "Mining".to_string(),
             JobArchetype::HuntingDeer => "Hunting".to_string(),
             JobArchetype::SmithingIronBar => "Smithing".to_string(),
-            JobArchetype::HerbalismCamomille => "Herbalism".to_string(),
+            JobArchetype::HerbalismChamomile => "Herbalism".to_string(),
             JobArchetype::Foraging => "Foraging".to_string(),
             JobArchetype::WoodworkingPlanks => "Woodworking".to_string(),
             JobArchetype::CookingSandwich => "Cooking".to_string(),
@@ -88,7 +63,7 @@ impl JobArchetype {
             JobArchetype::MiningIron => Item::Iron,
             JobArchetype::HuntingDeer => Item::Meat,
             JobArchetype::SmithingIronBar => Item::IronBar,
-            JobArchetype::HerbalismCamomille => Item::Herb,
+            JobArchetype::HerbalismChamomile => Item::Herb,
             JobArchetype::Foraging    => Item::Berry,
             JobArchetype::WoodworkingPlanks => Item::Wood, // todo: change to correct item
             JobArchetype::CookingSandwich => Item::Sandwich,
@@ -102,7 +77,7 @@ impl JobArchetype {
             JobArchetype::CookingSandwich => vec![(Item::Wood, 4), (Item::Meat, 1), (Item::Herb, 1), (Item::ManaPotion, 1)],
             JobArchetype::HuntingDeer => vec![(Item::Deer, 0)],
             JobArchetype::AlchemyManaPotion => vec![(Item::Herb, 1)],
-            JobArchetype::HerbalismCamomille => vec![(Item::Herb, 0)], // todo: change to correct item
+            JobArchetype::HerbalismChamomile => vec![(Item::Herb, 0)], // todo: change to correct item
             _ => vec![],
         }
     }
@@ -117,7 +92,7 @@ impl JobArchetype {
             JobArchetype::MiningIron => SkillArchetype::Mining,
             JobArchetype::HuntingDeer => SkillArchetype::Hunting,
             JobArchetype::SmithingIronBar => SkillArchetype::Smithing,
-            JobArchetype::HerbalismCamomille => SkillArchetype::Herbalism,
+            JobArchetype::HerbalismChamomile => SkillArchetype::Herbalism,
             JobArchetype::Foraging => SkillArchetype::Foraging,
             JobArchetype::WoodworkingPlanks => SkillArchetype::Woodworking,
             JobArchetype::CookingSandwich => SkillArchetype::Cooking,
@@ -143,8 +118,29 @@ impl JobArchetypeInstance {
         }
     }
 
+    fn actions_cumulative(level: u8) -> i64 {
+        let first_portion = (level - 1) * (level) / 2;
+
+        let a = 6.95622e-9;
+        let b = 6.57881;
+        let c = a * (level as f64).powf(b);
+
+        first_portion as i64 + c as i64
+    }
+
+    fn actions_to_reach(current_level: u8, target_level: u8) -> i64 {
+        if target_level <= current_level {
+            return 0;
+        }
+
+        let current_actions = Self::actions_cumulative(current_level);
+        let target_actions = Self::actions_cumulative(target_level);
+
+        target_actions - current_actions
+    }
+
     pub fn actions_to_next_level(&self) -> i64 {
-        job_actions_to_reach(self.level as u8, self.level as u8 + 1)
+        Self::actions_to_reach(self.level as u8, (self.level + 1) as u8)
     }
 
     pub fn level_up(&mut self) {
@@ -354,7 +350,7 @@ pub fn build_job_card(
 
     let right_side_width = 64.0;
 
-    // Draw HyperMode button on the right
+    // Draw the HyperMode button on the right
     elements.push(UiElement::RectButton {
         rectangle: UiRect {
             x: offset.x + card_width - right_side_width - card_padding_x,

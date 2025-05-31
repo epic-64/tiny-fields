@@ -36,8 +36,8 @@ async fn main() {
     state.add_job_instance(JobArchetype::LumberingWood);
     state.add_job_instance(JobArchetype::LumberingWood);
     state.add_job_instance(JobArchetype::LumberingWood);
-    state.add_job_instance(JobArchetype::HerbalismCamomille);
-    state.add_job_instance(JobArchetype::HerbalismCamomille);
+    state.add_job_instance(JobArchetype::HerbalismChamomile);
+    state.add_job_instance(JobArchetype::HerbalismChamomile);
     state.add_job_instance(JobArchetype::AlchemyManaPotion);
     state.add_job_instance(JobArchetype::HuntingDeer);
     state.add_job_instance(JobArchetype::CookingSandwich);
