@@ -117,7 +117,7 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
                     *height - strength,
                     palette::BORDER.get_color(),
                     strength,
-                    14
+                    14,
                 );
             }
         }
