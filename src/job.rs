@@ -31,7 +31,7 @@ pub fn job_actions_to_reach(current_level: u8, target_level: u8) -> i64 {
     target_actions - current_actions
 }
 
-#[derive(EnumIter, Clone, PartialEq, Eq)]
+#[derive(EnumIter, Clone, PartialEq, Eq, Hash, Debug, Copy)]
 pub enum JobArchetype {
     LumberingWood,
     MiningIron,
