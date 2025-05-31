@@ -30,6 +30,7 @@ async fn main() {
 
     let mut state = GameState::new();
     let mut is_fullscreen = false;
+    let mut show_debug = false;
 
     state.add_job_instance(JobArchetype::LumberingWood);
     state.add_job_instance(JobArchetype::LumberingWood);
@@ -65,6 +66,11 @@ async fn main() {
             }
         }
 
+        // toggle debug mode on F9
+        if is_key_pressed(KeyCode::F9) {
+            show_debug = !show_debug;
+        }
+
         // collect inputs (IO)
         let mouse_input = MouseInput {
             pressed: get_mouse_buttons(is_mouse_button_pressed),
@@ -76,8 +82,18 @@ async fn main() {
 
         // build all ui elements (draw commands)
         let job_elements = build_job_cards(&state, &assets, Vec2::new(25.0, 100.0) + resolution_offset);
-        let debug_elements = build_debug_elements(&state, &assets, UiRect { x: 700.0, y: 25.0, w: 200.0, h: 40.0 });
-        let cheat_buttons = get_cheat_buttons(&assets, UiRect { x: 25.0, y: 25.0, w: 400.0, h: 40.0 });
+        
+        let debug_elements: Vec<UiElement> = if show_debug {
+            build_debug_elements(&state, &assets, UiRect { x: 700.0, y: 25.0, w: 200.0, h: 40.0 })
+        } else {
+            vec![]
+        };
+        
+        let cheat_buttons: Vec<UiElement> = if show_debug {
+            get_cheat_buttons(&assets, UiRect { x: 25.0, y: 25.0, w: 400.0, h: 40.0 })
+        } else {
+            vec![]
+        };
 
         // collect all intents from UI interactions
         let mut all_intents: Vec<Intent> = vec![];
