@@ -110,7 +110,15 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
 
             if *border_style == BorderStyle::Dotted {
                 let strength = BORDER_STRENGTH;
-                draw_dotted_rectangle(*x + strength / 2.0, *y + strength / 2.0, *width - strength, *height - strength, palette::BORDER.get_color(), strength, 10);
+                draw_dotted_rectangle(
+                    *x + strength / 2.0,
+                    *y + strength / 2.0,
+                    *width - strength,
+                    *height - strength,
+                    palette::BORDER.get_color(),
+                    strength,
+                    14
+                );
             }
         }
         UiElement::Circle { x, y, radius, color } => {
@@ -208,21 +216,41 @@ pub fn pill(x: f32, y: f32, w: f32, h: f32, text: &str, text_color: Option<Color
     elements
 }
 
-fn draw_dotted_line(x1: f32, y1: f32, x2: f32, y2: f32, color: Color, strength: f32, segments: u8) {
+fn draw_dotted_line(
+    x1: f32,
+    y1: f32,
+    x2: f32,
+    y2: f32,
+    color: Color,
+    strength: f32,
+    segments: u8,
+) {
     let dx = (x2 - x1) / segments as f32;
     let dy = (y2 - y1) / segments as f32;
 
-    for i in 0..segments {
-        if i % 2 == 0 {
+    let draw_len = 2; // draw 2 segments
+    let gap_len = 1;  // skip 1 segment
+    let pattern_len = draw_len + gap_len;
+
+    let mut i = 0;
+    while i < segments {
+        // draw for `draw_len` segments, if there's enough remaining
+        for j in 0..draw_len {
+            if i + j >= segments {
+                break;
+            }
+
             draw_line(
-                x1 + i as f32 * dx,
-                y1 + i as f32 * dy,
-                x1 + (i + 1) as f32 * dx,
-                y1 + (i + 1) as f32 * dy,
+                x1 + (i + j) as f32 * dx,
+                y1 + (i + j) as f32 * dy,
+                x1 + (i + j + 1) as f32 * dx,
+                y1 + (i + j + 1) as f32 * dy,
                 strength,
                 color,
             );
         }
+
+        i += pattern_len;
     }
 }
 
