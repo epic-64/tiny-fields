@@ -9,6 +9,7 @@ pub mod ui;
 pub mod palette;
 pub mod assets;
 pub mod skill;
+pub mod counts_actions;
 
 use crate::draw::{draw, BorderStyle, UiElement};
 use crate::game::{GameState, Intent, MouseInput, UiRect};

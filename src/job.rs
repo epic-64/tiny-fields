@@ -9,6 +9,7 @@ use macroquad::math::Vec2;
 use macroquad::prelude::Texture2D;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
+use crate::counts_actions::CountsActions;
 
 #[derive(EnumIter, Clone, PartialEq, Eq, Hash, Debug, Copy)]
 pub enum JobArchetype {
@@ -103,63 +104,29 @@ impl JobArchetype {
 
 pub struct JobArchetypeInstance {
     pub job_archetype: JobArchetype,
-    pub level: i32,
-    pub actions_done_current_level: i64,
-    pub level_up_progress: Progress,
+    pub action_counter: CountsActions,
 }
 
 impl JobArchetypeInstance {
     pub fn new(job_archetype: JobArchetype) -> Self {
         Self {
             job_archetype,
-            level: 1,
-            actions_done_current_level: 0,
-            level_up_progress: Progress::new(),
+            action_counter: CountsActions::new(Self::actions_cumulative),
         }
     }
 
-    fn actions_cumulative(level: i32) -> i64 {
+    fn actions_cumulative(level: i64) -> i64 {
         let first_portion = (level - 1) * (level) / 2;
 
         let a = 6.95622e-9;
         let b = 6.57881;
         let c = a * (level as f64).powf(b);
 
-        first_portion as i64 + c as i64
-    }
-
-    fn actions_to_reach(current_level: i32, target_level: i32) -> i64 {
-        if target_level <= current_level {
-            return 0;
-        }
-
-        let current_actions = Self::actions_cumulative(current_level);
-        let target_actions = Self::actions_cumulative(target_level);
-
-        target_actions - current_actions
-    }
-
-    pub fn actions_to_next_level(&self) -> i64 {
-        Self::actions_to_reach(self.level, self.level + 1)
-    }
-
-    pub fn level_up(&mut self) {
-        self.level += 1;
-        self.actions_done_current_level = 0; // Reset actions after leveling up
-        self.level_up_progress.reset();
+        first_portion + c as i64
     }
 
     pub fn increment_actions(&mut self) {
-        self.actions_done_current_level += 1;
-
-        // update level up progress bar
-        self.level_up_progress.set(
-            self.actions_done_current_level as f64 / self.actions_to_next_level() as f64
-        );
-
-        if self.actions_done_current_level as f64 >= self.actions_to_next_level() as f64 {
-            self.level_up();
-        }
+        self.action_counter.increment_actions()
     }
 }
 
@@ -419,7 +386,7 @@ pub fn build_job_card(
         y: skill_progress_bar_y,
         width: skill_progress_bar_width,
         height: skill_progress_bar_height,
-        progress: skill_instance.level_up_progress.get(),
+        progress: skill_instance.actions_counter.level_up_progress.get(),
         background_color: palette::BAR_BACKGROUND.get_color(),
         foreground_color: palette::SKILL_COLOR.get_color(),
         with_border: true,
@@ -431,7 +398,7 @@ pub fn build_job_card(
         y: skill_progress_bar_y + skill_progress_bar_height + 8.0,
         width: skill_progress_bar_width,
         height: skill_progress_bar_height,
-        progress: job_archetype_instance.level_up_progress.get(),
+        progress: job_archetype_instance.action_counter.level_up_progress.get(),
         background_color: palette::BAR_BACKGROUND.get_color(),
         foreground_color: palette::PRODUCT_COLOR.get_color(),
         with_border: true,
@@ -525,9 +492,9 @@ pub fn build_job_card(
         content: format!(
             "{} Lv. {} ({} / {})",
             skill_instance.skill_type.as_str(),
-            skill_instance.level.to_string(),
-            skill_instance.actions_done_current_level,
-            skill_instance.actions_to_next_level(),
+            skill_instance.actions_counter.level.to_string(),
+            skill_instance.actions_counter.actions_done_current_level,
+            skill_instance.actions_counter.actions_to_next_level(),
         ),
         font: assets.fonts.text_bold.clone(),
         x: offset.x + card_padding_x,
@@ -541,9 +508,9 @@ pub fn build_job_card(
         content: format!(
             "{} Lv. {} ({} / {})",
             job.job_archetype.get_name(),
-            job_archetype_instance.level,
-            job_archetype_instance.actions_done_current_level,
-            job_archetype_instance.actions_to_next_level(),
+            job_archetype_instance.action_counter.level,
+            job_archetype_instance.action_counter.actions_done_current_level,
+            job_archetype_instance.action_counter.actions_to_next_level(),
         ),
         font: assets.fonts.text.clone(),
         x: offset.x + card_padding_x,

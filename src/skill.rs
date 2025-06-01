@@ -1,6 +1,7 @@
 use crate::game::Progress;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
+use crate::counts_actions::CountsActions;
 
 pub enum SkillCategory {
     Gathering,
@@ -80,18 +81,16 @@ impl SkillArchetype {
 
 pub struct SkillArchetypeInstance {
     pub skill_type: SkillArchetype,
-    pub actions_done_current_level: i64,
-    pub level: i64,
-    pub level_up_progress: Progress,
+    pub actions_counter: CountsActions,
 }
 
 impl SkillArchetypeInstance {
     pub fn new(skill_type: SkillArchetype) -> Self {
+        let rate = |level: i64| Self::actions_to_level(level);
+
         Self {
             skill_type,
-            level: 1,
-            actions_done_current_level: 0,
-            level_up_progress: Progress::new(),
+            actions_counter: CountsActions::new(rate),
         }
     }
 
@@ -105,38 +104,8 @@ impl SkillArchetypeInstance {
         first_portion + c as i64
     }
 
-    fn actions_to_reach(current_level: i64, target_level: i64) -> i64 {
-        if target_level <= current_level {
-            return 0;
-        }
-
-        let current_actions = Self::actions_to_level(current_level);
-        let target_actions = Self::actions_to_level(target_level);
-
-        target_actions - current_actions
-    }
-
-    pub fn actions_to_next_level(&self) -> i64 {
-        Self::actions_to_reach(self.level, self.level + 1)
-    }
-
-    pub fn level_up(&mut self) {
-        self.level += 1;
-        self.actions_done_current_level = 0; // Reset actions after leveling up
-        self.level_up_progress.reset();
-    }
-
     pub fn increment_actions(&mut self) {
-        self.actions_done_current_level += 1;
-
-        // update level up progress bar
-        self.level_up_progress.set(
-            self.actions_done_current_level as f64 / self.actions_to_next_level() as f64
-        );
-
-        if self.actions_done_current_level as f64 >= self.actions_to_next_level() as f64 {
-            self.level_up();
-        }
+        self.actions_counter.increment_actions();
     }
 }
 
