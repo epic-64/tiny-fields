@@ -1,5 +1,6 @@
 use crate::assets::AssetId::{AlchemyAnim1, AlchemyAnim2, CookingAnim1, CookingAnim2, HerbalismAnim1, HerbalismAnim2, Hunting1, Hunting2, Mining1, Mining2, Smithing1, Smithing2, WoodAnim1, WoodAnim2};
 use crate::assets::{AssetId, Assets};
+use crate::counts_actions::CountsActions;
 use crate::draw::{pill, BorderStyle, UiElement};
 use crate::game::{Effect, GameState, Intent, Inventory, Item, Progress, UiRect};
 use crate::palette;
@@ -9,7 +10,6 @@ use macroquad::math::Vec2;
 use macroquad::prelude::Texture2D;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
-use crate::counts_actions::CountsActions;
 
 #[derive(EnumIter, Clone, PartialEq, Eq, Hash, Debug, Copy)]
 pub enum JobArchetype {
