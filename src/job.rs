@@ -231,7 +231,7 @@ impl JobInstance {
             self.has_paid_resources = false;
 
             vec![
-                self.job_archetype.get_completion_effect(),
+                Effect::AddItem { item: self.job_archetype.get_product(), amount: 1 },
                 Effect::IncrementActionsForSkill { skill_type: self.job_archetype.get_skill_type() },
                 Effect::IncrementActionsForJobType { job_type: self.job_archetype.clone() },
             ]
@@ -260,7 +260,7 @@ pub fn build_job_cards(state: &GameState, assets: &Assets, offset: Vec2) -> Vec<
     let card_padding_y = 12.0;
 
     for (id, job) in state.jobs.iter().enumerate() {
-        let job_draw_container = build_job_card(
+        let job_card = build_job_card(
             state,
             &None, // No clipping for the job cards
             assets,
@@ -274,7 +274,7 @@ pub fn build_job_cards(state: &GameState, assets: &Assets, offset: Vec2) -> Vec<
             card_spacing_inner,
         );
 
-        elements.extend(job_draw_container);
+        elements.extend(job_card);
 
         if (id + 1) % 3 == 0 && id != 0 {
             offset_x = offset.x; // Reset horizontal offset for the new row
@@ -374,7 +374,6 @@ pub fn build_job_card(
         width: right_side_width,
         height: right_side_width,
         color: palette::PRODUCT_COLOR.get_color(),
-        bordered: true,
         border_style: BorderStyle::Solid,
     });
 
@@ -451,7 +450,6 @@ pub fn build_job_card(
             width: resource_icon_size,
             height: resource_icon_size,
             color: if player_has_enough { palette::IMAGE_BACKGROUND.get_color() } else { PaletteC::Coral.get_color() },
-            bordered: true,
             border_style: BorderStyle::Solid,
         });
 
@@ -508,7 +506,6 @@ pub fn build_job_card(
             width: resource_icon_size,
             height: resource_icon_size,
             color: palette::IMAGE_BACKGROUND.get_color(),
-            bordered: true,
             border_style: BorderStyle::Dotted,
         });
     }

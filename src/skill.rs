@@ -1,6 +1,6 @@
+use crate::game::Progress;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
-use crate::game::Progress;
 
 pub enum SkillCategory {
     Gathering,

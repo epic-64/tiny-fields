@@ -11,7 +11,7 @@ pub mod assets;
 pub mod skill;
 
 use crate::draw::{draw, BorderStyle, UiElement};
-use crate::game::{Effect, EffectWithSource, GameState, Intent, MouseInput, TextParticle, UiRect};
+use crate::game::{GameState, Intent, MouseInput, UiRect};
 use crate::job::build_job_cards;
 use crate::job::JobArchetype;
 
@@ -192,57 +192,6 @@ pub fn get_intents(elements: &Vec<UiElement>, mouse_input: &MouseInput) -> Vec<I
     intents
 }
 
-pub fn get_top_hud(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiElement> {
-    let mut elements = vec![];
-
-    let icon_size = 60.0;
-
-    // Draw Rectangle for each Time Slot (used and free)
-    for i in 0..state.time_slots.total {
-        elements.push(UiElement::Rectangle {
-            x: rect.x + i as f32 * (icon_size + 5.0),
-            y: rect.y,
-            width: icon_size,
-            height: icon_size,
-            color: palette::BUTTON_BACKGROUND.get_color(),
-            bordered: false,
-            border_style: BorderStyle::None,
-        });
-    }
-
-    // Draw a smaller green rectangle for each used time slot
-    for i in 0..state.time_slots.used {
-        elements.push(UiElement::Rectangle {
-            x: rect.x + i as f32 * (icon_size + 5.0) + 5.0,
-            y: rect.y + 5.0,
-            width: icon_size - 10.0,
-            height: icon_size - 10.0,
-            color: palette::PROGRESS_COLOR.get_color(),
-            bordered: false,
-            border_style: BorderStyle::None,
-        });
-    }
-
-    // Button for buying time slots
-    elements.push(UiElement::RectButton {
-        rectangle: UiRect {
-            x: rect.x + state.time_slots.total as f32 * (icon_size + 5.0) + 5.0,
-            y: rect.y,
-            w: 120.0,
-            h: icon_size,
-        },
-        font: assets.fonts.mono.clone(),
-        intent: Intent::BuyTimeSlot,
-        text: format!("Buy ({})", state.time_slots.get_upgrade_cost()),
-        font_size: 14.0,
-        background_color: palette::BUTTON_BACKGROUND.get_color(),
-        text_color: palette::BUTTON_TEXT.get_color(),
-        parent_clip: None,
-    });
-
-    elements
-}
-
 pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
     let mut elements = vec![];
 
@@ -293,7 +242,6 @@ pub fn build_inventory_elements(state: &GameState, assets: &Assets, rect: UiRect
         width: rect.w,
         height: rect.h,
         color: palette::CARD_BACKGROUND.get_color(),
-        bordered: true,
         border_style: BorderStyle::Solid,
     });
 
@@ -309,7 +257,6 @@ pub fn build_inventory_elements(state: &GameState, assets: &Assets, rect: UiRect
             width: item_size,
             height: item_size,
             color: palette::IMAGE_BACKGROUND.get_color(),
-            bordered: true,
             border_style: BorderStyle::Solid,
         });
 

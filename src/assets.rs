@@ -1,9 +1,9 @@
 use futures::future::join_all;
+use futures::join;
 use macroquad::prelude::{Font, Texture2D};
 use macroquad::text::load_ttf_font;
 use macroquad::texture::load_texture;
 use std::collections::HashMap;
-use futures::join;
 
 pub struct Fonts {
     pub mono: Font,
@@ -91,9 +91,9 @@ pub async fn load_textures() -> HashMap<AssetId, Texture2D> {
     paths
         .into_iter()
         .zip(results)
-        .map(|((assetId, _), res)| {
+        .map(|((asset_id, _), res)| {
             let texture = res.expect("Failed to load asset");
-            (assetId, texture)
+            (asset_id, texture)
         })
         .collect()
 }

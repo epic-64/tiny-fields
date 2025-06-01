@@ -1,9 +1,9 @@
 use crate::game::{Intent, MouseInput, UiRect};
 use crate::palette;
-use macroquad::color::{Color, SKYBLUE, WHITE};
+use macroquad::color::{Color, WHITE};
 use macroquad::math::Vec2;
 use macroquad::prelude::{draw_rectangle, draw_text_ex, draw_texture_ex, get_internal_gl, measure_text, DrawTextureParams, QuadGl, Texture2D};
-use macroquad::shapes::{draw_circle, draw_line, draw_rectangle_lines, draw_rectangle_lines_ex};
+use macroquad::shapes::{draw_circle, draw_line, draw_rectangle_lines};
 use macroquad::text::{Font, TextParams};
 
 const BORDER_STRENGTH: f32 = 2.0;
@@ -52,7 +52,7 @@ pub enum UiElement {
         with_border: bool,
     },
     Circle { x: f32, y: f32, radius: f32, color: Color },
-    Rectangle { x: f32, y: f32, width: f32, height: f32, color: Color, bordered: bool, border_style: BorderStyle },
+    Rectangle { x: f32, y: f32, width: f32, height: f32, color: Color, border_style: BorderStyle },
     Image { x: f32, y: f32, width: f32, height: f32, texture: Texture2D, color: Color },
     Scissor { clip: Option<(i32, i32, i32, i32)> },
 }
@@ -100,25 +100,27 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
                 draw_rectangle_lines(*x, *y, *width, *height, strength * 2.0, palette::BORDER.get_color());
             }
         }
-        UiElement::Rectangle { x, y, width, height, color, bordered, border_style } => {
+        UiElement::Rectangle { x, y, width, height, color, border_style } => {
             draw_rectangle(*x, *y, *width, *height, *color);
 
-            if *border_style == BorderStyle::Solid {
-                let strength = BORDER_STRENGTH;
-                draw_rectangle_lines(*x, *y, *width, *height, strength * 2.0, palette::BORDER.get_color());
-            }
-
-            if *border_style == BorderStyle::Dotted {
-                let strength = BORDER_STRENGTH;
-                draw_dotted_rectangle(
-                    (*x + strength / 2.0).round(),
-                    (*y + strength / 2.0).round(),
-                    *width - strength,
-                    *height - strength,
-                    palette::BORDER.get_color(),
-                    strength,
-                    14,
-                );
+            match border_style {
+                BorderStyle::None => {}
+                BorderStyle::Solid => {
+                    let strength = BORDER_STRENGTH;
+                    draw_rectangle_lines(*x, *y, *width, *height, strength * 2.0, palette::BORDER.get_color());
+                }
+                BorderStyle::Dotted => {
+                    let strength = BORDER_STRENGTH;
+                    draw_dotted_rectangle(
+                        (*x + strength / 2.0).round(),
+                        (*y + strength / 2.0).round(),
+                        *width - strength,
+                        *height - strength,
+                        palette::BORDER.get_color(),
+                        strength,
+                        14,
+                    );
+                }
             }
         }
         UiElement::Circle { x, y, radius, color } => {
@@ -188,7 +190,6 @@ pub fn pill(x: f32, y: f32, w: f32, h: f32, text: &str, text_color: Option<Color
         width: w,
         height: h,
         color: palette::PILL_COLOR.get_color(),
-        bordered: false,
         border_style: BorderStyle::None,
     });
 

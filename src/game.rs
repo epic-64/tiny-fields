@@ -1,6 +1,6 @@
 use crate::assets::AssetId::*;
-use crate::assets::{AssetId, Assets};
-use crate::job::{JobInstance, JobParameters, JobArchetype, JobArchetypeInstance, JobArchetypeInstances};
+use crate::assets::Assets;
+use crate::job::{JobArchetype, JobArchetypeInstances, JobInstance, JobParameters};
 use crate::skill::{SkillArchetype, SkillArchetypeInstances};
 use macroquad::color::Color;
 use macroquad::input::MouseButton;
