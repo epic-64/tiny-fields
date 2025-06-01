@@ -80,8 +80,8 @@ impl SkillArchetype {
 
 pub struct SkillArchetypeInstance {
     pub skill_type: SkillArchetype,
-    pub actions_done_current_level: i32,
-    pub level: u32,
+    pub actions_done_current_level: i64,
+    pub level: i64,
     pub level_up_progress: Progress,
 }
 
@@ -95,17 +95,17 @@ impl SkillArchetypeInstance {
         }
     }
 
-    fn actions_to_level(level: u8) -> i64 {
+    fn actions_to_level(level: i64) -> i64 {
         let first_portion = level * (level + 1) / 2;
 
         let a = 6.95622e-7;
         let b = 6.57881;
         let c = a * (level as f64).powf(b);
 
-        first_portion as i64 + c as i64
+        first_portion + c as i64
     }
 
-    fn actions_to_reach(current_level: u8, target_level: u8) -> i64 {
+    fn actions_to_reach(current_level: i64, target_level: i64) -> i64 {
         if target_level <= current_level {
             return 0;
         }
@@ -117,7 +117,7 @@ impl SkillArchetypeInstance {
     }
 
     pub fn actions_to_next_level(&self) -> i64 {
-        Self::actions_to_reach(self.level as u8, self.level as u8 + 1)
+        Self::actions_to_reach(self.level, self.level + 1)
     }
 
     pub fn level_up(&mut self) {
@@ -131,10 +131,10 @@ impl SkillArchetypeInstance {
 
         // update level up progress bar
         self.level_up_progress.set(
-            self.actions_done_current_level as f32 / self.actions_to_next_level() as f32
+            self.actions_done_current_level as f64 / self.actions_to_next_level() as f64
         );
 
-        if self.actions_done_current_level as i64 >= self.actions_to_next_level() {
+        if self.actions_done_current_level as f64 >= self.actions_to_next_level() as f64 {
             self.level_up();
         }
     }

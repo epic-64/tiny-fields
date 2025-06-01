@@ -195,18 +195,24 @@ pub fn get_intents(elements: &Vec<UiElement>, mouse_input: &MouseInput) -> Vec<I
 pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
     let mut elements = vec![];
 
+
+    let button_width = 120.0;
+    let button_height = 40.0;
+    let button_spacing = 10.0;
+    let font_size = 14.0;
+
     // Button for skipping 5 minutes
     elements.push(UiElement::RectButton {
         rectangle: UiRect {
             x: rect.x,
             y: rect.y,
-            w: 200.0,
-            h: 40.0,
+            w: button_width,
+            h: button_height,
         },
         font: assets.fonts.mono.clone(),
         intent: Intent::SkipSeconds(300),
         text: "Skip 5 min".to_string(),
-        font_size: 14.0,
+        font_size: font_size,
         background_color: palette::BUTTON_BACKGROUND.get_color(),
         text_color: palette::BUTTON_TEXT.get_color(),
         parent_clip: None,
@@ -215,15 +221,32 @@ pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
     // Button for skipping 1 week
     elements.push(UiElement::RectButton {
         rectangle: UiRect {
-            x: rect.x + 210.0,
+            x: rect.x + button_width + button_spacing,
             y: rect.y,
-            w: 200.0,
-            h: 40.0,
+            w: button_width,
+            h: button_height,
         },
         font: assets.fonts.mono.clone(),
         intent: Intent::SkipSeconds(604_800),
         text: "Skip 1 week".to_string(),
-        font_size: 14.0,
+        font_size: font_size,
+        background_color: palette::BUTTON_BACKGROUND.get_color(),
+        text_color: palette::BUTTON_TEXT.get_color(),
+        parent_clip: None,
+    });
+
+    // Button for skipping 1 month
+    elements.push(UiElement::RectButton {
+        rectangle: UiRect {
+            x: rect.x + 2.0 * (button_width + button_spacing),
+            y: rect.y,
+            w: button_width,
+            h: button_height,
+        },
+        font: assets.fonts.mono.clone(),
+        intent: Intent::SkipSeconds(60 * 60 * 24 * 30), // 1 month in seconds
+        text: "Skip 1 month".to_string(),
+        font_size: font_size,
         background_color: palette::BUTTON_BACKGROUND.get_color(),
         text_color: palette::BUTTON_TEXT.get_color(),
         parent_clip: None,

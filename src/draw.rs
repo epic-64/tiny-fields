@@ -46,7 +46,7 @@ pub enum UiElement {
         y: f32,
         width: f32,
         height: f32,
-        progress: f32,
+        progress: f64,
         background_color: Color,
         foreground_color: Color,
         with_border: bool,
@@ -93,7 +93,7 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
         }
         UiElement::ProgressBar { x, y, width, height, progress, background_color, foreground_color, with_border } => {
             draw_rectangle(*x, *y, *width, *height, *background_color);
-            draw_rectangle(*x, *y, *width * *progress, *height, *foreground_color);
+            draw_rectangle(*x, *y, *width * *progress as f32, *height, *foreground_color);
 
             if *with_border {
                 let strength = BORDER_STRENGTH;

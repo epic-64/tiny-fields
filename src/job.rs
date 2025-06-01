@@ -37,7 +37,7 @@ impl JobArchetype {
         }
     }
 
-    pub fn base_duration(&self) -> f32 {
+    pub fn base_duration(&self) -> f64 {
         match self {
             _ => 4.0,
         }
@@ -104,7 +104,7 @@ impl JobArchetype {
 pub struct JobArchetypeInstance {
     pub job_archetype: JobArchetype,
     pub level: i32,
-    pub actions_done_current_level: i32,
+    pub actions_done_current_level: i64,
     pub level_up_progress: Progress,
 }
 
@@ -118,7 +118,7 @@ impl JobArchetypeInstance {
         }
     }
 
-    fn actions_cumulative(level: u8) -> i64 {
+    fn actions_cumulative(level: i32) -> i64 {
         let first_portion = (level - 1) * (level) / 2;
 
         let a = 6.95622e-9;
@@ -128,7 +128,7 @@ impl JobArchetypeInstance {
         first_portion as i64 + c as i64
     }
 
-    fn actions_to_reach(current_level: u8, target_level: u8) -> i64 {
+    fn actions_to_reach(current_level: i32, target_level: i32) -> i64 {
         if target_level <= current_level {
             return 0;
         }
@@ -140,7 +140,7 @@ impl JobArchetypeInstance {
     }
 
     pub fn actions_to_next_level(&self) -> i64 {
-        Self::actions_to_reach(self.level as u8, (self.level + 1) as u8)
+        Self::actions_to_reach(self.level, self.level + 1)
     }
 
     pub fn level_up(&mut self) {
@@ -154,10 +154,10 @@ impl JobArchetypeInstance {
 
         // update level up progress bar
         self.level_up_progress.set(
-            self.actions_done_current_level as f32 / self.actions_to_next_level() as f32
+            self.actions_done_current_level as f64 / self.actions_to_next_level() as f64
         );
 
-        if self.actions_done_current_level as i64 >= self.actions_to_next_level() {
+        if self.actions_done_current_level as f64 >= self.actions_to_next_level() as f64 {
             self.level_up();
         }
     }
@@ -168,7 +168,7 @@ pub struct JobInstance {
     pub instance_id: i32,
     pub job_archetype: JobArchetype,
     pub action_progress: Progress,
-    pub time_accumulator: f32,
+    pub time_accumulator: f64,
     pub running: bool,
     pub timeslot_cost: i32,
     pub has_paid_resources: bool,
@@ -222,7 +222,7 @@ impl JobInstance {
             self.has_paid_resources = true; // Mark that we've paid resources
         }
 
-        self.time_accumulator += dt;
+        self.time_accumulator += dt as f64;
         self.action_progress.set(self.time_accumulator / duration);
 
         if self.time_accumulator >= duration {
@@ -337,8 +337,18 @@ pub fn build_job_card(
         color: PaletteC::White.get_color(),
     });
 
+    // Job Animation Rectangle
+    elements.push(UiElement::Rectangle {
+        x: image_x,
+        y: image_y,
+        width: image_width,
+        height: image_height,
+        color: palette::IMAGE_BACKGROUND.get_color(),
+        border_style: BorderStyle::Solid,
+    });
+
     // Job Animation Image
-    let image_padding = 0.0;
+    let image_padding = 6.0;
     elements.push(UiElement::Image {
         x: image_x + image_padding,
         y: image_y + image_padding,

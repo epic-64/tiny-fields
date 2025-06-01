@@ -203,7 +203,7 @@ impl UiRect {
 
 #[derive(Clone, PartialEq)]
 pub struct Progress {
-    pub value: f32, // Value between 0.0 and 1.0
+    pub value: f64, // Value between 0.0 and 1.0
 }
 
 impl Progress {
@@ -211,11 +211,11 @@ impl Progress {
         Self { value: 0.0 }
     }
 
-    pub fn set(&mut self, value: f32) {
+    pub fn set(&mut self, value: f64) {
         self.value = value.clamp(0.0, 1.0);
     }
 
-    pub fn get(&self) -> f32 {
+    pub fn get(&self) -> f64 {
         self.value
     }
 
