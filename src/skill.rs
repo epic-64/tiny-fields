@@ -85,11 +85,9 @@ pub struct SkillArchetypeInstance {
 
 impl SkillArchetypeInstance {
     pub fn new(skill_type: SkillArchetype) -> Self {
-        let rate = |level: i64| Self::actions_to_level(level);
-
         Self {
             skill_type,
-            actions_counter: CountsActions::new(rate),
+            actions_counter: CountsActions::new(Self::actions_to_level, 5),
         }
     }
 
@@ -100,7 +98,7 @@ impl SkillArchetypeInstance {
         let b = 6.57881;
         let c = a * (level as f64).powf(b);
 
-        first_portion + c as i64
+        5 + first_portion + c as i64
     }
 
     pub fn increment_actions(&mut self) {

@@ -34,12 +34,14 @@ pub enum UiElement {
         text_color: Color,
         intent: Intent,
         parent_clip: Option<(i32, i32, i32, i32)>,
+        border_style: BorderStyle,
     },
     ImgButton {
         rectangle: UiRect,
         intent: Intent,
         texture: Texture2D,
         parent_clip: Option<(i32, i32, i32, i32)>,
+        border_style: BorderStyle,
     },
     ProgressBar {
         x: f32,
@@ -133,12 +135,32 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
             };
             draw_texture_ex(texture, *x, *y, *color, params);
         }
-        UiElement::RectButton { rectangle: r, font_size, text, background_color, text_color, font, .. } => {
+        UiElement::RectButton { rectangle: r, font_size, text, background_color, text_color, font, border_style, .. } => {
             if is_hovered(command, mouse_input) {
                 draw_rectangle(r.x - 2.0, r.y - 2.0, r.w + 4.0, r.h + 4.0, palette::BUTTON_HOVER.get_color());
             }
 
             draw_rectangle(r.x, r.y, r.w, r.h, *background_color);
+
+            match border_style {
+                BorderStyle::None => {}
+                BorderStyle::Solid => {
+                    let strength = BORDER_STRENGTH;
+                    draw_rectangle_lines(r.x, r.y, r.w, r.h, strength * 2.0, palette::BORDER.get_color());
+                }
+                BorderStyle::Dotted => {
+                    let strength = BORDER_STRENGTH;
+                    draw_dotted_rectangle(
+                        (r.x + strength / 2.0).round(),
+                        (r.y + strength / 2.0).round(),
+                        r.w - strength,
+                        r.h - strength,
+                        palette::BORDER.get_color(),
+                        strength,
+                        14,
+                    );
+                }
+            }
 
             let the_font = Some(font);
             let text_measure = measure_text(text, the_font, *font_size as u16, 1.);
@@ -167,6 +189,10 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
             gl.scissor(*clip)
         }
     }
+}
+
+pub fn number_pill(x: f32, y: f32, w: f32, h: f32, number: i64, text_color: Option<Color>, font: Font) -> Vec<UiElement> {
+    pill(x, y, w, h, &to_pill_number(number), text_color, font)
 }
 
 pub fn pill(x: f32, y: f32, w: f32, h: f32, text: &str, text_color: Option<Color>, font: Font) -> Vec<UiElement> {
@@ -260,4 +286,35 @@ fn draw_dotted_rectangle(x: f32, y: f32, width: f32, height: f32, color: Color, 
     draw_dotted_line(x + width, y, x + width, y + height, color, strength, segments);
     draw_dotted_line(x + width, y + height, x, y + height, color, strength, segments);
     draw_dotted_line(x, y + height, x, y, color, strength, segments);
+}
+
+fn to_pill_number(x: i64) -> String {
+    match x {
+        x if x > 1_000_000_000 => format!("{:.1}B", x as f32 / 1_000_000_000.0),
+        x if x > 100_000_000 => format!("{:.0}M", x as f32 / 1_000_000.0),
+        x if x > 10_000_000 => format!("{:.0}M", x as f32 / 1_000_000.0),
+        x if x > 1_000_000 => format!("{:.1}M", x as f32 / 1_000_000.0),
+        x if x > 100_000 => format!("{:.0}K", x as f32 / 1_000.0),
+        x if x > 10_000 => format!("{:.0}K", x as f32 / 1_000.0),
+        default => default.to_string(),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_to_pill_number() {
+        assert_eq!(to_pill_number(1234567890), "1.2B");
+        assert_eq!(to_pill_number(123456789), "123M");
+        assert_eq!(to_pill_number(12345678), "12M");
+        assert_eq!(to_pill_number(1234567), "1.2M");
+        assert_eq!(to_pill_number(123456), "123K");
+        assert_eq!(to_pill_number(12345), "12K");
+        assert_eq!(to_pill_number(1234), "1234");
+        assert_eq!(to_pill_number(123), "123");
+        assert_eq!(to_pill_number(12), "12");
+        assert_eq!(to_pill_number(0), "0");
+    }
 }

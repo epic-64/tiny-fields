@@ -1,7 +1,7 @@
 use crate::assets::AssetId::{AlchemyAnim1, AlchemyAnim2, CookingAnim1, CookingAnim2, HerbalismAnim1, HerbalismAnim2, Hunting1, Hunting2, Mining1, Mining2, Smithing1, Smithing2, WoodAnim1, WoodAnim2};
 use crate::assets::{AssetId, Assets};
 use crate::counts_actions::CountsActions;
-use crate::draw::{pill, BorderStyle, UiElement};
+use crate::draw::{number_pill, BorderStyle, UiElement};
 use crate::game::{Effect, GameState, Intent, Inventory, Item, Progress, UiRect};
 use crate::palette;
 use crate::palette::PaletteC;
@@ -111,12 +111,12 @@ impl JobArchetypeInstance {
     pub fn new(job_archetype: JobArchetype) -> Self {
         Self {
             job_archetype,
-            action_counter: CountsActions::new(Self::actions_cumulative),
+            action_counter: CountsActions::new(Self::actions_cumulative, 1),
         }
     }
 
     fn actions_cumulative(level: i64) -> i64 {
-        let first_portion = (level - 1) * (level) / 2;
+        let first_portion = level * (level + 1) / 2;
 
         let a = 6.95622e-9;
         let b = 6.57881;
@@ -333,7 +333,7 @@ pub fn build_job_card(
             x: offset.x + card_width - right_side_width - card_padding_x,
             y: image_y,
             w: right_side_width,
-            h: 30.0,
+            h: 24.0,
         },
         font: assets.fonts.text_bold.clone(),
         parent_clip: clip.clone(),
@@ -342,6 +342,7 @@ pub fn build_job_card(
         background_color: palette::BUTTON_BACKGROUND.get_color(),
         text_color: palette::BUTTON_TEXT.get_color(),
         intent: Intent::ToggleHyperMode(job_id),
+        border_style: BorderStyle::Solid,
     });
 
     // Draw Product Image on the right
@@ -366,12 +367,12 @@ pub fn build_job_card(
 
     // Draw Product Pill at the top of the rectangle
     elements.extend(
-        pill(
+        number_pill(
             offset.x + card_width - right_side_width - card_padding_x + right_side_width / 2.0 - 24.0 / 2.0,
             image_y + 40.0 - 14.0 / 2.0,
             24.0,
             14.0,
-            state.inventory.get_item_amount(&job.job_archetype.get_product()).to_string().as_str(),
+            state.inventory.get_item_amount(&job.job_archetype.get_product()),
             None,
             assets.fonts.mono.clone()
         )
@@ -395,7 +396,7 @@ pub fn build_job_card(
     // Draw Job instance level up progress bar
     elements.push(UiElement::ProgressBar {
         x: inner_x,
-        y: skill_progress_bar_y + skill_progress_bar_height + 8.0,
+        y: skill_progress_bar_y + skill_progress_bar_height + 4.0,
         width: skill_progress_bar_width,
         height: skill_progress_bar_height,
         progress: job_archetype_instance.action_counter.level_up_progress.get(),
@@ -444,12 +445,12 @@ pub fn build_job_card(
         if draw_pills {
             // draw pill at the top of the rectangle
             elements.extend(
-                pill(
+                number_pill(
                     resource_x + resource_icon_size / 2.0 - 24.0 / 2.0,
                     offset.y + card_padding_y + 96.0 - 14.0 / 2.0 - 2.0,
                     24.0,
                     14.0,
-                    state.inventory.get_item_amount(required_item).to_string().as_str(),
+                    state.inventory.get_item_amount(required_item),
                     None,
                     assets.fonts.mono.clone()
                 )
@@ -459,12 +460,12 @@ pub fn build_job_card(
             let pill_width = resource_icon_size - 24.0;
             let pill_height = 14.0;
             elements.extend(
-                pill(
+                number_pill(
                     resource_x + resource_icon_size / 2.0 - pill_width / 2.0,
                     offset.y + card_padding_y + 96.0 + resource_icon_size - pill_height / 2.0 + 2.0,
                     pill_width,
                     pill_height,
-                    required_amount.to_string().as_str(),
+                    *required_amount,
                     if player_has_enough { Some(PaletteC::Peach.get_color()) } else { Some(PaletteC::Coral.get_color()) },
                     assets.fonts.mono.clone(),
                 )
@@ -552,6 +553,7 @@ pub fn build_job_card(
         background_color: palette::BUTTON_BACKGROUND.get_color(),
         text_color: palette::BUTTON_TEXT.get_color(),
         intent: Intent::ToggleJob(job_id),
+        border_style: BorderStyle::Solid,
     });
 
     // Start / Stop Button
@@ -569,6 +571,7 @@ pub fn build_job_card(
         background_color: palette::BUTTON_BACKGROUND.get_color(),
         text_color: palette::BUTTON_TEXT.get_color(),
         intent: Intent::ToggleJob(job_id),
+        border_style: BorderStyle::Solid,
     });
 
     elements

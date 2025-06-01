@@ -5,29 +5,26 @@ pub struct CountsActions {
     pub actions_done_current_level: i64,
     pub actions_done_total: i64,
     pub level_up_progress: Progress,
-    pub rate: fn (i64) -> i64,
+    pub actions_to_reach_level: fn (i64) -> i64,
+    pub actions_flat: i64,
 }
 
 impl CountsActions {
-    pub fn new(rate: fn (i64) -> i64) -> Self {
+    pub fn new(actions_to_reach_level: fn (i64) -> i64, actions_flat: i64) -> Self {
         Self {
             level: 1,
             actions_done_current_level: 0,
             actions_done_total: 0,
             level_up_progress: Progress::new(),
-            rate
+            actions_to_reach_level,
+            actions_flat,
         }
     }
 
-    fn actions_to_reach(current_level: i64, target_level: i64, rate: fn (i64) -> i64) -> i64 {
-        let current_actions = rate(current_level);
-        let target_actions = rate(target_level);
-
-        target_actions - current_actions
-    }
-
     pub fn actions_to_next_level(&self) -> i64 {
-        Self::actions_to_reach(self.level, self.level + 1, self.rate)
+        self.actions_flat
+            + (self.actions_to_reach_level)(self.level + 1)
+            - (self.actions_to_reach_level)(self.level)
     }
 
     pub fn increment_actions(&mut self) {

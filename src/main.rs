@@ -217,6 +217,7 @@ pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
         background_color: palette::BUTTON_BACKGROUND.get_color(),
         text_color: palette::BUTTON_TEXT.get_color(),
         parent_clip: None,
+        border_style: BorderStyle::Solid,
     });
 
     // Button for skipping 1 week
@@ -234,6 +235,7 @@ pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
         background_color: palette::BUTTON_BACKGROUND.get_color(),
         text_color: palette::BUTTON_TEXT.get_color(),
         parent_clip: None,
+        border_style: BorderStyle::Solid,
     });
 
     // Button for skipping 1 month
@@ -251,6 +253,7 @@ pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
         background_color: palette::BUTTON_BACKGROUND.get_color(),
         text_color: palette::BUTTON_TEXT.get_color(),
         parent_clip: None,
+        border_style: BorderStyle::Solid,
     });
 
     elements
