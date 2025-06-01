@@ -35,7 +35,7 @@ impl CountsActions {
             self.actions_done_current_level as f64 / self.actions_to_next_level() as f64
         );
 
-        if self.actions_done_current_level as f64 >= self.actions_to_next_level() as f64 {
+        if self.actions_done_current_level >= self.actions_to_next_level() {
             self.level_up();
         }
     }

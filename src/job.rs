@@ -390,7 +390,7 @@ pub fn build_job_card(
         progress: skill_instance.actions_counter.level_up_progress.get(),
         background_color: palette::BAR_BACKGROUND.get_color(),
         foreground_color: palette::SKILL_COLOR.get_color(),
-        with_border: true,
+        border_style: BorderStyle::Solid,
     });
 
     // Draw Job instance level up progress bar
@@ -402,7 +402,7 @@ pub fn build_job_card(
         progress: job_archetype_instance.action_counter.level_up_progress.get(),
         background_color: palette::BAR_BACKGROUND.get_color(),
         foreground_color: palette::PRODUCT_COLOR.get_color(),
-        with_border: true,
+        border_style: BorderStyle::Solid,
     });
 
     // Draw 4 resource icons in the middle
@@ -533,7 +533,7 @@ pub fn build_job_card(
         progress: job.action_progress.get(),
         background_color: palette::BAR_BACKGROUND.get_color(),
         foreground_color: palette::PROGRESS_COLOR.get_color(),
-        with_border: true,
+        border_style: BorderStyle::Solid,
     });
 
     // Delete Button

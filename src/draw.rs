@@ -15,6 +15,29 @@ pub enum BorderStyle {
     Dotted,
 }
 
+impl BorderStyle {
+    pub fn draw(&self, x: f32, y: f32, width: f32, height: f32, strength: f32) {
+        let color = palette::BORDER.get_color();
+        match self {
+            BorderStyle::None => {}
+            BorderStyle::Solid => {
+                draw_rectangle_lines(x, y, width, height, strength * 2.0, color);
+            }
+            BorderStyle::Dotted => {
+                draw_dotted_rectangle(
+                    (x + strength / 2.0).round(),
+                    (y + strength / 2.0).round(),
+                    width - strength,
+                    height - strength,
+                    color,
+                    strength,
+                    14
+                );
+            }
+        }
+    }
+}
+
 #[derive(Clone)]
 pub enum UiElement {
     Text {
@@ -51,7 +74,7 @@ pub enum UiElement {
         progress: f64,
         background_color: Color,
         foreground_color: Color,
-        with_border: bool,
+        border_style: BorderStyle,
     },
     Circle { x: f32, y: f32, radius: f32, color: Color },
     Rectangle { x: f32, y: f32, width: f32, height: f32, color: Color, border_style: BorderStyle },
@@ -81,7 +104,7 @@ pub fn is_hovered(command: &UiElement, mouse_input: &MouseInput) -> bool {
     }
 }
 
-pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
+pub fn draw(command: &UiElement, mouse_input: &MouseInput) -> () {
     let gl: &mut QuadGl = unsafe { get_internal_gl() }.quad_gl ;
 
     match command {
@@ -93,37 +116,14 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
                 ..Default::default()
             });
         }
-        UiElement::ProgressBar { x, y, width, height, progress, background_color, foreground_color, with_border } => {
+        UiElement::ProgressBar { x, y, width, height, progress, background_color, foreground_color, border_style } => {
             draw_rectangle(*x, *y, *width, *height, *background_color);
             draw_rectangle(*x, *y, *width * *progress as f32, *height, *foreground_color);
-
-            if *with_border {
-                let strength = BORDER_STRENGTH;
-                draw_rectangle_lines(*x, *y, *width, *height, strength * 2.0, palette::BORDER.get_color());
-            }
+            border_style.draw(*x, *y, *width, *height, BORDER_STRENGTH);
         }
         UiElement::Rectangle { x, y, width, height, color, border_style } => {
             draw_rectangle(*x, *y, *width, *height, *color);
-
-            match border_style {
-                BorderStyle::None => {}
-                BorderStyle::Solid => {
-                    let strength = BORDER_STRENGTH;
-                    draw_rectangle_lines(*x, *y, *width, *height, strength * 2.0, palette::BORDER.get_color());
-                }
-                BorderStyle::Dotted => {
-                    let strength = BORDER_STRENGTH;
-                    draw_dotted_rectangle(
-                        (*x + strength / 2.0).round(),
-                        (*y + strength / 2.0).round(),
-                        *width - strength,
-                        *height - strength,
-                        palette::BORDER.get_color(),
-                        strength,
-                        14,
-                    );
-                }
-            }
+            border_style.draw(*x, *y, *width, *height, BORDER_STRENGTH);
         }
         UiElement::Circle { x, y, radius, color } => {
             draw_circle(*x, *y, *radius, *color);
@@ -141,26 +141,7 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) {
             }
 
             draw_rectangle(r.x, r.y, r.w, r.h, *background_color);
-
-            match border_style {
-                BorderStyle::None => {}
-                BorderStyle::Solid => {
-                    let strength = BORDER_STRENGTH;
-                    draw_rectangle_lines(r.x, r.y, r.w, r.h, strength * 2.0, palette::BORDER.get_color());
-                }
-                BorderStyle::Dotted => {
-                    let strength = BORDER_STRENGTH;
-                    draw_dotted_rectangle(
-                        (r.x + strength / 2.0).round(),
-                        (r.y + strength / 2.0).round(),
-                        r.w - strength,
-                        r.h - strength,
-                        palette::BORDER.get_color(),
-                        strength,
-                        14,
-                    );
-                }
-            }
+            border_style.draw(r.x, r.y, r.w, r.h, BORDER_STRENGTH);
 
             let the_font = Some(font);
             let text_measure = measure_text(text, the_font, *font_size as u16, 1.);
@@ -243,15 +224,7 @@ pub fn pill(x: f32, y: f32, w: f32, h: f32, text: &str, text_color: Option<Color
     elements
 }
 
-fn draw_dotted_line(
-    x1: f32,
-    y1: f32,
-    x2: f32,
-    y2: f32,
-    color: Color,
-    strength: f32,
-    segments: u8,
-) {
+fn draw_dotted_line(x1: f32, y1: f32, x2: f32, y2: f32, color: Color, strength: f32, segments: u8) {
     let dx = (x2 - x1) / segments as f32;
     let dy = (y2 - y1) / segments as f32;
 
