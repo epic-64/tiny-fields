@@ -234,7 +234,7 @@ pub fn pretty_number(num: i64) -> String {
 #[derive(Hash, Eq, PartialEq, Clone, Copy, Debug)]
 pub enum Item {
     Coin,
-    Wood,
+    Kindlewood,
     Iron,
     Herb,
     Meat,
@@ -245,13 +245,17 @@ pub enum Item {
     Tree,
     Deer,
     ManaPotion,
+    Craftwood,
+    Graintree,
 }
 
 impl Item {
-    pub fn to_string(&self) -> String {
+    pub fn get_name(&self) -> String {
         match self {
             Item::Coin => "Coin".to_string(),
-            Item::Wood => "Wood".to_string(),
+            Item::Kindlewood => "Kindlewood".to_string(),
+            Item::Craftwood => "Craftwood".to_string(),
+            Item::Graintree => "Graintree".to_string(),
             Item::Iron => "Iron".to_string(),
             Item::Herb => "Herb".to_string(),
             Item::Meat => "Meat".to_string(),
@@ -267,7 +271,7 @@ impl Item {
 
     pub fn get_texture(&self, assets: &Assets) -> Texture2D {
         match self {
-            Item::Wood => Wood.texture(assets),
+            Item::Kindlewood => Wood.texture(assets),
             Item::Meat => MeatGame.texture(assets),
             Item::Coin => Coin.texture(assets),
             Item::Bread => Bread.texture(assets),

@@ -163,7 +163,7 @@ pub fn skill_selection_ui(
             },
             font_size: 16.0,
             font: assets.fonts.text.clone(),
-            text: skill_archetype.as_str().to_string(),
+            text: skill_archetype.get_name().to_string(),
             background_color: palette::BUTTON_BACKGROUND.get_color(),
             text_color: palette::BUTTON_TEXT.get_color(),
             intent: Intent::ChangeJobSlotState(
@@ -197,7 +197,7 @@ pub fn product_selection_ui(
 
     // Add title: Select Product
     elements.push(UiElement::Text {
-        content: format!("Select Product for {}", skill_archetype.as_str()),
+        content: format!("Select Product for {}", skill_archetype.get_name()),
         font: assets.fonts.text_bold.clone(),
         x: offset.x + 10.0,
         y: offset.y + 10.0 + 32.0,

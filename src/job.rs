@@ -1,4 +1,4 @@
-use crate::assets::AssetId::{AlchemyAnim1, AlchemyAnim2, CookingAnim1, CookingAnim2, HerbalismAnim1, HerbalismAnim2, Hunting1, Hunting2, Mining1, Mining2, Smithing1, Smithing2, WoodAnim1, WoodAnim2};
+use crate::assets::AssetId::{AlchemyAnim1, AlchemyAnim2, CookingAnim1, CookingAnim2, HerbalismAnim1, HerbalismAnim2, HuntingAnim1, HuntingAnim2, MiningAnim1, MiningAnim2, SmithingAnim1, SmithingAnim2, WoodAnim1, WoodAnim2};
 use crate::assets::{AssetId, Assets};
 use crate::counts_actions::CountsActions;
 use crate::draw::{number_pill, BorderStyle, UiElement};
@@ -10,10 +10,13 @@ use macroquad::math::Vec2;
 use macroquad::prelude::Texture2D;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
+use crate::job_slot::JobSlotState;
 
 #[derive(EnumIter, Clone, PartialEq, Eq, Hash, Debug, Copy)]
 pub enum JobArchetype {
-    LumberingWood,
+    LumberingKindleWood,
+    LumberingCraftWood,
+    LumberingGrainTree,
     MiningIron,
     HerbalismChamomile,
     HuntingDeer,
@@ -27,10 +30,10 @@ pub enum JobArchetype {
 impl JobArchetype {
     pub fn get_animation_images(&self, assets: &Assets) -> (Texture2D, Texture2D) {
         match self {
-            JobArchetype::LumberingWood => (WoodAnim1.texture(assets), WoodAnim2.texture(assets)),
-            JobArchetype::MiningIron => (Mining1.texture(assets), Mining2.texture(assets)),
-            JobArchetype::HuntingDeer => (Hunting1.texture(assets), Hunting2.texture(assets)),
-            JobArchetype::SmithingIronBar => (Smithing1.texture(assets), Smithing2.texture(assets)),
+            JobArchetype::LumberingKindleWood => (WoodAnim1.texture(assets), WoodAnim2.texture(assets)),
+            JobArchetype::MiningIron => (MiningAnim1.texture(assets), MiningAnim2.texture(assets)),
+            JobArchetype::HuntingDeer => (HuntingAnim1.texture(assets), HuntingAnim2.texture(assets)),
+            JobArchetype::SmithingIronBar => (SmithingAnim1.texture(assets), SmithingAnim2.texture(assets)),
             JobArchetype::CookingSandwich => (CookingAnim1.texture(assets), CookingAnim2.texture(assets)),
             JobArchetype::HerbalismChamomile => (HerbalismAnim1.texture(assets), HerbalismAnim2.texture(assets)),
             JobArchetype::AlchemyManaPotion => (AlchemyAnim1.texture(assets), AlchemyAnim2.texture(assets)),
@@ -46,7 +49,9 @@ impl JobArchetype {
 
     pub fn get_name(&self) -> String {
         match self {
-            JobArchetype::LumberingWood => "LumberingWood".to_string(),
+            JobArchetype::LumberingKindleWood => "Kindlewood".to_string(),
+            JobArchetype::LumberingCraftWood => "Craftwood".to_string(),
+            JobArchetype::LumberingGrainTree => "Graintree".to_string(),
             JobArchetype::MiningIron => "Mining".to_string(),
             JobArchetype::HuntingDeer => "Hunting".to_string(),
             JobArchetype::SmithingIronBar => "Smithing".to_string(),
@@ -60,13 +65,15 @@ impl JobArchetype {
 
     pub fn get_product(&self) -> Item {
         match self {
-            JobArchetype::LumberingWood => Item::Wood,
+            JobArchetype::LumberingKindleWood => Item::Kindlewood,
+            JobArchetype::LumberingCraftWood => Item::Craftwood,
+            JobArchetype::LumberingGrainTree => Item::Graintree,
             JobArchetype::MiningIron => Item::Iron,
             JobArchetype::HuntingDeer => Item::Meat,
             JobArchetype::SmithingIronBar => Item::IronBar,
             JobArchetype::HerbalismChamomile => Item::Herb,
             JobArchetype::Foraging    => Item::Berry,
-            JobArchetype::WoodworkingPlanks => Item::Wood, // todo: change to correct item
+            JobArchetype::WoodworkingPlanks => Item::Kindlewood, // todo: change to correct item
             JobArchetype::CookingSandwich => Item::Sandwich,
             JobArchetype::AlchemyManaPotion => Item::ManaPotion, // todo: change to correct item
         }
@@ -74,8 +81,8 @@ impl JobArchetype {
 
     pub fn get_required_items(&self) -> Vec<(Item, i64)>{
         match self {
-            JobArchetype::LumberingWood => vec![(Item::Tree, 0)],
-            JobArchetype::CookingSandwich => vec![(Item::Wood, 4), (Item::Meat, 1), (Item::Herb, 1), (Item::ManaPotion, 1)],
+            JobArchetype::LumberingKindleWood => vec![(Item::Tree, 0)],
+            JobArchetype::CookingSandwich => vec![(Item::Kindlewood, 4), (Item::Meat, 1), (Item::Herb, 1), (Item::ManaPotion, 1)],
             JobArchetype::HuntingDeer => vec![(Item::Deer, 0)],
             JobArchetype::AlchemyManaPotion => vec![(Item::Herb, 1)],
             JobArchetype::HerbalismChamomile => vec![(Item::Herb, 0)], // todo: change to correct item
@@ -89,7 +96,11 @@ impl JobArchetype {
 
     pub fn get_skill_type(&self) -> SkillArchetype {
         match self {
-            JobArchetype::LumberingWood => SkillArchetype::Lumbering,
+            // Lumbering Jobs
+            JobArchetype::LumberingKindleWood => SkillArchetype::Lumbering,
+            JobArchetype::LumberingCraftWood => SkillArchetype::Lumbering,
+            JobArchetype::LumberingGrainTree => SkillArchetype::Lumbering,
+            
             JobArchetype::MiningIron => SkillArchetype::Mining,
             JobArchetype::HuntingDeer => SkillArchetype::Hunting,
             JobArchetype::SmithingIronBar => SkillArchetype::Smithing,
@@ -445,7 +456,7 @@ pub fn build_job_card(
     elements.push(UiElement::Text {
         content: format!(
             "{} Lv. {} ({} / {})",
-            skill_instance.skill_type.as_str(),
+            skill_instance.skill_type.get_name(),
             skill_instance.actions_counter.level.to_string(),
             skill_instance.actions_counter.actions_done_current_level,
             skill_instance.actions_counter.actions_to_next_level(),
@@ -505,7 +516,7 @@ pub fn build_job_card(
         text: "x".to_string(),
         background_color: palette::BUTTON_BACKGROUND.get_color(),
         text_color: palette::BUTTON_TEXT.get_color(),
-        intent: Intent::ToggleJob(job_slot_id),
+        intent: Intent::ChangeJobSlotState(job_slot_id, JobSlotState::Empty),
         border_style: BorderStyle::Solid,
     });
 

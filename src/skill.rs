@@ -1,6 +1,9 @@
+use macroquad::prelude::Texture2D;
 use crate::counts_actions::CountsActions;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
+use crate::assets::AssetId::{AlchemyAnim1, AlchemyAnim2, CookingAnim1, CookingAnim2, HerbalismAnim1, HerbalismAnim2, HuntingAnim1, HuntingAnim2, MiningAnim1, MiningAnim2, SmithingAnim1, SmithingAnim2, WoodAnim1, WoodAnim2};
+use crate::assets::Assets;
 use crate::job::JobArchetype;
 
 #[derive(EnumIter, Clone, Debug)]
@@ -62,7 +65,7 @@ pub enum SkillArchetype {
 }
 
 impl SkillArchetype {
-    pub fn as_str(&self) -> &str {
+    pub fn get_name(&self) -> &str {
         match self {
             SkillArchetype::Lumbering => "Lumbering",
             SkillArchetype::Mining => "Mining",
@@ -81,9 +84,22 @@ impl SkillArchetype {
 
     pub fn get_job_archetypes(&self) -> Vec<JobArchetype> {
         match self {
-            SkillArchetype::Lumbering => vec![JobArchetype::LumberingWood],
+            SkillArchetype::Lumbering => vec![JobArchetype::LumberingKindleWood],
             SkillArchetype::Mining => vec![JobArchetype::MiningIron],
             default => vec![],
+        }
+    }
+
+    pub fn get_animation_images(&self, assets: &Assets) -> (Texture2D, Texture2D) {
+        match self {
+            SkillArchetype::Lumbering => (WoodAnim1.texture(assets), WoodAnim2.texture(assets)),
+            SkillArchetype::Mining => (MiningAnim1.texture(assets), MiningAnim2.texture(assets)),
+            SkillArchetype::Hunting => (HuntingAnim1.texture(assets), HuntingAnim2.texture(assets)),
+            SkillArchetype::Herbalism => (HerbalismAnim1.texture(assets), HerbalismAnim2.texture(assets)),
+            SkillArchetype::Smithing => (SmithingAnim1.texture(assets), SmithingAnim2.texture(assets)),
+            SkillArchetype::Cooking => (CookingAnim1.texture(assets), CookingAnim2.texture(assets)),
+            SkillArchetype::Alchemy => (AlchemyAnim1.texture(assets), AlchemyAnim2.texture(assets)),
+            default => (Texture2D::empty(), Texture2D::empty()), // todo: handle other skills
         }
     }
 }

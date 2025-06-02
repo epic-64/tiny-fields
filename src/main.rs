@@ -251,7 +251,7 @@ pub fn build_inventory_elements(state: &GameState, assets: &Assets, rect: UiRect
         });
 
         elements.push(UiElement::Text {
-            content: format!("{}", item_name.to_string()),
+            content: format!("{}", item_name.get_name()),
             font: assets.fonts.mono.clone(),
             x: rect.x + index as f32 * (item_size + 5.0),
             y: rect.y + item_size / 2.0,
