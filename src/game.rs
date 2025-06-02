@@ -18,28 +18,6 @@ pub struct MouseInput {
     pub scroll_y: f32,
 }
 
-pub struct PerformanceFlags {
-    pub timeslots_changed: bool,
-}
-
-impl PerformanceFlags {
-    pub fn new() -> Self {
-        Self { timeslots_changed: false }
-    }
-}
-
-pub struct TimeSlots {
-    pub total: i32,
-    pub used: i32,
-}
-
-impl TimeSlots {
-    pub fn get_free(&self) -> i32 {
-        self.total - self.used
-    }
-    pub fn get_upgrade_cost(&self) -> i64 { 10_i64.pow(self.total as u32 - 1) }
-}
-
 pub struct GameMeta {
     pub effective_fps: f64,
     pub raw_fps: f64,
@@ -59,8 +37,6 @@ impl GameMeta {
 pub struct GameState {
     pub skill_archetype_instances: SkillArchetypeInstances,
     pub job_archetype_instances: JobArchetypeInstances,
-    pub time_slots: TimeSlots,
-    pub performance_flags: PerformanceFlags,
     pub game_meta: GameMeta,
     pub inventory: Inventory,
     pub text_particles: Vec<TextParticle>,
@@ -72,8 +48,6 @@ impl GameState {
         Self {
             skill_archetype_instances: SkillArchetypeInstances::new(),
             job_archetype_instances: JobArchetypeInstances::new(),
-            time_slots: TimeSlots { total: 9, used: 0, },
-            performance_flags: PerformanceFlags::new(),
             game_meta: GameMeta::new(),
             inventory: Inventory::new(),
             text_particles: vec![],
@@ -90,39 +64,10 @@ impl GameState {
     // Step logic (tick + inputs)
     pub fn step(&mut self, intents: &[Intent], dt: f32) -> Vec<EffectWithSource>
     {
-        for intent in intents {
-            match intent {
-                Intent::ToggleJob(index) => {
-                    if let Some(JobSlot { state: JobSlotState::RunningJob(job_instance), .. }) = self.job_slots.get_mut(*index) {
-                        job_instance.toggle_running();
-                    }
-                }
-                Intent::ToggleHyperMode(index) => {
-                    // todo: implement hyper mode toggle
-                }
-                Intent::BuyTimeSlot => {
-                    let upgrade_cost = self.time_slots.get_upgrade_cost();
+        // Process intents
+        intents.iter().for_each(|intent| intent.execute(self));
 
-                    if self.inventory.get_item_amount(&Item::Coin) >= upgrade_cost {
-                        self.inventory.add_item(Item::Coin, -upgrade_cost);
-                        self.time_slots.total += 1;
-                        self.performance_flags.timeslots_changed = true;
-                    }
-                }
-                Intent::SkipSeconds(seconds) => {
-                    for _ in 0..*seconds {
-                        // skip capturing effects because we don't want to draw millions of events
-                        self.update_progress(1.0);
-                    }
-                }
-                Intent::ChangeJobSlotState(index, new_state) => {
-                    if let Some(slot) = self.job_slots.get_mut(*index) {
-                        slot.state = new_state.clone();
-                    }
-                }
-            }
-        }
-
+        // update game progress and collect effects
         let effects = self.update_progress(dt);
 
         effects
@@ -175,17 +120,38 @@ impl GameState {
     }
 }
 
-fn get_used_timeslots(jobs: &[JobInstance]) -> i32 {
-    jobs.iter().filter(|j| j.running).map(|j| j.timeslot_cost).sum()
-}
-
 #[derive(Clone)]
 pub enum Intent {
     ToggleJob(usize),
-    BuyTimeSlot,
     SkipSeconds(i32),
     ToggleHyperMode(usize),
     ChangeJobSlotState(usize, JobSlotState),
+}
+
+impl Intent {
+    pub fn execute(&self, game_state: &mut GameState) {
+        match self {
+            Intent::ToggleJob(index) => {
+                if let Some(JobSlot { state: JobSlotState::RunningJob(job_instance), .. }) = game_state.job_slots.get_mut(*index) {
+                    job_instance.toggle_running();
+                }
+            }
+            Intent::ToggleHyperMode(index) => {
+                // todo: implement hyper mode toggle
+            }
+            Intent::SkipSeconds(seconds) => {
+                for _ in 0..*seconds {
+                    // skip capturing effects because we don't want to draw millions of events
+                    game_state.update_progress(1.0);
+                }
+            }
+            Intent::ChangeJobSlotState(index, new_state) => {
+                if let Some(slot) = game_state.job_slots.get_mut(*index) {
+                    slot.state = new_state.clone();
+                }
+            }
+        }
+    }
 }
 
 #[derive(Clone)]
