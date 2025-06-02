@@ -159,12 +159,8 @@ impl JobInstance {
         }
     }
 
-    pub fn toggle_running(&mut self, free_timeslots: i32) -> () {
-        if self.running {
-            self.running = false;
-        } else if free_timeslots >= self.timeslot_cost {
-            self.running = true;
-        }
+    pub fn toggle_running(&mut self) -> () {
+        self.running = !self.running;
     }
 
     pub fn update_progress(&mut self, inventory: &mut Inventory, dt: f32) -> Vec<Effect> {

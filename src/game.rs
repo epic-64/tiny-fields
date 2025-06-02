@@ -95,8 +95,10 @@ impl GameState {
                 Intent::ToggleJob(index) => {
                     let job_slot = self.job_slots.get_mut(*index).unwrap();
 
-                    match &job_slot.state {
-                        JobSlotState::RunningJob(job_instance) => { }, // todo: implement job stop
+                    match &mut job_slot.state {
+                        JobSlotState::RunningJob(job_instance) => {
+                            job_instance.toggle_running()
+                        }
                         default => {}
                     }
                 }
