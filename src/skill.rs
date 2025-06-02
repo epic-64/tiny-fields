@@ -2,13 +2,14 @@ use crate::counts_actions::CountsActions;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
+#[derive(EnumIter, Clone, Debug)]
 pub enum SkillCategory {
     Gathering,
     Crafting,
     Selling,
 }
 
-#[derive(EnumIter, Clone, PartialEq)]
+#[derive(EnumIter, Clone, PartialEq, Debug)]
 pub enum SkillArchetype {
     // Gathering Skills
     Lumbering,

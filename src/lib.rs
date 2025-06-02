@@ -6,3 +6,4 @@ pub mod palette;
 pub mod assets;
 pub mod skill;
 pub mod counts_actions;
+pub mod job_slot;

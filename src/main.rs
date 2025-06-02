@@ -10,6 +10,7 @@ pub mod palette;
 pub mod assets;
 pub mod skill;
 pub mod counts_actions;
+pub mod job_slot;
 
 use crate::draw::{draw, BorderStyle, UiElement};
 use crate::game::{GameState, Intent, MouseInput, UiRect};
@@ -81,25 +82,28 @@ async fn main() {
             scroll_y: mouse_wheel().1,
         };
 
-        // build all ui elements (draw commands)
-        let job_elements = build_job_cards(&state, &assets, Vec2::new(25.0, 100.0) + resolution_offset);
-        
-        let debug_elements: Vec<UiElement> = if show_debug {
-            build_debug_elements(&state, &assets, UiRect { x: 700.0, y: 25.0, w: 200.0, h: 40.0 })
-        } else {
-            vec![]
-        };
-        
-        let cheat_buttons: Vec<UiElement> = if show_debug {
-            get_cheat_buttons(&assets, UiRect { x: 25.0, y: 25.0, w: 400.0, h: 40.0 })
-        } else {
-            vec![]
-        };
+        let mut all_elements: Vec<UiElement> = vec![];
+        all_elements.extend(build_job_cards(&state, &assets, Vec2::new(25.0, 100.0) + resolution_offset));
+        // all_elements.extend(state.job_slots.iter()
+        //     .flat_map(|job_slot| { job_slot.build_ui(&assets) })
+        //     .collect());
+
+        // let job_slot_elements: Vec<UiElement> = state.job_slots.iter()
+        //     .flat_map(|job_slot| { job_slot.build_ui(&assets) })
+        //     .collect();
+
+        if show_debug {
+            all_elements.extend(
+                build_debug_elements(&state, &assets, UiRect::new(700.0, 25.0, 200.0, 40.0))
+            );
+
+            all_elements.extend(
+                get_cheat_buttons(&assets, UiRect::new(25.0, 25.0, 400.0, 40.0))
+            );
+        }
 
         // collect all intents from UI interactions
-        let mut all_intents: Vec<Intent> = vec![];
-        all_intents.extend(get_intents(&job_elements, &mouse_input));
-        all_intents.extend(get_intents(&cheat_buttons, &mouse_input));
+        let all_intents: Vec<Intent> = get_intents(&all_elements, &mouse_input);
 
         // Update game state
         let effects = state.step(&all_intents, dt); 
@@ -124,9 +128,7 @@ async fn main() {
 
         // Draw everything
         clear_background(palette::GAME_BACKGROUND.get_color());
-        job_elements.iter().for_each(|el|draw(el, &mouse_input));
-        debug_elements.iter().for_each(|el|draw(el, &mouse_input));
-        cheat_buttons.iter().for_each(|el|draw(el, &mouse_input));
+        all_elements.iter().for_each(|el| draw(el, &mouse_input));
 
         // Keep track of FPS
         let elapsed = now() - frame_start;

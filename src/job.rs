@@ -130,7 +130,7 @@ impl JobArchetypeInstance {
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub struct JobInstance {
     pub instance_id: i32,
     pub job_archetype: JobArchetype,

@@ -7,6 +7,7 @@ use macroquad::input::MouseButton;
 use macroquad::math::Vec2;
 use macroquad::prelude::Texture2D;
 use std::collections::HashMap;
+use crate::job_slot::{JobSlot, JobSlotState};
 
 pub struct MouseInput {
     pub pressed: Vec<MouseButton>,
@@ -63,6 +64,7 @@ pub struct GameState {
     pub game_meta: GameMeta,
     pub inventory: Inventory,
     pub text_particles: Vec<TextParticle>,
+    pub job_slots: Vec<JobSlot>,
 }
 
 impl GameState {
@@ -76,6 +78,7 @@ impl GameState {
             game_meta: GameMeta::new(),
             inventory: Inventory::new(),
             text_particles: vec![],
+            job_slots: (0..9).map(|i| JobSlot { index: i, state: JobSlotState::Empty }).collect()
         }
     }
 
@@ -103,7 +106,7 @@ impl GameState {
                 }
                 Intent::ToggleHyperMode(index) => {
                     // todo: implement hyper mode toggle
-                },
+                }
                 Intent::BuyTimeSlot => {
                     let upgrade_cost = self.time_slots.get_upgrade_cost();
 
@@ -112,11 +115,16 @@ impl GameState {
                         self.time_slots.total += 1;
                         self.performance_flags.timeslots_changed = true;
                     }
-                },
+                }
                 Intent::SkipSeconds(seconds) => {
                     for _ in 0..*seconds {
                         // skip capturing effects because we don't want to draw millions of events
                         self.update_progress(1.0);
+                    }
+                }
+                Intent::ChangeJobSlotState(index, new_state) => {
+                    if let Some(slot) = self.job_slots.get_mut(*index) {
+                        slot.state = new_state.clone();
                     }
                 }
             }
@@ -136,29 +144,31 @@ impl GameState {
         let mut effects_with_source = vec![];
 
         for job in &mut self.jobs {
-            if job.running {
-                let effects = job.update_progress(&mut self.inventory, dt);
+            if !job.running {
+                continue;
+            }
 
-                for effect in effects {
-                    // execute side effects
-                    match &effect {
-                        Effect::AddItem { item, amount } => {
-                            self.inventory.add_item(*item, *amount);
-                        }
-                        Effect::IncrementActionsForSkill { skill_type } => {
-                            self.skill_archetype_instances.get_skill_by_type_mut(skill_type).increment_actions();
-                        }
-                        Effect::IncrementActionsForJobType { job_type } => {
-                            self.job_archetype_instances.get_archetype_mut(job_type).increment_actions();
-                        }
+            let effects = job.update_progress(&mut self.inventory, dt);
+
+            for effect in effects {
+                // execute side effects
+                match &effect {
+                    Effect::AddItem { item, amount } => {
+                        self.inventory.add_item(*item, *amount);
                     }
-
-                    // collect effects with source
-                    effects_with_source.push(EffectWithSource::JobSource {
-                        job: job.clone(),
-                        effect: effect.clone(),
-                    });
+                    Effect::IncrementActionsForSkill { skill_type } => {
+                        self.skill_archetype_instances.get_skill_by_type_mut(skill_type).increment_actions();
+                    }
+                    Effect::IncrementActionsForJobType { job_type } => {
+                        self.job_archetype_instances.get_archetype_mut(job_type).increment_actions();
+                    }
                 }
+
+                // collect effects with source
+                effects_with_source.push(EffectWithSource::JobSource {
+                    job: job.clone(),
+                    effect: effect.clone(),
+                });
             }
         }
 
@@ -176,6 +186,7 @@ pub enum Intent {
     BuyTimeSlot,
     SkipSeconds(i32),
     ToggleHyperMode(usize),
+    ChangeJobSlotState(usize, JobSlotState),
 }
 
 #[derive(Clone)]
@@ -187,6 +198,10 @@ pub struct UiRect {
 }
 
 impl UiRect {
+    pub fn new(x: f32, y: f32, w: f32, h: f32) -> Self {
+        Self { x, y, w, h }
+    }
+
     pub fn contains_point(&self, point: (f32, f32)) -> bool {
         point.0 >= self.x && point.0 <= self.x + self.w &&
             point.1 >= self.y && point.1 <= self.y + self.h
@@ -201,7 +216,7 @@ impl UiRect {
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub struct Progress {
     pub value: f64, // Value between 0.0 and 1.0
 }
