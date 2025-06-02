@@ -37,7 +37,7 @@ impl SkillCategory {
         }
     }
 
-    pub fn get_skills(&self) -> Vec<SkillArchetype> {
+    pub fn get_skill_archetypes(&self) -> Vec<SkillArchetype> {
         match self {
             SkillCategory::Gathering => vec![
                 SkillArchetype::Lumbering,
