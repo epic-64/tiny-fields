@@ -85,7 +85,7 @@ async fn main() {
         let mut all_elements: Vec<UiElement> = vec![];
 
         // all_elements.extend(build_job_cards(&state, &assets, Vec2::new(25.0, 100.0) + resolution_offset));
-        all_elements.extend(state.get_job_slot_ui(&assets, Vec2::new(25.0, 100.0) + resolution_offset));
+        all_elements.extend(state.get_job_slot_ui(&state, &assets, Vec2::new(25.0, 100.0) + resolution_offset));
 
         if show_debug {
             all_elements.extend(build_debug_elements(&state, &assets, UiRect::new(700.0, 25.0, 200.0, 40.0)));

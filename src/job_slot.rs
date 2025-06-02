@@ -1,8 +1,8 @@
 use macroquad::prelude::Vec2;
 use crate::assets::Assets;
 use crate::draw::{BorderStyle, UiElement};
-use crate::game::{Intent, UiRect};
-use crate::job::{JobArchetype, JobInstance, JobParameters, JOB_CARD_HEIGHT, JOB_CARD_SPACING_OUTER, JOB_CARD_WIDTH};
+use crate::game::{GameState, Intent, UiRect};
+use crate::job::{build_job_card, JobArchetype, JobInstance, JobParameters, JOB_CARD_HEIGHT, JOB_CARD_SPACING_OUTER, JOB_CARD_WIDTH};
 use crate::palette;
 use crate::skill::{SkillArchetype, SkillCategory};
 use crate::assets::AssetId::BackgroundParchment;
@@ -17,7 +17,7 @@ pub enum JobSlotState {
 }
 
 impl JobSlotState {
-    pub fn build_ui(&self, job_slot_index: usize, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
+    pub fn build_ui(&self, job_slot_index: usize, state: &GameState, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
         let column = job_slot_index % 3;
         let row = job_slot_index / 3;
 
@@ -34,6 +34,9 @@ impl JobSlotState {
             JobSlotState::PickingProduct(skill_archetype) => {
                 product_selection_ui(job_slot_index, skill_archetype, assets, offset)
             }
+            JobSlotState::RunningJob(job_instance) => {
+                job_ui(&state, assets, job_instance, job_slot_index, offset)
+            }
             default => {
                 // Handle other states if needed
                 vec![]
@@ -49,8 +52,8 @@ pub struct JobSlot {
 }
 
 impl JobSlot {
-    pub fn build_ui(&self, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
-        self.state.build_ui(self.index, assets, offset)
+    pub fn build_ui(&self, game_state: &GameState, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
+        self.state.build_ui(self.index, game_state, assets, offset)
     }
 }
 
@@ -227,4 +230,26 @@ pub fn product_selection_ui(
     });
 
     elements
+}
+
+pub fn job_ui(
+    state: &GameState,
+    assets: &Assets,
+    job_instance: &JobInstance,
+    job_id: usize,
+    offset: Vec2,
+) -> Vec<UiElement> {
+    build_job_card(
+        &state,
+        &None,
+        &assets,
+        &job_instance,
+        job_id,
+        offset,
+        JOB_CARD_HEIGHT,
+        JOB_CARD_WIDTH,
+        10.0,
+        10.0,
+        JOB_CARD_SPACING_OUTER,
+    )
 }

@@ -92,9 +92,9 @@ impl GameState {
         );
     }
 
-    pub fn get_job_slot_ui(&self, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
+    pub fn get_job_slot_ui(&self, state: &GameState, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
         self.job_slots.iter()
-            .flat_map(|job_slot| { job_slot.build_ui(&assets, offset) })
+            .flat_map(|job_slot| { job_slot.build_ui(&state, &assets, offset) })
             .collect::<Vec<_>>()
     }
 
