@@ -18,8 +18,19 @@ pub enum JobSlotState {
 
 impl JobSlotState {
     pub fn build_ui(&self, job_slot_index: usize, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
+        let column = job_slot_index % 3;
+        let row = job_slot_index / 3;
+
+        let offset = Vec2::new(
+            offset.x + (column as f32 * JOB_CARD_WIDTH) + JOB_CARD_SPACING_OUTER * (column as f32),
+            offset.y + (row as f32 * JOB_CARD_HEIGHT) + JOB_CARD_SPACING_OUTER * (row as f32),
+        );
+
         match self {
             JobSlotState::Empty => empty_slot_ui(job_slot_index, assets, offset),
+            JobSlotState::PickingSkill(category) => {
+                pick_skill_ui(job_slot_index, category, assets, offset)
+            }
             default => {
                 // Handle other states if needed
                 vec![]
@@ -42,14 +53,6 @@ impl JobSlot {
 
 fn empty_slot_ui(job_slot_index: usize, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
     let mut elements = vec![];
-
-    let column = job_slot_index % 3;
-    let row = job_slot_index / 3;
-
-    let offset = Vec2::new(
-        offset.x + (column as f32 * JOB_CARD_WIDTH) + JOB_CARD_SPACING_OUTER * (column as f32),
-        offset.y + (row as f32 * JOB_CARD_HEIGHT) + JOB_CARD_SPACING_OUTER * (row as f32),
-    );
 
     elements.push(UiElement::Image {
         x: offset.x,
@@ -83,11 +86,14 @@ fn empty_slot_ui(job_slot_index: usize, assets: &Assets, offset: Vec2) -> Vec<Ui
         text: "Gathering".to_string(),
         background_color: palette::BUTTON_BACKGROUND.get_color(),
         text_color: palette::BUTTON_TEXT.get_color(),
-        intent: Intent::ChangeJobSlotState(job_slot_index, JobSlotState::PickingCategory),
+        intent: Intent::ChangeJobSlotState(
+            job_slot_index,
+            JobSlotState::PickingSkill(SkillCategory::Gathering),
+        ),
         parent_clip: None,
         border_style: BorderStyle::None,
     });
-    
+
     // Add button for Crafting Category
     elements.push(UiElement::RectButton {
         rectangle: UiRect {
@@ -101,10 +107,66 @@ fn empty_slot_ui(job_slot_index: usize, assets: &Assets, offset: Vec2) -> Vec<Ui
         text: "Crafting".to_string(),
         background_color: palette::BUTTON_BACKGROUND.get_color(),
         text_color: palette::BUTTON_TEXT.get_color(),
-        intent: Intent::ChangeJobSlotState(job_slot_index, JobSlotState::PickingCategory),
+        intent: Intent::ChangeJobSlotState(
+            job_slot_index,
+            JobSlotState::PickingSkill(SkillCategory::Crafting),
+        ),
         parent_clip: None,
         border_style: BorderStyle::None,
     });
+
+    elements
+}
+
+pub fn pick_skill_ui(
+    job_slot_index: usize,
+    category: &SkillCategory,
+    assets: &Assets,
+    offset: Vec2,
+) -> Vec<UiElement> {
+    let mut elements = vec![];
+
+    elements.push(UiElement::Image {
+        x: offset.x,
+        y: offset.y,
+        width: JOB_CARD_WIDTH,
+        height: JOB_CARD_HEIGHT,
+        texture: assets.textures.get(&BackgroundParchment).unwrap().clone(),
+        color: palette::CARD_BACKGROUND.get_color(),
+    });
+
+    // Add title: Select Skill
+    elements.push(UiElement::Text {
+        content: format!("Select Skill for {}", category.as_str()),
+        font: assets.fonts.text_bold.clone(),
+        x: offset.x + 10.0,
+        y: offset.y + 10.0 + 32.0,
+        font_size: 32.0,
+        color: palette::TEXT.get_color(),
+    });
+
+    // Add buttons for each skill in the category
+    for (i, skill_archetype) in category.get_skills().iter().enumerate() {
+        elements.push(UiElement::RectButton {
+            rectangle: UiRect {
+                x: offset.x + 10.0,
+                y: offset.y + 60.0 + (i as f32 * 40.0),
+                w: JOB_CARD_WIDTH - 20.0,
+                h: 30.0,
+            },
+            font_size: 16.0,
+            font: assets.fonts.text.clone(),
+            text: skill_archetype.as_str().to_string(),
+            background_color: palette::BUTTON_BACKGROUND.get_color(),
+            text_color: palette::BUTTON_TEXT.get_color(),
+            intent: Intent::ChangeJobSlotState(
+                job_slot_index,
+                JobSlotState::PickingProduct(skill_archetype.clone()),
+            ),
+            parent_clip: None,
+            border_style: BorderStyle::None,
+        });
+    }
 
     elements
 }
