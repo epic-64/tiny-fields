@@ -151,7 +151,7 @@ impl JobInstance {
         Self {
             job_archetype: p.job_archetype,
             instance_id: p.instance_id,
-            running: false,
+            running: true, // todo: change to false
             action_progress: Progress{value: 0.0},
             time_accumulator: 0.0,
             timeslot_cost: 1,
@@ -212,59 +212,13 @@ pub const JOB_CARD_HEIGHT: f32 = 192.0;
 pub const JOB_CARD_WIDTH: f32 = 404.0;
 pub const JOB_CARD_SPACING_OUTER: f32 = 8.0;
 
-pub fn build_job_cards(state: &GameState, assets: &Assets, offset: Vec2) -> Vec<UiElement>
-{
-    let mut elements: Vec<UiElement> = vec![];
-
-    let mut container_offset = offset;
-    let mut offset_x = offset.x;
-    let mut offset_y = offset.y;
-
-    let card_height = JOB_CARD_HEIGHT;
-    let card_width = JOB_CARD_WIDTH;
-    let card_spacing_inner = 6.0;
-    let card_padding_x = 12.0;
-    let card_padding_y = 12.0;
-
-    for (id, job) in state.jobs.iter().enumerate() {
-        let job_card = build_job_card(
-            state,
-            &None, // No clipping for the job cards
-            assets,
-            job,
-            id,
-            container_offset,
-            card_height,
-            card_width,
-            card_padding_x,
-            card_padding_y,
-            card_spacing_inner,
-        );
-
-        elements.extend(job_card);
-
-        if (id + 1) % 3 == 0 && id != 0 {
-            offset_x = offset.x; // Reset horizontal offset for the new row
-            offset_y += card_height + JOB_CARD_SPACING_OUTER;
-        } else {
-            offset_x += card_width + JOB_CARD_SPACING_OUTER;
-        }
-
-        container_offset = Vec2::new(offset_x, offset_y);
-    }
-
-    elements
-}
-
 pub fn build_job_card(
     state: &GameState,
     clip: &Option<(i32, i32, i32, i32)>,
     assets: &Assets,
     job: &JobInstance,
-    job_id: usize,
+    job_slot_id: usize,
     offset: Vec2,
-    card_height: f32,
-    card_width: f32,
     card_padding_x: f32,
     card_padding_y: f32,
     card_spacing: f32,
@@ -277,6 +231,9 @@ pub fn build_job_card(
     let color_secondary = palette::BORDER.get_color();
     let font_size_large = 16.0;
     let font_size_small = 14.0;
+
+    let card_height = JOB_CARD_HEIGHT;
+    let card_width = JOB_CARD_WIDTH;
 
     let image_width = 90.0f32;
     let image_height = 120.0f32;
@@ -341,7 +298,7 @@ pub fn build_job_card(
         text: "Hyper".to_string(),
         background_color: palette::BUTTON_BACKGROUND.get_color(),
         text_color: palette::BUTTON_TEXT.get_color(),
-        intent: Intent::ToggleHyperMode(job_id),
+        intent: Intent::ToggleHyperMode(job_slot_id),
         border_style: BorderStyle::Solid,
     });
 
@@ -552,7 +509,7 @@ pub fn build_job_card(
         text: "x".to_string(),
         background_color: palette::BUTTON_BACKGROUND.get_color(),
         text_color: palette::BUTTON_TEXT.get_color(),
-        intent: Intent::ToggleJob(job_id),
+        intent: Intent::ToggleJob(job_slot_id),
         border_style: BorderStyle::Solid,
     });
 
@@ -570,7 +527,7 @@ pub fn build_job_card(
         text: if job.running { "||".to_string() } else { ">".to_string() },
         background_color: palette::BUTTON_BACKGROUND.get_color(),
         text_color: palette::BUTTON_TEXT.get_color(),
-        intent: Intent::ToggleJob(job_id),
+        intent: Intent::ToggleJob(job_slot_id),
         border_style: BorderStyle::Solid,
     });
 

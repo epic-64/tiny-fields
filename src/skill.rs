@@ -1,31 +1,13 @@
 use crate::counts_actions::CountsActions;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
+use crate::job::JobArchetype;
 
 #[derive(EnumIter, Clone, Debug)]
 pub enum SkillCategory {
     Gathering,
     Crafting,
     Selling,
-}
-
-#[derive(EnumIter, Clone, PartialEq, Debug)]
-pub enum SkillArchetype {
-    // Gathering Skills
-    Lumbering,
-    Mining,
-    Fishing,
-    Hunting,
-    Foraging,
-    Herbalism,
-    Thieving,
-
-    // Crafting Skills
-    Woodworking,
-    Smithing,
-    Tailoring,
-    Alchemy,
-    Cooking,
 }
 
 impl SkillCategory {
@@ -60,6 +42,25 @@ impl SkillCategory {
     }
 }
 
+#[derive(EnumIter, Clone, PartialEq, Debug)]
+pub enum SkillArchetype {
+    // Gathering Skills
+    Lumbering,
+    Mining,
+    Fishing,
+    Hunting,
+    Foraging,
+    Herbalism,
+    Thieving,
+
+    // Crafting Skills
+    Woodworking,
+    Smithing,
+    Tailoring,
+    Alchemy,
+    Cooking,
+}
+
 impl SkillArchetype {
     pub fn as_str(&self) -> &str {
         match self {
@@ -75,6 +76,14 @@ impl SkillArchetype {
             SkillArchetype::Tailoring => "Tailoring",
             SkillArchetype::Alchemy => "Alchemy",
             SkillArchetype::Cooking => "Cooking",
+        }
+    }
+
+    pub fn get_job_archetypes(&self) -> Vec<JobArchetype> {
+        match self {
+            SkillArchetype::Lumbering => vec![JobArchetype::LumberingWood],
+            SkillArchetype::Mining => vec![JobArchetype::MiningIron],
+            default => vec![],
         }
     }
 }

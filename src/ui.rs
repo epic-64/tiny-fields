@@ -79,37 +79,4 @@ impl ScrollContainer {
             self.last_mouse_position = current_mouse_pos;
         }
     }
-
-    pub fn build(
-        &mut self,
-        state: &GameState,
-        assets: &Assets,
-        build_ui_elements: fn(&GameState, &Assets, &UiRect, Vec2) -> Vec<UiElement>
-    ) -> Vec<UiElement>
-    {
-        let mut elements: Vec<UiElement> = vec![];
-
-        // Create a clipping area for the scroll container
-        let clip = Some((
-            self.rect.x as i32,
-            self.rect.y as i32,
-            self.rect.w as i32,
-            self.rect.h as i32,
-        ));
-
-        // Create a scissor rectangle for the clipping area
-        elements.push(UiElement::Scissor { clip });
-
-        let scrollable_pos = Vec2::new(self.rect.x, self.rect.y) + self.scroll_offset;
-        elements.extend(build_ui_elements(state, assets, &self.rect, scrollable_pos));
-
-        // Remove the clipping area
-        elements.push(UiElement::Scissor { clip: None });
-
-        // determine total height of all job cards (inspect elements)
-        self.total_height = state.jobs.len() as f32 * JOB_CARD_HEIGHT
-            + (state.jobs.len() as f32 - 1.0) * JOB_CARD_SPACING_OUTER;
-
-        elements
-    }
 }

@@ -59,7 +59,6 @@ impl GameMeta {
 pub struct GameState {
     pub skill_archetype_instances: SkillArchetypeInstances,
     pub job_archetype_instances: JobArchetypeInstances,
-    pub jobs: Vec<JobInstance>,
     pub time_slots: TimeSlots,
     pub performance_flags: PerformanceFlags,
     pub game_meta: GameMeta,
@@ -73,7 +72,6 @@ impl GameState {
         Self {
             skill_archetype_instances: SkillArchetypeInstances::new(),
             job_archetype_instances: JobArchetypeInstances::new(),
-            jobs: vec![],
             time_slots: TimeSlots { total: 9, used: 0, },
             performance_flags: PerformanceFlags::new(),
             game_meta: GameMeta::new(),
@@ -81,15 +79,6 @@ impl GameState {
             text_particles: vec![],
             job_slots: (0..9).map(|i| JobSlot { index: i, state: JobSlotState::Empty }).collect()
         }
-    }
-
-    pub fn add_job_instance(&mut self, job_type: JobArchetype) {
-        self.jobs.push(
-            JobInstance::new(JobParameters {
-                instance_id: self.jobs.iter().map(|j| j.instance_id).max().unwrap_or(0) + 1,
-                job_archetype: job_type.clone(),
-            })
-        );
     }
 
     pub fn get_job_slot_ui(&self, state: &GameState, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
@@ -101,14 +90,14 @@ impl GameState {
     // Step logic (tick + inputs)
     pub fn step(&mut self, intents: &[Intent], dt: f32) -> Vec<EffectWithSource>
     {
-        let free_timeslots = self.time_slots.get_free();
-
         for intent in intents {
             match intent {
                 Intent::ToggleJob(index) => {
-                    if let Some(job) = self.jobs.get_mut(*index) {
-                        job.toggle_running(free_timeslots);
-                        self.performance_flags.timeslots_changed = true;
+                    let job_slot = self.job_slots.get_mut(*index).unwrap();
+
+                    match &job_slot.state {
+                        JobSlotState::RunningJob(job_instance) => { }, // todo: implement job stop
+                        default => {}
                     }
                 }
                 Intent::ToggleHyperMode(index) => {
@@ -137,10 +126,6 @@ impl GameState {
             }
         }
 
-        if self.performance_flags.timeslots_changed {
-            self.time_slots.used = get_used_timeslots(&self.jobs);
-        }
-
         let effects = self.update_progress(dt);
 
         effects
@@ -150,12 +135,22 @@ impl GameState {
     {
         let mut effects_with_source = vec![];
 
-        for job in &mut self.jobs {
-            if !job.running {
+        let mut running_jobs: Vec<&mut JobInstance> = self.job_slots.iter_mut()
+            .filter_map(|slot| {
+                if let JobSlotState::RunningJob(job_instance) = &mut slot.state {
+                    Some(job_instance)
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        for job_instance in &mut running_jobs {
+            if !job_instance.running {
                 continue;
             }
 
-            let effects = job.update_progress(&mut self.inventory, dt);
+            let effects = job_instance.update_progress(&mut self.inventory, dt);
 
             for effect in effects {
                 // execute side effects
@@ -173,7 +168,7 @@ impl GameState {
 
                 // collect effects with source
                 effects_with_source.push(EffectWithSource::JobSource {
-                    job: job.clone(),
+                    job: job_instance.clone(),
                     effect: effect.clone(),
                 });
             }

@@ -14,7 +14,6 @@ pub mod job_slot;
 
 use crate::draw::{draw, BorderStyle, UiElement};
 use crate::game::{GameState, Intent, MouseInput, UiRect};
-use crate::job::build_job_cards;
 use crate::job::JobArchetype;
 
 pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
@@ -33,16 +32,6 @@ async fn main() {
     let mut state = GameState::new();
     let mut is_fullscreen = false;
     let mut show_debug = false;
-
-    state.add_job_instance(JobArchetype::LumberingWood);
-    state.add_job_instance(JobArchetype::LumberingWood);
-    state.add_job_instance(JobArchetype::LumberingWood);
-    state.add_job_instance(JobArchetype::LumberingWood);
-    state.add_job_instance(JobArchetype::HerbalismChamomile);
-    state.add_job_instance(JobArchetype::HerbalismChamomile);
-    state.add_job_instance(JobArchetype::AlchemyManaPotion);
-    state.add_job_instance(JobArchetype::HuntingDeer);
-    state.add_job_instance(JobArchetype::CookingSandwich);
 
     let assets: Assets = load_assets().await;
 
@@ -82,43 +71,12 @@ async fn main() {
             scroll_y: mouse_wheel().1,
         };
 
-        let mut all_elements: Vec<UiElement> = vec![];
+        let all_ui_elements = build_ui_elements(&state, &assets, resolution_offset, show_debug);
+        let all_intents: Vec<Intent> = get_intents(&all_ui_elements, &mouse_input);
+        let effects = state.step(&all_intents, dt);
 
-        // all_elements.extend(build_job_cards(&state, &assets, Vec2::new(25.0, 100.0) + resolution_offset));
-        all_elements.extend(state.get_job_slot_ui(&state, &assets, Vec2::new(25.0, 100.0) + resolution_offset));
-
-        if show_debug {
-            all_elements.extend(build_debug_elements(&state, &assets, UiRect::new(700.0, 25.0, 200.0, 40.0)));
-            all_elements.extend(get_cheat_buttons(&assets, UiRect::new(25.0, 25.0, 400.0, 40.0)));
-        }
-
-        // collect all intents from UI interactions
-        let all_intents: Vec<Intent> = get_intents(&all_elements, &mouse_input);
-
-        // Update game state
-        let effects = state.step(&all_intents, dt); 
-
-        // remove expired text particles
-        state.text_particles.retain(|particle| { particle.is_alive() });
-
-        // step through all text particles
-        state.text_particles.iter_mut().for_each(|particle| particle.step(dt));
-
-        // Build UI elements for text particles
-        let effects_elements: Vec<UiElement> = state.text_particles.iter().map(|particle| {
-            UiElement::Text {
-                content: particle.text.clone(),
-                font: assets.fonts.mono.clone(),
-                x: particle.position.x,
-                y: particle.position.y,
-                font_size: 12.0,
-                color: particle.color,
-            }
-        }).collect();
-
-        // Draw everything
         clear_background(palette::GAME_BACKGROUND.get_color());
-        all_elements.iter().for_each(|el| draw(el, &mouse_input));
+        all_ui_elements.iter().for_each(|el| draw(el, &mouse_input));
 
         // Keep track of FPS
         let elapsed = now() - frame_start;
@@ -128,6 +86,19 @@ async fn main() {
 
         next_frame().await;
     }
+}
+
+fn build_ui_elements(state: &GameState, assets: &Assets, resolution_offset: Vec2, show_debug: bool) -> Vec<UiElement> {
+    let mut all_elements: Vec<UiElement> = vec![];
+
+    all_elements.extend(state.get_job_slot_ui(&state, &assets, Vec2::new(25.0, 100.0) + resolution_offset));
+
+    if show_debug {
+        all_elements.extend(build_debug_elements(&state, &assets, UiRect::new(700.0, 25.0, 200.0, 40.0)));
+        all_elements.extend(get_cheat_buttons(&assets, UiRect::new(25.0, 25.0, 400.0, 40.0)));
+    }
+
+    all_elements
 }
 
 fn build_debug_elements(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiElement> {

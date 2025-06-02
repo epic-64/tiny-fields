@@ -27,7 +27,12 @@ impl JobSlotState {
         );
 
         match self {
-            JobSlotState::Empty => category_selection_ui(job_slot_index, assets, offset),
+            JobSlotState::Empty => {
+                category_selection_ui(job_slot_index, assets, offset)
+            }
+            JobSlotState::PickingCategory => {
+                category_selection_ui(job_slot_index, assets, offset)
+            }
             JobSlotState::PickingSkill(category) => {
                 skill_selection_ui(job_slot_index, category, assets, offset)
             }
@@ -35,11 +40,7 @@ impl JobSlotState {
                 product_selection_ui(job_slot_index, skill_archetype, assets, offset)
             }
             JobSlotState::RunningJob(job_instance) => {
-                job_ui(&state, assets, job_instance, job_slot_index, offset)
-            }
-            default => {
-                // Handle other states if needed
-                vec![]
+                job_card_ui(&state, assets, job_instance, job_slot_index, offset)
             }
         }
     }
@@ -205,34 +206,35 @@ pub fn product_selection_ui(
     });
 
     // Here you would add buttons for each product related to the skill archetype
-    // For now, we will just add a placeholder button
-    elements.push(UiElement::RectButton {
-        rectangle: UiRect {
-            x: offset.x + 10.0,
-            y: offset.y + 60.0,
-            w: JOB_CARD_WIDTH - 20.0,
-            h: 30.0,
-        },
-        font_size: 16.0,
-        font: assets.fonts.text.clone(),
-        text: "Placeholder Product".to_string(),
-        background_color: palette::BUTTON_BACKGROUND.get_color(),
-        text_color: palette::BUTTON_TEXT.get_color(),
-        intent: Intent::ChangeJobSlotState(
-            job_slot_index,
-            JobSlotState::RunningJob(JobInstance::new(JobParameters{
-                instance_id: job_slot_index as i32,
-                job_archetype: JobArchetype::LumberingWood,
-            })),
-        ),
-        parent_clip: None,
-        border_style: BorderStyle::None,
-    });
+    for (i, job_archetype) in skill_archetype.get_job_archetypes().iter().enumerate() {
+        elements.push(UiElement::RectButton {
+            rectangle: UiRect {
+                x: offset.x + 10.0,
+                y: offset.y + 60.0 + (i as f32 * 40.0),
+                w: JOB_CARD_WIDTH - 20.0,
+                h: 30.0,
+            },
+            font_size: 16.0,
+            font: assets.fonts.text.clone(),
+            text: job_archetype.get_name().clone(),
+            background_color: palette::BUTTON_BACKGROUND.get_color(),
+            text_color: palette::BUTTON_TEXT.get_color(),
+            intent: Intent::ChangeJobSlotState(
+                job_slot_index,
+                JobSlotState::RunningJob(JobInstance::new(JobParameters{
+                    instance_id: job_slot_index as i32,
+                    job_archetype: job_archetype.clone(),
+                })),
+            ),
+            parent_clip: None,
+            border_style: BorderStyle::None,
+        });
+    }
 
     elements
 }
 
-pub fn job_ui(
+pub fn job_card_ui(
     state: &GameState,
     assets: &Assets,
     job_instance: &JobInstance,
@@ -246,8 +248,6 @@ pub fn job_ui(
         &job_instance,
         job_id,
         offset,
-        JOB_CARD_HEIGHT,
-        JOB_CARD_WIDTH,
         10.0,
         10.0,
         JOB_CARD_SPACING_OUTER,
