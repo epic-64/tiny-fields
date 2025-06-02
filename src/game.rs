@@ -7,6 +7,7 @@ use macroquad::input::MouseButton;
 use macroquad::math::Vec2;
 use macroquad::prelude::Texture2D;
 use std::collections::HashMap;
+use crate::draw::UiElement;
 use crate::job_slot::{JobSlot, JobSlotState};
 
 pub struct MouseInput {
@@ -89,6 +90,12 @@ impl GameState {
                 job_archetype: job_type.clone(),
             })
         );
+    }
+
+    pub fn get_job_slot_ui(&self, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
+        self.job_slots.iter()
+            .flat_map(|job_slot| { job_slot.build_ui(&assets, offset) })
+            .collect::<Vec<_>>()
     }
 
     // Step logic (tick + inputs)
