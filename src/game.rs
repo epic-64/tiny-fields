@@ -93,13 +93,8 @@ impl GameState {
         for intent in intents {
             match intent {
                 Intent::ToggleJob(index) => {
-                    let job_slot = self.job_slots.get_mut(*index).unwrap();
-
-                    match &mut job_slot.state {
-                        JobSlotState::RunningJob(job_instance) => {
-                            job_instance.toggle_running()
-                        }
-                        default => {}
+                    if let Some(JobSlot { state: JobSlotState::RunningJob(job_instance), .. }) = self.job_slots.get_mut(*index) {
+                        job_instance.toggle_running();
                     }
                 }
                 Intent::ToggleHyperMode(index) => {
