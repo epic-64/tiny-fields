@@ -238,6 +238,20 @@ pub enum WoodItem {
     Graintree,
 }
 
+trait GetName {
+    fn get_name(&self) -> String;
+}
+
+impl GetName for WoodItem {
+    fn get_name(&self) -> String {
+        match self {
+            WoodItem::Kindlewood => "Kindlewood".to_string(),
+            WoodItem::Craftwood => "Craftwood".to_string(),
+            WoodItem::Graintree => "Graintree".to_string(),
+        }
+    }
+}
+
 #[derive(Hash, Eq, PartialEq, Clone, Copy, Debug)]
 pub enum WoodWorkingItem {
     Plank,
@@ -266,9 +280,7 @@ impl Item {
     pub fn get_name(&self) -> String {
         match self {
             Item::Coin => "Coin".to_string(),
-            Item::Wood(WoodItem::Kindlewood) => "Kindlewood".to_string(),
-            Item::Wood(WoodItem::Craftwood) => "Craftwood".to_string(),
-            Item::Wood(WoodItem::Graintree) => "Graintree".to_string(),
+            Item::Wood(item) => item.get_name(),
             Item::Woodworking(WoodWorkingItem::Plank) => "Plank".to_string(),
             Item::Iron => "Iron".to_string(),
             Item::Herb => "Herb".to_string(),
