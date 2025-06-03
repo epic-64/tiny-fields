@@ -1,11 +1,11 @@
-use macroquad::prelude::Vec2;
+use crate::assets::AssetId::BackgroundParchment;
 use crate::assets::Assets;
 use crate::draw::{BorderStyle, UiElement};
 use crate::game::{GameState, Intent, UiRect};
-use crate::job::{build_job_card, JobArchetype, JobInstance, JobParameters, JOB_CARD_HEIGHT, JOB_CARD_SPACING_OUTER, JOB_CARD_WIDTH};
+use crate::job::{build_job_card, JobInstance, JobParameters, JOB_CARD_HEIGHT, JOB_CARD_SPACING_OUTER, JOB_CARD_WIDTH};
 use crate::palette;
 use crate::skill::{SkillArchetype, SkillCategory};
-use crate::assets::AssetId::BackgroundParchment;
+use macroquad::prelude::Vec2;
 
 #[derive(Clone, Debug)]
 pub enum JobSlotState {

@@ -20,7 +20,10 @@ pub enum FontId {
 
 #[derive(Hash, Eq, PartialEq, Debug, Clone, Copy)]
 pub enum AssetId {
+    // Backgrounds
     BackgroundParchment,
+
+    // Animations
     WoodAnim1,
     WoodAnim2,
     CookingAnim1,
@@ -35,7 +38,13 @@ pub enum AssetId {
     HuntingAnim2,
     SmithingAnim1,
     SmithingAnim2,
-    Wood,
+
+    // Icons and Items
+    // Wood
+    Kindlewood,
+    Craftwood,
+    Graintree,
+
     MeatGame,
     Coin,
     BagOfCoins,
@@ -55,7 +64,10 @@ impl AssetId {
 
 fn texture_paths() -> Vec<(AssetId, &'static str)> {
     vec![
+        // Backgrounds
         (AssetId::BackgroundParchment, "chatgpt/parchment.png"),
+        
+        // Animations
         (AssetId::WoodAnim1, "ChopChop_1_.png"),
         (AssetId::WoodAnim2, "chop2_lanczos.png"),
         (AssetId::CookingAnim1, "pan_1.png"),
@@ -70,7 +82,12 @@ fn texture_paths() -> Vec<(AssetId, &'static str)> {
         (AssetId::HuntingAnim2, "PewPew_2.png"),
         (AssetId::SmithingAnim1, "BomBom_1.png"),
         (AssetId::SmithingAnim2, "BomBom_2.png"),
-        (AssetId::Wood, "chatgpt/wood.png"),
+        
+        // Wood
+        (AssetId::Kindlewood, "chatgpt/kindlewood.png"),
+        (AssetId::Craftwood, "chatgpt/craftwood.png"),
+        (AssetId::Graintree, "chatgpt/graintree.png"),
+        
         (AssetId::MeatGame, "chatgpt/game.png"),
         (AssetId::Coin, "coin.png"),
         (AssetId::BagOfCoins, "chatgpt/bag_of_coins.png"),
