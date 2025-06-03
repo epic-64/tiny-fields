@@ -5,7 +5,7 @@ use strum_macros::EnumIter;
 use SkillArchetype::{Alchemy, Cooking, Herbalism, Hunting, Lumbering, Mining, Smithing};
 use crate::assets::AssetId::{AlchemyAnim1, AlchemyAnim2, CookingAnim1, CookingAnim2, HerbalismAnim1, HerbalismAnim2, HuntingAnim1, HuntingAnim2, MiningAnim1, MiningAnim2, SmithingAnim1, SmithingAnim2, WoodAnim1, WoodAnim2};
 use crate::assets::Assets;
-use crate::job::{JobArchetype, LumberingJobArchetype};
+use crate::job::{JobArchetype, LumberingJobArchetype, MiningJobArchetype};
 
 #[derive(EnumIter, Clone, Debug)]
 pub enum SkillCategory {
@@ -92,7 +92,7 @@ impl SkillArchetype {
             ],
 
             Mining => vec![
-                JobArchetype::MiningIron,
+                JobArchetype::Mining(MiningJobArchetype::Iron)
             ],
             
             default => vec![],

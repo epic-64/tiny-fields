@@ -1,29 +1,31 @@
-use crate::assets::AssetId::{AlchemyAnim1, AlchemyAnim2, CookingAnim1, CookingAnim2, HerbalismAnim1, HerbalismAnim2, HuntingAnim1, HuntingAnim2, MiningAnim1, MiningAnim2, SmithingAnim1, SmithingAnim2, WoodAnim1, WoodAnim2};
 use crate::assets::{AssetId, Assets};
 use crate::counts_actions::CountsActions;
 use crate::draw::{number_pill, BorderStyle, UiElement};
-use crate::game::{Effect, GameState, Intent, Inventory, Item, Progress, UiRect};
+use crate::game::{Effect, GameState, Intent, Inventory, Item, Progress, UiRect, WoodItem, WoodWorkingItem};
 use crate::palette;
 use crate::palette::PaletteC;
 use crate::skill::SkillArchetype;
 use macroquad::math::Vec2;
-use macroquad::prelude::Texture2D;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 use crate::job_slot::JobSlotState;
 
-#[derive(Default, EnumIter, Clone, PartialEq, Eq, Hash, Debug, Copy)]
+#[derive(EnumIter, Clone, PartialEq, Eq, Hash, Debug, Copy)]
 pub enum LumberingJobArchetype {
-    #[default]
     Kindlewood,
     Craftwood,
     Graintree,
 }
 
 #[derive(EnumIter, Clone, PartialEq, Eq, Hash, Debug, Copy)]
+pub enum MiningJobArchetype {
+    Iron,
+}
+
+#[derive(Clone, PartialEq, Eq, Hash, Debug, Copy)]
 pub enum JobArchetype {
     Lumbering(LumberingJobArchetype),
-    MiningIron,
+    Mining(MiningJobArchetype),
     HerbalismChamomile,
     HuntingDeer,
     Foraging,
@@ -45,7 +47,7 @@ impl JobArchetype {
             JobArchetype::Lumbering(LumberingJobArchetype::Kindlewood) => "Kindlewood".to_string(),
             JobArchetype::Lumbering(LumberingJobArchetype::Craftwood) => "Craftwood".to_string(),
             JobArchetype::Lumbering(LumberingJobArchetype::Graintree) => "Graintree".to_string(),
-            JobArchetype::MiningIron => "Mining".to_string(),
+            JobArchetype::Mining(MiningJobArchetype::Iron) => "Mining".to_string(),
             JobArchetype::HuntingDeer => "Hunting".to_string(),
             JobArchetype::SmithingIronBar => "Smithing".to_string(),
             JobArchetype::HerbalismChamomile => "Herbalism".to_string(),
@@ -58,15 +60,15 @@ impl JobArchetype {
 
     pub fn get_product(&self) -> Item {
         match self {
-            JobArchetype::Lumbering(LumberingJobArchetype::Kindlewood) => Item::Kindlewood,
-            JobArchetype::Lumbering(LumberingJobArchetype::Craftwood) => Item::Craftwood,
-            JobArchetype::Lumbering(LumberingJobArchetype::Graintree) => Item::Graintree,
-            JobArchetype::MiningIron => Item::Iron,
+            JobArchetype::Lumbering(LumberingJobArchetype::Kindlewood) => Item::Wood(WoodItem::Kindlewood),
+            JobArchetype::Lumbering(LumberingJobArchetype::Craftwood) => Item::Wood(WoodItem::Craftwood),
+            JobArchetype::Lumbering(LumberingJobArchetype::Graintree) => Item::Wood(WoodItem::Graintree),
+            JobArchetype::Mining(MiningJobArchetype::Iron) => Item::Iron,
             JobArchetype::HuntingDeer => Item::Meat,
             JobArchetype::SmithingIronBar => Item::IronBar,
             JobArchetype::HerbalismChamomile => Item::Herb,
             JobArchetype::Foraging    => Item::Berry,
-            JobArchetype::WoodworkingPlanks => Item::Kindlewood, // todo: change to correct item
+            JobArchetype::WoodworkingPlanks => Item::Woodworking(WoodWorkingItem::Plank),
             JobArchetype::CookingSandwich => Item::Sandwich,
             JobArchetype::AlchemyManaPotion => Item::ManaPotion, // todo: change to correct item
         }
@@ -74,7 +76,12 @@ impl JobArchetype {
 
     pub fn get_required_items(&self) -> Vec<(Item, i64)>{
         match self {
-            JobArchetype::CookingSandwich => vec![(Item::Kindlewood, 4), (Item::Meat, 1), (Item::Herb, 1), (Item::ManaPotion, 1)],
+            JobArchetype::CookingSandwich => vec![
+                (Item::Wood(WoodItem::Kindlewood), 4),
+                (Item::Meat, 1),
+                (Item::Herb, 1),
+                (Item::ManaPotion, 1)
+            ],
             JobArchetype::HuntingDeer => vec![(Item::Deer, 0)],
             JobArchetype::AlchemyManaPotion => vec![(Item::Herb, 1)],
             JobArchetype::HerbalismChamomile => vec![(Item::Herb, 0)], // todo: change to correct item
@@ -93,7 +100,7 @@ impl JobArchetype {
             JobArchetype::Lumbering(LumberingJobArchetype::Craftwood) => SkillArchetype::Lumbering,
             JobArchetype::Lumbering(LumberingJobArchetype::Graintree) => SkillArchetype::Lumbering,
             
-            JobArchetype::MiningIron => SkillArchetype::Mining,
+            JobArchetype::Mining(MiningJobArchetype::Iron) => SkillArchetype::Mining,
             JobArchetype::HuntingDeer => SkillArchetype::Hunting,
             JobArchetype::SmithingIronBar => SkillArchetype::Smithing,
             JobArchetype::HerbalismChamomile => SkillArchetype::Herbalism,
@@ -539,7 +546,8 @@ pub struct JobArchetypeInstances {
 
 impl JobArchetypeInstances {
     pub fn new() -> Self {
-        let instances = JobArchetype::iter()
+        let instances = LumberingJobArchetype::iter().map(JobArchetype::Lumbering)
+            .chain(MiningJobArchetype::iter().map(JobArchetype::Mining))
             .map(|archetype| JobArchetypeInstance::new(archetype))
             .collect();
 

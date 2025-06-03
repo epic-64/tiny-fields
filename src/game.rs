@@ -232,11 +232,21 @@ pub fn pretty_number(num: i64) -> String {
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Copy, Debug)]
-pub enum Item {
-    // Wood
+pub enum WoodItem {
     Kindlewood,
     Craftwood,
     Graintree,
+}
+
+#[derive(Hash, Eq, PartialEq, Clone, Copy, Debug)]
+pub enum WoodWorkingItem {
+    Plank,
+}
+
+#[derive(Hash, Eq, PartialEq, Clone, Copy, Debug)]
+pub enum Item {
+    Wood(WoodItem),
+    Woodworking(WoodWorkingItem),
 
     Coin,
 
@@ -256,9 +266,10 @@ impl Item {
     pub fn get_name(&self) -> String {
         match self {
             Item::Coin => "Coin".to_string(),
-            Item::Kindlewood => "Kindlewood".to_string(),
-            Item::Craftwood => "Craftwood".to_string(),
-            Item::Graintree => "Graintree".to_string(),
+            Item::Wood(WoodItem::Kindlewood) => "Kindlewood".to_string(),
+            Item::Wood(WoodItem::Craftwood) => "Craftwood".to_string(),
+            Item::Wood(WoodItem::Graintree) => "Graintree".to_string(),
+            Item::Woodworking(WoodWorkingItem::Plank) => "Plank".to_string(),
             Item::Iron => "Iron".to_string(),
             Item::Herb => "Herb".to_string(),
             Item::Meat => "Meat".to_string(),
@@ -275,9 +286,9 @@ impl Item {
     pub fn get_texture(&self, assets: &Assets) -> Texture2D {
         match self {
             // Wood
-            Item::Kindlewood => Kindlewood.texture(assets),
-            Item::Craftwood => Craftwood.texture(assets),
-            Item::Graintree => Graintree.texture(assets),
+            Item::Wood(WoodItem::Kindlewood) => Kindlewood.texture(assets),
+            Item::Wood(WoodItem::Craftwood) => Craftwood.texture(assets),
+            Item::Wood(WoodItem::Graintree) => Graintree.texture(assets),
 
             Item::Meat => MeatGame.texture(assets),
             Item::Coin => Coin.texture(assets),
