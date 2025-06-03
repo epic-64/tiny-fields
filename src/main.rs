@@ -25,7 +25,7 @@ pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
 
 #[macroquad::main("Tiny Fields")]
 async fn main() {
-    set_pc_assets_folder("site/assets");
+    set_pc_assets_folder("assets");
     request_new_screen_size(1280., 720.0);
     set_default_filter_mode(FilterMode::Linear);
 
