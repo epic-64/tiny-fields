@@ -2,11 +2,10 @@ use macroquad::prelude::Texture2D;
 use crate::counts_actions::CountsActions;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
-use JobArchetype::{LumberingCraftWood, LumberingGrainTree, LumberingKindleWood, MiningIron};
 use SkillArchetype::{Alchemy, Cooking, Herbalism, Hunting, Lumbering, Mining, Smithing};
 use crate::assets::AssetId::{AlchemyAnim1, AlchemyAnim2, CookingAnim1, CookingAnim2, HerbalismAnim1, HerbalismAnim2, HuntingAnim1, HuntingAnim2, MiningAnim1, MiningAnim2, SmithingAnim1, SmithingAnim2, WoodAnim1, WoodAnim2};
 use crate::assets::Assets;
-use crate::job::JobArchetype;
+use crate::job::{JobArchetype, LumberingJobArchetype};
 
 #[derive(EnumIter, Clone, Debug)]
 pub enum SkillCategory {
@@ -87,13 +86,13 @@ impl SkillArchetype {
     pub fn get_job_archetypes(&self) -> Vec<JobArchetype> {
         match self {
             Lumbering => vec![
-                LumberingKindleWood,
-                LumberingCraftWood,
-                LumberingGrainTree
+                JobArchetype::Lumbering(LumberingJobArchetype::Kindlewood),
+                JobArchetype::Lumbering(LumberingJobArchetype::Craftwood),
+                JobArchetype::Lumbering(LumberingJobArchetype::Graintree),
             ],
 
             Mining => vec![
-                MiningIron
+                JobArchetype::MiningIron,
             ],
             
             default => vec![],

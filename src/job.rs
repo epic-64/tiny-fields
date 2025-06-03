@@ -12,11 +12,17 @@ use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 use crate::job_slot::JobSlotState;
 
+#[derive(Default, EnumIter, Clone, PartialEq, Eq, Hash, Debug, Copy)]
+pub enum LumberingJobArchetype {
+    #[default]
+    Kindlewood,
+    Craftwood,
+    Graintree,
+}
+
 #[derive(EnumIter, Clone, PartialEq, Eq, Hash, Debug, Copy)]
 pub enum JobArchetype {
-    LumberingKindleWood,
-    LumberingCraftWood,
-    LumberingGrainTree,
+    Lumbering(LumberingJobArchetype),
     MiningIron,
     HerbalismChamomile,
     HuntingDeer,
@@ -28,19 +34,6 @@ pub enum JobArchetype {
 }
 
 impl JobArchetype {
-    pub fn get_animation_images(&self, assets: &Assets) -> (Texture2D, Texture2D) {
-        match self {
-            JobArchetype::LumberingKindleWood => (WoodAnim1.texture(assets), WoodAnim2.texture(assets)),
-            JobArchetype::MiningIron => (MiningAnim1.texture(assets), MiningAnim2.texture(assets)),
-            JobArchetype::HuntingDeer => (HuntingAnim1.texture(assets), HuntingAnim2.texture(assets)),
-            JobArchetype::SmithingIronBar => (SmithingAnim1.texture(assets), SmithingAnim2.texture(assets)),
-            JobArchetype::CookingSandwich => (CookingAnim1.texture(assets), CookingAnim2.texture(assets)),
-            JobArchetype::HerbalismChamomile => (HerbalismAnim1.texture(assets), HerbalismAnim2.texture(assets)),
-            JobArchetype::AlchemyManaPotion => (AlchemyAnim1.texture(assets), AlchemyAnim2.texture(assets)),
-            _ => (WoodAnim1.texture(assets), WoodAnim2.texture(assets)),
-        }
-    }
-
     pub fn base_duration(&self) -> f64 {
         match self {
             _ => 4.0,
@@ -49,9 +42,9 @@ impl JobArchetype {
 
     pub fn get_name(&self) -> String {
         match self {
-            JobArchetype::LumberingKindleWood => "Kindlewood".to_string(),
-            JobArchetype::LumberingCraftWood => "Craftwood".to_string(),
-            JobArchetype::LumberingGrainTree => "Graintree".to_string(),
+            JobArchetype::Lumbering(LumberingJobArchetype::Kindlewood) => "Kindlewood".to_string(),
+            JobArchetype::Lumbering(LumberingJobArchetype::Craftwood) => "Craftwood".to_string(),
+            JobArchetype::Lumbering(LumberingJobArchetype::Graintree) => "Graintree".to_string(),
             JobArchetype::MiningIron => "Mining".to_string(),
             JobArchetype::HuntingDeer => "Hunting".to_string(),
             JobArchetype::SmithingIronBar => "Smithing".to_string(),
@@ -65,9 +58,9 @@ impl JobArchetype {
 
     pub fn get_product(&self) -> Item {
         match self {
-            JobArchetype::LumberingKindleWood => Item::Kindlewood,
-            JobArchetype::LumberingCraftWood => Item::Craftwood,
-            JobArchetype::LumberingGrainTree => Item::Graintree,
+            JobArchetype::Lumbering(LumberingJobArchetype::Kindlewood) => Item::Kindlewood,
+            JobArchetype::Lumbering(LumberingJobArchetype::Craftwood) => Item::Craftwood,
+            JobArchetype::Lumbering(LumberingJobArchetype::Graintree) => Item::Graintree,
             JobArchetype::MiningIron => Item::Iron,
             JobArchetype::HuntingDeer => Item::Meat,
             JobArchetype::SmithingIronBar => Item::IronBar,
@@ -81,7 +74,6 @@ impl JobArchetype {
 
     pub fn get_required_items(&self) -> Vec<(Item, i64)>{
         match self {
-            JobArchetype::LumberingKindleWood => vec![(Item::Tree, 0)],
             JobArchetype::CookingSandwich => vec![(Item::Kindlewood, 4), (Item::Meat, 1), (Item::Herb, 1), (Item::ManaPotion, 1)],
             JobArchetype::HuntingDeer => vec![(Item::Deer, 0)],
             JobArchetype::AlchemyManaPotion => vec![(Item::Herb, 1)],
@@ -97,9 +89,9 @@ impl JobArchetype {
     pub fn get_skill_type(&self) -> SkillArchetype {
         match self {
             // Lumbering Jobs
-            JobArchetype::LumberingKindleWood => SkillArchetype::Lumbering,
-            JobArchetype::LumberingCraftWood => SkillArchetype::Lumbering,
-            JobArchetype::LumberingGrainTree => SkillArchetype::Lumbering,
+            JobArchetype::Lumbering(LumberingJobArchetype::Kindlewood) => SkillArchetype::Lumbering,
+            JobArchetype::Lumbering(LumberingJobArchetype::Craftwood) => SkillArchetype::Lumbering,
+            JobArchetype::Lumbering(LumberingJobArchetype::Graintree) => SkillArchetype::Lumbering,
             
             JobArchetype::MiningIron => SkillArchetype::Mining,
             JobArchetype::HuntingDeer => SkillArchetype::Hunting,
@@ -248,7 +240,7 @@ pub fn build_job_card(
     let image_y = offset.y + card_height - image_height - card_padding_y;
     let inner_x = offset.x + card_padding_x + image_width + card_spacing;
 
-    let (image1, image2) = job.job_archetype.get_animation_images(assets);
+    let (image1, image2) = job.job_archetype.get_skill_type().get_animation_images(assets);
 
     let chosen_image = if job.running && job.time_accumulator % 2.0 < 1.0 {
         image1
