@@ -95,7 +95,7 @@ impl SkillArchetype {
                 JobArchetype::Mining(MiningJobArchetype::Iron)
             ],
             
-            default => vec![],
+            _default => vec![],
         }
     }
 
@@ -108,7 +108,7 @@ impl SkillArchetype {
             Smithing => (SmithingAnim1.texture(assets), SmithingAnim2.texture(assets)),
             Cooking => (CookingAnim1.texture(assets), CookingAnim2.texture(assets)),
             Alchemy => (AlchemyAnim1.texture(assets), AlchemyAnim2.texture(assets)),
-            default => (Texture2D::empty(), Texture2D::empty()), // todo: handle other skills
+            _default => (Texture2D::empty(), Texture2D::empty()), // todo: handle other skills
         }
     }
 }

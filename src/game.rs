@@ -1,14 +1,14 @@
 use crate::assets::AssetId::*;
 use crate::assets::Assets;
-use crate::job::{JobArchetype, JobArchetypeInstances, JobInstance, JobParameters};
+use crate::draw::UiElement;
+use crate::job::{JobArchetype, JobArchetypeInstances, JobInstance};
+use crate::job_slot::{JobSlot, JobSlotState};
 use crate::skill::{SkillArchetype, SkillArchetypeInstances};
 use macroquad::color::Color;
 use macroquad::input::MouseButton;
 use macroquad::math::Vec2;
 use macroquad::prelude::Texture2D;
 use std::collections::HashMap;
-use crate::draw::UiElement;
-use crate::job_slot::{JobSlot, JobSlotState};
 
 pub struct MouseInput {
     pub pressed: Vec<MouseButton>,
@@ -136,7 +136,7 @@ impl Intent {
                     job_instance.toggle_running();
                 }
             }
-            Intent::ToggleHyperMode(index) => {
+            Intent::ToggleHyperMode(_index) => {
                 // todo: implement hyper mode toggle
             }
             Intent::SkipSeconds(seconds) => {

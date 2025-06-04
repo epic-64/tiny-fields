@@ -1,7 +1,4 @@
-use crate::assets::Assets;
-use crate::draw::UiElement;
-use crate::game::{GameState, MouseInput, UiRect};
-use crate::job::{JOB_CARD_HEIGHT, JOB_CARD_SPACING_OUTER};
+use crate::game::{MouseInput, UiRect};
 use macroquad::prelude::*;
 
 pub struct ScrollContainer {
@@ -32,7 +29,7 @@ impl ScrollContainer {
         if !is_mouse_button_down(MouseButton::Left) {
             let factor = 0.1;
             let upper_bound = 0.0;
-            
+
             if self.scroll_offset.y > upper_bound {
                 self.scroll_offset.y = self.scroll_offset.y.lerp(upper_bound, factor);
                 if (self.scroll_offset.y - upper_bound).abs() < 1.0 {
@@ -45,7 +42,7 @@ impl ScrollContainer {
             } else {
                 0.0
             };
-            
+
             if self.scroll_offset.y < lower_bound {
                 self.scroll_offset.y = self.scroll_offset.y.lerp(lower_bound, factor);
                 if (self.scroll_offset.y - lower_bound).abs() < 1.0 {

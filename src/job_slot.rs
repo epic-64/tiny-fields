@@ -222,7 +222,6 @@ pub fn product_selection_ui(
             intent: Intent::ChangeJobSlotState(
                 job_slot_index,
                 JobSlotState::RunningJob(JobInstance::new(JobParameters{
-                    instance_id: job_slot_index as i32,
                     job_archetype: job_archetype.clone(),
                 })),
             ),

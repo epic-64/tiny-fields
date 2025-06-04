@@ -44,7 +44,6 @@ async fn main() {
         };
 
         state.job_slots[i].state = JobSlotState::RunningJob(JobInstance::new(JobParameters{
-            instance_id: i as i32,
             job_archetype: archetype,
         }))
     }
@@ -87,7 +86,7 @@ async fn main() {
 
         let all_ui_elements = build_ui_elements(&state, &assets, resolution_offset, show_debug);
         let all_intents: Vec<Intent> = get_intents(&all_ui_elements, &mouse_input);
-        let effects = state.step(&all_intents, dt);
+        let _effects = state.step(&all_intents, dt);
 
         clear_background(palette::GAME_BACKGROUND.get_color());
         all_ui_elements.iter().for_each(|el| draw(el, &mouse_input));

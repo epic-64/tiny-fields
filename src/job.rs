@@ -142,7 +142,6 @@ impl JobArchetypeInstance {
 
 #[derive(Clone, PartialEq, Debug)]
 pub struct JobInstance {
-    pub instance_id: i32,
     pub job_archetype: JobArchetype,
     pub action_progress: Progress,
     pub time_accumulator: f64,
@@ -152,7 +151,6 @@ pub struct JobInstance {
 }
 
 pub struct JobParameters {
-    pub instance_id: i32,
     pub job_archetype: JobArchetype,
 }
 
@@ -160,7 +158,6 @@ impl JobInstance {
     pub fn new(p: JobParameters) -> Self {
         Self {
             job_archetype: p.job_archetype,
-            instance_id: p.instance_id,
             running: true, // todo: change to false
             action_progress: Progress{value: 0.0},
             time_accumulator: 0.0,
