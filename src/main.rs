@@ -14,7 +14,6 @@ pub mod job_slot;
 
 use crate::draw::{draw, BorderStyle, UiElement};
 use crate::game::{GameState, Intent, MouseInput, UiRect};
-use crate::job::{CookingJobArchetype, JobArchetype, JobInstance, JobParameters, LumberingJobArchetype};
 use crate::job_slot::JobSlotState;
 
 pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
