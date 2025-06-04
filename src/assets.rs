@@ -22,7 +22,7 @@ pub enum FontId {
 pub enum AssetId {
     // Backgrounds
     BackgroundParchment,
-    
+
     // Skill Icons
     LumberingIcon,
 
@@ -48,6 +48,9 @@ pub enum AssetId {
     Craftwood,
     Graintree,
 
+    // Ores
+    IronOre,
+
     MeatGame,
     Coin,
     BagOfCoins,
@@ -69,7 +72,7 @@ fn texture_paths() -> Vec<(AssetId, &'static str)> {
     vec![
         // Backgrounds
         (AssetId::BackgroundParchment, "chatgpt/parchment.png"),
-        
+
         // Skill Icons
         (AssetId::LumberingIcon, "chatgpt/skills/woodcutting.png"),
         
@@ -93,6 +96,9 @@ fn texture_paths() -> Vec<(AssetId, &'static str)> {
         (AssetId::Kindlewood, "chatgpt/kindlewood.png"),
         (AssetId::Craftwood, "chatgpt/craftwood.png"),
         (AssetId::Graintree, "chatgpt/graintree.png"),
+
+        // Ores
+        (AssetId::IronOre, "chatgpt/iron_ore.png"),
         
         (AssetId::MeatGame, "chatgpt/game.png"),
         (AssetId::Coin, "coin.png"),

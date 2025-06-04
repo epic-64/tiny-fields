@@ -78,7 +78,7 @@ impl JobArchetype {
             JobArchetype::Lumbering(LumberingJobArchetype::Kindlewood) => Item::Wood(WoodItem::Kindlewood),
             JobArchetype::Lumbering(LumberingJobArchetype::Craftwood) => Item::Wood(WoodItem::Craftwood),
             JobArchetype::Lumbering(LumberingJobArchetype::Graintree) => Item::Wood(WoodItem::Graintree),
-            JobArchetype::Mining(MiningJobArchetype::Iron) => Item::Iron,
+            JobArchetype::Mining(MiningJobArchetype::Iron) => Item::IronOre,
             JobArchetype::Hunting(HuntingJobArchetype::Deer) => Item::Meat,
             JobArchetype::Cooking(CookingJobArchetype::Sandwich) => Item::Sandwich,
             JobArchetype::Alchemy(AlchemyJobArchetype::ManaPotion) => Item::ManaPotion,
@@ -97,6 +97,9 @@ impl JobArchetype {
             ],
             JobArchetype::Alchemy(AlchemyJobArchetype::ManaPotion) => vec![
                 (Item::Herb, 1),
+            ],
+            JobArchetype::Smithing(SmithingJobArchetype::IronBar) => vec![
+                (Item::IronOre, 2),
             ],
             _ => vec![],
         }
