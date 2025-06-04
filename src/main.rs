@@ -14,7 +14,7 @@ pub mod job_slot;
 
 use crate::draw::{draw, BorderStyle, UiElement};
 use crate::game::{GameState, Intent, MouseInput, UiRect};
-use crate::job::{JobArchetype, JobInstance, JobParameters};
+use crate::job::{JobArchetype, JobInstance, JobParameters, LumberingJobArchetype};
 use crate::job_slot::JobSlotState;
 
 pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
@@ -37,9 +37,15 @@ async fn main() {
     let assets: Assets = load_assets().await;
 
     for i in 0..state.job_slots.len() {
+        let archetype = if i % 2 == 0 {
+            JobArchetype::CookingSandwich.clone()
+        } else {
+            JobArchetype::Lumbering(LumberingJobArchetype::Kindlewood)
+        };
+
         state.job_slots[i].state = JobSlotState::RunningJob(JobInstance::new(JobParameters{
             instance_id: i as i32,
-            job_archetype: JobArchetype::CookingSandwich.clone()
+            job_archetype: archetype,
         }))
     }
 
