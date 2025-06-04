@@ -22,6 +22,9 @@ pub enum FontId {
 pub enum AssetId {
     // Backgrounds
     BackgroundParchment,
+    
+    // Skill Icons
+    LumberingIcon,
 
     // Animations
     WoodAnim1,
@@ -66,6 +69,9 @@ fn texture_paths() -> Vec<(AssetId, &'static str)> {
     vec![
         // Backgrounds
         (AssetId::BackgroundParchment, "chatgpt/parchment.png"),
+        
+        // Skill Icons
+        (AssetId::LumberingIcon, "chatgpt/skills/woodcutting.png"),
         
         // Animations
         (AssetId::WoodAnim1, "ChopChop_1_.png"),

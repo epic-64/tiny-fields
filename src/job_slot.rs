@@ -7,6 +7,7 @@ use crate::palette;
 use crate::palette::PaletteC;
 use crate::skill::{SkillArchetype, SkillCategory};
 use macroquad::prelude::Vec2;
+use strum::IntoEnumIterator;
 
 pub const JOB_CARD_HEIGHT: f32 = 192.0;
 pub const JOB_CARD_WIDTH: f32 = 404.0;
@@ -43,10 +44,12 @@ impl JobSlotState {
             color: palette::CARD_BACKGROUND.get_color(),
         });
 
+        let layout = CardLayout::new(10.0, 10.0, 10.0, 10.0);
+
         let state_specific_elements = match self {
             JobSlotState::Locked => locked_job_slot_ui(job_slot_index, assets, offset),
             JobSlotState::Empty => empty_job_slot_ui(job_slot_index, assets, offset),
-            JobSlotState::PickingCategory => category_selection_ui(job_slot_index, assets, offset),
+            JobSlotState::PickingCategory => category_selection_ui(job_slot_index, assets, offset, &layout),
             JobSlotState::PickingSkill(category) => skill_selection_ui(job_slot_index, category, assets, offset),
             JobSlotState::PickingProduct(skill_archetype) => product_selection_ui(job_slot_index, skill_archetype, assets, offset),
             JobSlotState::RunningJob(job_instance) => job_card_ui(&state, assets, job_instance, job_slot_index, offset),
@@ -67,6 +70,19 @@ pub struct JobSlot {
 impl JobSlot {
     pub fn build_ui(&self, game_state: &GameState, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
         self.state.build_ui(self.index, game_state, assets, offset)
+    }
+}
+
+struct CardLayout {
+    padding_x: f32,
+    padding_y: f32,
+    spacing_x: f32,
+    spacing_y: f32,
+}
+
+impl CardLayout {
+    pub fn new(padding_x: f32, padding_y: f32, spacing_x: f32, spacing_y: f32) -> Self {
+        Self { padding_x, padding_y, spacing_x, spacing_y, }
     }
 }
 
@@ -136,26 +152,33 @@ fn empty_job_slot_ui(job_slot_index: usize, assets: &Assets, offset: Vec2) -> Ve
     elements
 }
 
-fn category_selection_ui(job_slot_index: usize, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
+fn category_selection_ui(job_slot_index: usize, assets: &Assets, offset: Vec2, layout: &CardLayout) -> Vec<UiElement> {
     let mut elements = vec![];
 
+    let CardLayout {padding_x, padding_y, spacing_x, spacing_y} = layout;
+
     // Add title: Select Category
+    let title_font_size = 32.0;
+
     elements.push(UiElement::Text {
         content: "Select Category".to_string(),
         font: assets.fonts.text_bold.clone(),
-        x: offset.x + 10.0,
-        y: offset.y + 10.0 + 32.0,
-        font_size: 32.0,
+        x: offset.x + padding_y,
+        y: offset.y + padding_y + title_font_size,
+        font_size: title_font_size,
         color: palette::TEXT.get_color(),
     });
 
-    // Add button for Gathering Category
+    let number_of_categories = SkillCategory::iter().count();
+    let button_height = JOB_CARD_HEIGHT - padding_y - title_font_size - padding_y - spacing_y;
+    let button_width = (JOB_CARD_WIDTH - padding_x * 2.0 - spacing_x * (number_of_categories as f32 - 1.0)) / number_of_categories as f32;
+
     elements.push(UiElement::RectButton {
         rectangle: UiRect {
-            x: offset.x + 10.0,
-            y: offset.y + 10.0 + 32.0 + 40.0,
-            w: 100.0,
-            h: 30.0,
+            x: offset.x + padding_x,
+            y: offset.y + padding_y + title_font_size + spacing_y,
+            w: button_width,
+            h: button_height,
         },
         font_size: 16.0,
         font: assets.fonts.text.clone(),
@@ -173,10 +196,10 @@ fn category_selection_ui(job_slot_index: usize, assets: &Assets, offset: Vec2) -
     // Add button for Crafting Category
     elements.push(UiElement::RectButton {
         rectangle: UiRect {
-            x: offset.x + 120.0,
-            y: offset.y + 10.0 + 32.0 + 40.0,
-            w: 100.0,
-            h: 30.0,
+            x: offset.x + padding_x + button_width + spacing_x,
+            y: offset.y + padding_y + title_font_size + spacing_y,
+            w: button_width,
+            h: button_height,
         },
         font_size: 16.0,
         font: assets.fonts.text.clone(),
