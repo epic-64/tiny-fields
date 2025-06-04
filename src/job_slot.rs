@@ -9,6 +9,7 @@ use macroquad::prelude::Vec2;
 
 #[derive(Clone, Debug)]
 pub enum JobSlotState {
+    Locked,
     Empty,
     PickingCategory,
     PickingSkill(SkillCategory),
@@ -26,7 +27,21 @@ impl JobSlotState {
             offset.y + (row as f32 * JOB_CARD_HEIGHT) + JOB_CARD_SPACING_OUTER * (row as f32),
         );
 
-        match self {
+        let mut elements = vec![];
+
+        elements.push(UiElement::Image {
+            x: offset.x,
+            y: offset.y,
+            width: JOB_CARD_WIDTH,
+            height: JOB_CARD_HEIGHT,
+            texture: BackgroundParchment.texture(&assets),
+            color: palette::CARD_BACKGROUND.get_color(),
+        });
+
+        let state_specific_elements = match self {
+            JobSlotState::Locked => {
+                locked_job_slot_ui(job_slot_index, assets, offset)
+            }
             JobSlotState::Empty => {
                 empty_job_slot_ui(job_slot_index, assets, offset)
             }
@@ -42,7 +57,11 @@ impl JobSlotState {
             JobSlotState::RunningJob(job_instance) => {
                 job_card_ui(&state, assets, job_instance, job_slot_index, offset)
             }
-        }
+        };
+
+        elements.extend(state_specific_elements);
+
+        elements
     }
 }
 
@@ -58,17 +77,37 @@ impl JobSlot {
     }
 }
 
-fn empty_job_slot_ui(job_slot_index: usize, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
+fn locked_job_slot_ui(index: usize, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
     let mut elements = vec![];
 
-    elements.push(UiElement::Image {
-        x: offset.x,
-        y: offset.y,
-        width: JOB_CARD_WIDTH,
-        height: JOB_CARD_HEIGHT,
-        texture: BackgroundParchment.texture(&assets),
-        color: palette::CARD_BACKGROUND.get_color(),
+    // Add title: Locked Slot
+    elements.push(UiElement::Text {
+        content: "Locked Slot".to_string(),
+        font: assets.fonts.text_bold.clone(),
+        x: offset.x + 10.0,
+        y: offset.y + 10.0 + 32.0,
+        font_size: 32.0,
+        color: palette::TEXT.get_color(),
     });
+
+    // Add button to unlock slot
+    elements.push(UiElement::RectButton {
+        rectangle: UiRect::new(offset.x + 10.0, offset.y + 10.0 + 32.0 + 40.0, JOB_CARD_WIDTH - 20.0, 30.0),
+        font_size: 16.0,
+        font: assets.fonts.text.clone(),
+        text: "Unlock Slot".to_string(),
+        background_color: palette::BUTTON_BACKGROUND.get_color(),
+        text_color: palette::BUTTON_TEXT.get_color(),
+        intent: Intent::ChangeJobSlotState(index, JobSlotState::Empty),
+        parent_clip: None,
+        border_style: BorderStyle::None,
+    });
+
+    elements
+}
+
+fn empty_job_slot_ui(job_slot_index: usize, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
+    let mut elements = vec![];
 
     // Add title: Empty Slot
     elements.push(UiElement::Text {
@@ -106,15 +145,6 @@ fn empty_job_slot_ui(job_slot_index: usize, assets: &Assets, offset: Vec2) -> Ve
 
 fn category_selection_ui(job_slot_index: usize, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
     let mut elements = vec![];
-
-    elements.push(UiElement::Image {
-        x: offset.x,
-        y: offset.y,
-        width: JOB_CARD_WIDTH,
-        height: JOB_CARD_HEIGHT,
-        texture: BackgroundParchment.texture(&assets),
-        color: palette::CARD_BACKGROUND.get_color(),
-    });
 
     // Add title: Select Category
     elements.push(UiElement::Text {
@@ -179,15 +209,6 @@ pub fn skill_selection_ui(
 ) -> Vec<UiElement> {
     let mut elements = vec![];
 
-    elements.push(UiElement::Image {
-        x: offset.x,
-        y: offset.y,
-        width: JOB_CARD_WIDTH,
-        height: JOB_CARD_HEIGHT,
-        texture: BackgroundParchment.texture(&assets),
-        color: palette::CARD_BACKGROUND.get_color(),
-    });
-
     // Add title: Select Skill
     elements.push(UiElement::Text {
         content: format!("Select Skill for {}", category.as_str()),
@@ -231,15 +252,6 @@ pub fn product_selection_ui(
     offset: Vec2,
 ) -> Vec<UiElement> {
     let mut elements = vec![];
-
-    elements.push(UiElement::Image {
-        x: offset.x,
-        y: offset.y,
-        width: JOB_CARD_WIDTH,
-        height: JOB_CARD_HEIGHT,
-        texture: BackgroundParchment.texture(&assets),
-        color: palette::CARD_BACKGROUND.get_color(),
-    });
 
     // Add title: Select Product
     elements.push(UiElement::Text {

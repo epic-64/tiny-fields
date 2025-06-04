@@ -256,18 +256,13 @@ pub enum WoodWorkingItem {
 pub enum Item {
     Wood(WoodItem),
     Woodworking(WoodWorkingItem),
-
     Coin,
-
     Iron,
     Herb,
     Meat,
     Berry,
     IronBar,
     Sandwich,
-    Bread,
-    Tree,
-    Deer,
     ManaPotion,
 }
 
@@ -283,29 +278,21 @@ impl Item {
             Item::Berry => "Berry".to_string(),
             Item::IronBar => "Iron Bar".to_string(),
             Item::Sandwich => "Sandwich".to_string(),
-            Item::Bread => "Bread".to_string(),
-            Item::Tree => "Tree".to_string(),
-            Item::Deer => "Deer".to_string(),
             Item::ManaPotion => "Mana Potion".to_string(),
         }
     }
 
     pub fn get_texture(&self, assets: &Assets) -> Texture2D {
         match self {
-            // Wood
             Item::Wood(WoodItem::Kindlewood) => Kindlewood.texture(assets),
             Item::Wood(WoodItem::Craftwood) => Craftwood.texture(assets),
             Item::Wood(WoodItem::Graintree) => Graintree.texture(assets),
-
             Item::Meat => MeatGame.texture(assets),
             Item::Coin => Coin.texture(assets),
-            Item::Bread => Bread.texture(assets),
             Item::Herb => Herbs.texture(assets),
             Item::Sandwich => Sandwich.texture(assets),
-            Item::Tree => Tree.texture(assets),
-            Item::Deer => Deer.texture(assets),
             Item::ManaPotion => ManaPotion.texture(assets),
-            _ => Texture2D::empty(),
+            _default => Texture2D::empty(),
         }
     }
 }

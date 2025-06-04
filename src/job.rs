@@ -85,7 +85,7 @@ impl JobArchetype {
             JobArchetype::Lumbering(LumberingJobArchetype::Craftwood) => Item::Wood(WoodItem::Craftwood),
             JobArchetype::Lumbering(LumberingJobArchetype::Graintree) => Item::Wood(WoodItem::Graintree),
             JobArchetype::Mining(MiningJobArchetype::Iron) => Item::Iron,
-            JobArchetype::Hunting(HuntingJobArchetype::Deer) => Item::Deer,
+            JobArchetype::Hunting(HuntingJobArchetype::Deer) => Item::Meat,
             JobArchetype::Cooking(CookingJobArchetype::Sandwich) => Item::Sandwich,
             JobArchetype::Alchemy(AlchemyJobArchetype::ManaPotion) => Item::ManaPotion,
             JobArchetype::Herbalism(HerbalismJobArchetype::Herb) => Item::Herb,

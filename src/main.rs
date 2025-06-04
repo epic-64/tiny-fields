@@ -37,15 +37,7 @@ async fn main() {
     let assets: Assets = load_assets().await;
 
     for i in 0..state.job_slots.len() {
-        let archetype = if i % 2 == 0 {
-            JobArchetype::Cooking(CookingJobArchetype::Sandwich)
-        } else {
-            JobArchetype::Lumbering(LumberingJobArchetype::Kindlewood)
-        };
-
-        state.job_slots[i].state = JobSlotState::RunningJob(JobInstance::new(JobParameters{
-            job_archetype: archetype,
-        }))
+        state.job_slots[i].state = JobSlotState::Locked;
     }
 
     // Example for using quad-storage
