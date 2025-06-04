@@ -14,7 +14,8 @@ pub mod job_slot;
 
 use crate::draw::{draw, BorderStyle, UiElement};
 use crate::game::{GameState, Intent, MouseInput, UiRect};
-use crate::job::JobArchetype;
+use crate::job::{JobArchetype, JobInstance, JobParameters};
+use crate::job_slot::JobSlotState;
 
 pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
     vec![MouseButton::Left, MouseButton::Right, MouseButton::Middle]
@@ -34,6 +35,13 @@ async fn main() {
     let mut show_debug = false;
 
     let assets: Assets = load_assets().await;
+
+    for i in 0..state.job_slots.len() {
+        state.job_slots[i].state = JobSlotState::RunningJob(JobInstance::new(JobParameters{
+            instance_id: i as i32,
+            job_archetype: JobArchetype::CookingSandwich.clone()
+        }))
+    }
 
     // Example for using quad-storage
     // let storage = &mut quad_storage::STORAGE.lock().unwrap();

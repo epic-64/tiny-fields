@@ -548,6 +548,15 @@ impl JobArchetypeInstances {
     pub fn new() -> Self {
         let instances = LumberingJobArchetype::iter().map(JobArchetype::Lumbering)
             .chain(MiningJobArchetype::iter().map(JobArchetype::Mining))
+            .chain(vec![
+                JobArchetype::HerbalismChamomile,
+                JobArchetype::HuntingDeer,
+                JobArchetype::Foraging,
+                JobArchetype::WoodworkingPlanks,
+                JobArchetype::SmithingIronBar,
+                JobArchetype::CookingSandwich,
+                JobArchetype::AlchemyManaPotion,
+            ])
             .map(|archetype| JobArchetypeInstance::new(archetype))
             .collect();
 
