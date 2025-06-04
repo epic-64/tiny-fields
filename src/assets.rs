@@ -23,6 +23,9 @@ pub enum AssetId {
     // Backgrounds
     BackgroundParchment,
 
+    // Icons
+    LockIcon,
+
     // Skill Icons
     LumberingIcon,
 
@@ -64,7 +67,7 @@ pub enum AssetId {
 
 impl AssetId {
     pub fn texture(&self, assets: &Assets) -> Texture2D {
-        assets.textures.get(self).expect("Couldn't find texture").clone()
+        assets.textures.get(self).unwrap_or(&Texture2D::empty()).clone()
     }
 }
 
@@ -72,6 +75,9 @@ fn texture_paths() -> Vec<(AssetId, &'static str)> {
     vec![
         // Backgrounds
         (AssetId::BackgroundParchment, "chatgpt/parchment.png"),
+
+        // Icons
+        // (AssetId::LockIcon, "chatgpt/lock.png"),
 
         // Skill Icons
         (AssetId::LumberingIcon, "chatgpt/skills/woodcutting.png"),

@@ -1,4 +1,4 @@
-use crate::assets::AssetId::BackgroundParchment;
+use crate::assets::AssetId::{BackgroundParchment, LockIcon};
 use crate::assets::{AssetId, Assets};
 use crate::draw::{number_pill, BorderStyle, UiElement};
 use crate::game::{GameState, Intent, UiRect};
@@ -89,25 +89,18 @@ impl CardLayout {
 fn locked_job_slot_ui(index: usize, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
     let mut elements = vec![];
 
-    // Add title: Locked Slot
-    elements.push(UiElement::Text {
-        content: "Locked Slot".to_string(),
-        font: assets.fonts.text_bold.clone(),
-        x: offset.x + 10.0,
-        y: offset.y + 10.0 + 32.0,
-        font_size: 32.0,
-        color: palette::TEXT.get_color(),
-    });
+    let icon_size = 96.0;
 
-    // Add button to unlock slot
-    elements.push(UiElement::RectButton {
-        rectangle: UiRect::new(offset.x + 10.0, offset.y + 10.0 + 32.0 + 40.0, JOB_CARD_WIDTH - 20.0, 30.0),
-        font_size: 16.0,
-        font: assets.fonts.text.clone(),
-        text: "Unlock Slot".to_string(),
-        background_color: palette::BUTTON_BACKGROUND.get_color(),
-        text_color: palette::BUTTON_TEXT.get_color(),
+    // Add image button of a lock in the middle of the card
+    elements.push(UiElement::ImgButton {
+        rectangle: UiRect::new(
+            offset.x + JOB_CARD_WIDTH / 2.0 - icon_size / 2.0,
+            offset.y + JOB_CARD_HEIGHT / 2.0 - icon_size / 2.0,
+            icon_size,
+            icon_size,
+        ),
         intent: Intent::ChangeJobSlotState(index, JobSlotState::Empty),
+        texture: LockIcon.texture(&assets),
         parent_clip: None,
         border_style: BorderStyle::None,
     });
@@ -431,33 +424,6 @@ pub fn job_card_ui(
         )
     );
 
-    // Draw Skill instance level up progress bar
-    let skill_progress_bar_width = card_width - card_padding_x - image_width - card_spacing - card_padding_x - right_side_width - card_spacing;
-    let skill_progress_bar_height = 10.0;
-    let skill_progress_bar_y = image_y;
-    elements.push(UiElement::ProgressBar {
-        x: inner_x,
-        y: skill_progress_bar_y,
-        width: skill_progress_bar_width,
-        height: skill_progress_bar_height,
-        progress: skill_instance.actions_counter.level_up_progress.get(),
-        background_color: palette::BAR_BACKGROUND.get_color(),
-        foreground_color: palette::SKILL_COLOR.get_color(),
-        border_style: BorderStyle::Solid,
-    });
-
-    // Draw Job instance level up progress bar
-    elements.push(UiElement::ProgressBar {
-        x: inner_x,
-        y: skill_progress_bar_y + skill_progress_bar_height + 4.0,
-        width: skill_progress_bar_width,
-        height: skill_progress_bar_height,
-        progress: job_archetype_instance.action_counter.level_up_progress.get(),
-        background_color: palette::BAR_BACKGROUND.get_color(),
-        foreground_color: palette::PRODUCT_COLOR.get_color(),
-        border_style: BorderStyle::Solid,
-    });
-
     // Draw 4 resource icons in the middle
     let resource_icon_size = 50.0;
     let resource_icon_padding = 4.0;
@@ -540,6 +506,33 @@ pub fn job_card_ui(
             border_style: BorderStyle::Dotted,
         });
     }
+
+    // Draw Skill instance level up progress bar
+    let skill_progress_bar_width = card_width - card_padding_x - card_padding_x - right_side_width - card_spacing;
+    let skill_progress_bar_height = 12.0;
+    let skill_progress_bar_y = image_y;
+    elements.push(UiElement::ProgressBar {
+        x: offset.x + card_padding_x,
+        y: offset.y + card_padding_y + font_size_large - 6.0,
+        width: skill_progress_bar_width,
+        height: skill_progress_bar_height,
+        progress: skill_instance.actions_counter.level_up_progress.get(),
+        background_color: palette::BAR_BACKGROUND.get_color(),
+        foreground_color: palette::SKILL_COLOR.get_color(),
+        border_style: BorderStyle::None,
+    });
+
+    // Draw Job instance level up progress bar
+    elements.push(UiElement::ProgressBar {
+        x: offset.x + card_padding_x,
+        y: offset.y + card_padding_y + font_size_large + skill_progress_bar_height + 4.0,
+        width: skill_progress_bar_width,
+        height: skill_progress_bar_height,
+        progress: job_archetype_instance.action_counter.level_up_progress.get(),
+        background_color: palette::BAR_BACKGROUND.get_color(),
+        foreground_color: palette::PRODUCT_COLOR.get_color(),
+        border_style: BorderStyle::None,
+    });
 
     // Skill Type and Level
     elements.push(UiElement::Text {
