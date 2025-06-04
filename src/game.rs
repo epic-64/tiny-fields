@@ -204,11 +204,6 @@ impl Progress {
     }
 }
 
-#[derive(Clone)]
-pub struct JobBaseValues {
-    pub actions_until_level_up: i32,
-}
-
 #[derive(Clone, PartialEq)]
 pub enum Effect {
     AddItem { item: Item, amount: i64 },

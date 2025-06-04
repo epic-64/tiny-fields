@@ -5,13 +5,12 @@ use strum_macros::EnumIter;
 use SkillArchetype::{Alchemy, Cooking, Herbalism, Hunting, Lumbering, Mining, Smithing};
 use crate::assets::AssetId::{AlchemyAnim1, AlchemyAnim2, CookingAnim1, CookingAnim2, HerbalismAnim1, HerbalismAnim2, HuntingAnim1, HuntingAnim2, MiningAnim1, MiningAnim2, SmithingAnim1, SmithingAnim2, WoodAnim1, WoodAnim2};
 use crate::assets::Assets;
-use crate::job::{JobArchetype, LumberingJobArchetype, MiningJobArchetype};
+use crate::job::{AlchemyJobArchetype, CookingJobArchetype, HerbalismJobArchetype, HuntingJobArchetype, JobArchetype, LumberingJobArchetype, MiningJobArchetype, SmithingJobArchetype};
 
 #[derive(EnumIter, Clone, Debug)]
 pub enum SkillCategory {
     Gathering,
     Crafting,
-    Selling,
 }
 
 impl SkillCategory {
@@ -19,7 +18,6 @@ impl SkillCategory {
         match self {
             SkillCategory::Gathering => "Gathering",
             SkillCategory::Crafting => "Crafting",
-            SkillCategory::Selling => "Selling",
         }
     }
 
@@ -28,20 +26,14 @@ impl SkillCategory {
             SkillCategory::Gathering => vec![
                 Lumbering,
                 Mining,
-                SkillArchetype::Fishing,
                 Hunting,
-                SkillArchetype::Foraging,
                 Herbalism,
-                SkillArchetype::Thieving,
             ],
             SkillCategory::Crafting => vec![
-                SkillArchetype::Woodworking,
                 Smithing,
-                SkillArchetype::Tailoring,
                 Alchemy,
                 Cooking,
             ],
-            SkillCategory::Selling => vec![], // No specific skills for selling
         }
     }
 }
@@ -51,16 +43,11 @@ pub enum SkillArchetype {
     // Gathering Skills
     Lumbering,
     Mining,
-    Fishing,
     Hunting,
-    Foraging,
     Herbalism,
-    Thieving,
 
     // Crafting Skills
-    Woodworking,
     Smithing,
-    Tailoring,
     Alchemy,
     Cooking,
 }
@@ -70,14 +57,9 @@ impl SkillArchetype {
         match self {
             Lumbering => "Lumbering",
             Mining => "Mining",
-            SkillArchetype::Fishing => "Fishing",
             Hunting => "Hunting",
-            SkillArchetype::Foraging => "Foraging",
             Herbalism => "Herbalism",
-            SkillArchetype::Thieving => "Thieving",
-            SkillArchetype::Woodworking => "Woodworking",
             Smithing => "Smithing",
-            SkillArchetype::Tailoring => "Tailoring",
             Alchemy => "Alchemy",
             Cooking => "Cooking",
         }
@@ -85,6 +67,14 @@ impl SkillArchetype {
 
     pub fn get_job_archetypes(&self) -> Vec<JobArchetype> {
         match self {
+            Alchemy => vec![
+                JobArchetype::Alchemy(AlchemyJobArchetype::ManaPotion),
+            ],
+
+            Cooking => vec![
+                JobArchetype::Cooking(CookingJobArchetype::Sandwich),
+            ],
+
             Lumbering => vec![
                 JobArchetype::Lumbering(LumberingJobArchetype::Kindlewood),
                 JobArchetype::Lumbering(LumberingJobArchetype::Craftwood),
@@ -92,10 +82,20 @@ impl SkillArchetype {
             ],
 
             Mining => vec![
-                JobArchetype::Mining(MiningJobArchetype::Iron)
+                JobArchetype::Mining(MiningJobArchetype::Iron),
             ],
-            
-            _default => vec![],
+
+            Hunting => vec![
+                JobArchetype::Hunting(HuntingJobArchetype::Deer),
+            ],
+
+            Herbalism => vec![
+                JobArchetype::Herbalism(HerbalismJobArchetype::Herb),
+            ],
+
+            Smithing => vec![
+                JobArchetype::Smithing(SmithingJobArchetype::IronBar),
+            ],
         }
     }
 
@@ -108,7 +108,6 @@ impl SkillArchetype {
             Smithing => (SmithingAnim1.texture(assets), SmithingAnim2.texture(assets)),
             Cooking => (CookingAnim1.texture(assets), CookingAnim2.texture(assets)),
             Alchemy => (AlchemyAnim1.texture(assets), AlchemyAnim2.texture(assets)),
-            _default => (Texture2D::empty(), Texture2D::empty()), // todo: handle other skills
         }
     }
 }
@@ -122,7 +121,7 @@ impl SkillArchetypeInstance {
     pub fn new(skill_type: SkillArchetype) -> Self {
         Self {
             skill_type,
-            actions_counter: CountsActions::new(Self::actions_to_level, 5),
+            actions_counter: CountsActions::new(Self::actions_to_level, 10),
         }
     }
 
@@ -133,7 +132,7 @@ impl SkillArchetypeInstance {
         let b = 6.57881;
         let c = a * (level as f64).powf(b);
 
-        5 + first_portion + c as i64
+        first_portion + c as i64
     }
 
     pub fn increment_actions(&mut self) {

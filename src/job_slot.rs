@@ -28,7 +28,7 @@ impl JobSlotState {
 
         match self {
             JobSlotState::Empty => {
-                category_selection_ui(job_slot_index, assets, offset)
+                empty_job_slot_ui(job_slot_index, assets, offset)
             }
             JobSlotState::PickingCategory => {
                 category_selection_ui(job_slot_index, assets, offset)
@@ -56,6 +56,52 @@ impl JobSlot {
     pub fn build_ui(&self, game_state: &GameState, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
         self.state.build_ui(self.index, game_state, assets, offset)
     }
+}
+
+fn empty_job_slot_ui(job_slot_index: usize, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
+    let mut elements = vec![];
+
+    elements.push(UiElement::Image {
+        x: offset.x,
+        y: offset.y,
+        width: JOB_CARD_WIDTH,
+        height: JOB_CARD_HEIGHT,
+        texture: BackgroundParchment.texture(&assets),
+        color: palette::CARD_BACKGROUND.get_color(),
+    });
+
+    // Add title: Empty Slot
+    elements.push(UiElement::Text {
+        content: "Empty Slot".to_string(),
+        font: assets.fonts.text_bold.clone(),
+        x: offset.x + 10.0,
+        y: offset.y + 10.0 + 32.0,
+        font_size: 32.0,
+        color: palette::TEXT.get_color(),
+    });
+
+    // Add button to select category
+    elements.push(UiElement::RectButton {
+        rectangle: UiRect {
+            x: offset.x + 10.0,
+            y: offset.y + 10.0 + 32.0 + 40.0,
+            w: JOB_CARD_WIDTH - 20.0,
+            h: 30.0,
+        },
+        font_size: 16.0,
+        font: assets.fonts.text.clone(),
+        text: "Select Category".to_string(),
+        background_color: palette::BUTTON_BACKGROUND.get_color(),
+        text_color: palette::BUTTON_TEXT.get_color(),
+        intent: Intent::ChangeJobSlotState(
+            job_slot_index,
+            JobSlotState::PickingCategory,
+        ),
+        parent_clip: None,
+        border_style: BorderStyle::None,
+    });
+
+    elements
 }
 
 fn category_selection_ui(job_slot_index: usize, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
