@@ -523,7 +523,6 @@ pub fn job_card_ui(
     // Draw Skill instance level up progress bar
     let skill_progress_bar_width = card_width - card_padding_x - card_padding_x - right_side_width - card_spacing;
     let skill_progress_bar_height = 12.0;
-    let skill_progress_bar_y = image_y;
     elements.push(UiElement::ProgressBar {
         x: offset.x + card_padding_x,
         y: offset.y + card_padding_y + font_size_large - 6.0,
