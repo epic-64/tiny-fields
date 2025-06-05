@@ -1,7 +1,6 @@
-use macroquad::miniquad::CursorIcon;
-use crate::assets::{load_assets, Assets};
 use macroquad::miniquad::date::now;
 use macroquad::miniquad::window::set_mouse_cursor;
+use macroquad::miniquad::CursorIcon;
 use macroquad::prelude::*;
 
 pub mod draw;
@@ -14,6 +13,7 @@ pub mod skill;
 pub mod counts_actions;
 pub mod job_slot;
 
+use crate::assets::{load_assets, Assets};
 use crate::draw::{draw, BorderStyle, UiElement};
 use crate::game::{GameState, Intent, MouseInput, UiRect};
 use crate::job_slot::JobSlotState;

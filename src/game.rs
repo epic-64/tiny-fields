@@ -140,7 +140,6 @@ impl Intent {
                 }
             }
             Intent::EnableHyperMode(index) => {
-                // Enable hyper mode for the job slot at index
                 if let Some(JobSlot { state: JobSlotState::RunningJob(job_instance), .. }) = game_state.job_slots.get_mut(*index) {
                     job_instance.hyper_mode.enable();
                 }
