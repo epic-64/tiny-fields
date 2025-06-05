@@ -126,7 +126,7 @@ impl GameState {
 pub enum Intent {
     ToggleJob(usize),
     SkipSeconds(i32),
-    ToggleHyperMode(usize),
+    EnableHyperMode(usize),
     ChangeJobSlotState(usize, JobSlotState),
     SetMouseCursor(CursorIcon),
 }
@@ -139,8 +139,11 @@ impl Intent {
                     job_instance.toggle_running();
                 }
             }
-            Intent::ToggleHyperMode(_index) => {
-                // todo: implement hyper mode toggle
+            Intent::EnableHyperMode(index) => {
+                // Enable hyper mode for the job slot at index
+                if let Some(JobSlot { state: JobSlotState::RunningJob(job_instance), .. }) = game_state.job_slots.get_mut(*index) {
+                    job_instance.hyper_mode.enable();
+                }
             }
             Intent::SkipSeconds(seconds) => {
                 for _ in 0..*seconds {
@@ -234,7 +237,6 @@ pub fn pretty_number(num: i64) -> String {
 
 #[derive(Hash, Eq, PartialEq, Clone, Copy, Debug)]
 pub enum WoodItem {
-    Kindlewood,
     Craftwood,
     Graintree,
 }
@@ -246,7 +248,6 @@ trait GetName {
 impl GetName for WoodItem {
     fn get_name(&self) -> String {
         match self {
-            WoodItem::Kindlewood => "Kindlewood".to_string(),
             WoodItem::Craftwood => "Craftwood".to_string(),
             WoodItem::Graintree => "Graintree".to_string(),
         }
@@ -290,7 +291,6 @@ impl Item {
 
     pub fn get_texture(&self, assets: &Assets) -> Texture2D {
         match self {
-            Item::Wood(WoodItem::Kindlewood) => Kindlewood.texture(assets),
             Item::Wood(WoodItem::Craftwood) => Craftwood.texture(assets),
             Item::Wood(WoodItem::Graintree) => Graintree.texture(assets),
             Item::Meat => MeatGame.texture(assets),

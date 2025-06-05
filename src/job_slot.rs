@@ -387,22 +387,24 @@ pub fn job_card_ui(
     let right_side_width = 64.0;
 
     // Draw the HyperMode button on the right
-    elements.push(UiElement::RectButton {
-        rectangle: UiRect {
-            x: offset.x + card_width - right_side_width - card_padding_x,
-            y: image_y,
-            w: right_side_width,
-            h: 24.0,
-        },
-        font: assets.fonts.text_bold.clone(),
-        parent_clip: clip.clone(),
-        font_size: font_size_small,
-        text: "Hyper".to_string(),
-        background_color: palette::BUTTON_BACKGROUND.get_color(),
-        text_color: palette::BUTTON_TEXT.get_color(),
-        intent: Intent::ToggleHyperMode(job_slot_id),
-        border_style: BorderStyle::Solid,
-    });
+    if job.hyper_mode.has_enough_actions() {
+        elements.push(UiElement::RectButton {
+            rectangle: UiRect {
+                x: offset.x + card_width - right_side_width - card_padding_x,
+                y: image_y,
+                w: right_side_width,
+                h: 24.0,
+            },
+            font: assets.fonts.text_bold.clone(),
+            parent_clip: clip.clone(),
+            font_size: font_size_small,
+            text: "Hyper".to_string(),
+            background_color: palette::BUTTON_BACKGROUND.get_color(),
+            text_color: palette::BUTTON_TEXT.get_color(),
+            intent: Intent::EnableHyperMode(job_slot_id),
+            border_style: BorderStyle::Solid,
+        });
+    }
 
     // Draw Product Image on the right
     elements.push(UiElement::Rectangle {
@@ -525,9 +527,9 @@ pub fn job_card_ui(
     let skill_progress_bar_height = 12.0;
     elements.push(UiElement::ProgressBar {
         x: offset.x + card_padding_x,
-        y: offset.y + card_padding_y + font_size_large - 6.0,
+        y: offset.y + card_padding_y + 2.0,
         width: skill_progress_bar_width,
-        height: skill_progress_bar_height,
+        height: font_size_large + 2.0,
         progress: skill_instance.actions_counter.level_up_progress.get(),
         background_color: palette::BAR_BACKGROUND.get_color(),
         foreground_color: palette::SKILL_COLOR.get_color(),
@@ -537,9 +539,9 @@ pub fn job_card_ui(
     // Draw Job instance level up progress bar
     elements.push(UiElement::ProgressBar {
         x: offset.x + card_padding_x,
-        y: offset.y + card_padding_y + font_size_large + skill_progress_bar_height + 4.0,
+        y: offset.y + card_padding_y + font_size_large + 6.0,
         width: skill_progress_bar_width,
-        height: skill_progress_bar_height,
+        height: font_size_large + 2.0,
         progress: job_archetype_instance.action_counter.level_up_progress.get(),
         background_color: palette::BAR_BACKGROUND.get_color(),
         foreground_color: palette::PRODUCT_COLOR.get_color(),

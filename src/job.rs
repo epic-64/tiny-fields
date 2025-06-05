@@ -6,7 +6,6 @@ use strum_macros::EnumIter;
 
 #[derive(EnumIter, Clone, PartialEq, Eq, Hash, Debug, Copy)]
 pub enum LumberingJobArchetype {
-    Kindlewood,
     Craftwood,
     Graintree,
 }
@@ -61,7 +60,6 @@ impl JobArchetype {
 
     pub fn get_name(&self) -> String {
         match self {
-            JobArchetype::Lumbering(LumberingJobArchetype::Kindlewood) => "Kindlewood".to_string(),
             JobArchetype::Lumbering(LumberingJobArchetype::Craftwood) => "Craftwood".to_string(),
             JobArchetype::Lumbering(LumberingJobArchetype::Graintree) => "Graintree".to_string(),
             JobArchetype::Mining(MiningJobArchetype::Iron) => "Mining".to_string(),
@@ -75,7 +73,6 @@ impl JobArchetype {
 
     pub fn get_product(&self) -> Item {
         match self {
-            JobArchetype::Lumbering(LumberingJobArchetype::Kindlewood) => Item::Wood(WoodItem::Kindlewood),
             JobArchetype::Lumbering(LumberingJobArchetype::Craftwood) => Item::Wood(WoodItem::Craftwood),
             JobArchetype::Lumbering(LumberingJobArchetype::Graintree) => Item::Wood(WoodItem::Graintree),
             JobArchetype::Mining(MiningJobArchetype::Iron) => Item::IronOre,
@@ -90,13 +87,12 @@ impl JobArchetype {
     pub fn get_required_items(&self) -> Vec<(Item, i64)>{
         match self {
             JobArchetype::Cooking(CookingJobArchetype::Sandwich) => vec![
-                (Item::Wood(WoodItem::Kindlewood), 4),
-                (Item::Meat, 1),
-                (Item::Herb, 1),
-                (Item::ManaPotion, 1),
+                (Item::Wood(WoodItem::Craftwood), 2),
+                (Item::Meat, 2),
+                (Item::Herb, 2),
             ],
             JobArchetype::Alchemy(AlchemyJobArchetype::ManaPotion) => vec![
-                (Item::Herb, 1),
+                (Item::Herb, 4),
             ],
             JobArchetype::Smithing(SmithingJobArchetype::IronBar) => vec![
                 (Item::IronOre, 2),
@@ -111,7 +107,6 @@ impl JobArchetype {
 
     pub fn get_skill_type(&self) -> SkillArchetype {
         match self {
-            JobArchetype::Lumbering(LumberingJobArchetype::Kindlewood) => SkillArchetype::Lumbering,
             JobArchetype::Lumbering(LumberingJobArchetype::Craftwood) => SkillArchetype::Lumbering,
             JobArchetype::Lumbering(LumberingJobArchetype::Graintree) => SkillArchetype::Lumbering,
             JobArchetype::Mining(MiningJobArchetype::Iron) => SkillArchetype::Mining,
@@ -160,10 +155,64 @@ pub struct JobInstance {
     pub running: bool,
     pub timeslot_cost: i32,
     pub has_paid_resources: bool,
+    pub hyper_mode: HyperMode,
 }
 
 pub struct JobParameters {
     pub job_archetype: JobArchetype,
+}
+
+#[derive(Clone, PartialEq, Debug)]
+pub struct HyperMode {
+    pub is_enabled: bool,
+    pub hyper_time_accumulator: f64,
+    pub hyper_duration_seconds: f64,
+    pub hyper_multiplier: f64,
+    pub actions_counter: i32,
+    pub hyper_actions_cost: i32,
+}
+
+impl HyperMode {
+    pub fn new() -> Self {
+        Self {
+            is_enabled: false,
+            hyper_time_accumulator: 0.0,
+            hyper_duration_seconds: 10.0,
+            hyper_multiplier: 4.0,
+            actions_counter: 0,
+            hyper_actions_cost: 5,
+        }
+    }
+
+    pub fn has_enough_actions(&self) -> bool {
+        self.actions_counter >= self.hyper_actions_cost
+    }
+
+    pub fn increment_actions(&mut self) -> () {
+        if !self.is_enabled {
+            self.actions_counter += 1;
+        }
+    }
+
+    pub fn enable(&mut self) {
+        if self.has_enough_actions() {
+            self.actions_counter = 0;
+            self.is_enabled = true;
+        }
+    }
+
+    pub fn update(&mut self, dt: f32) -> () {
+        if !self.is_enabled {
+            return;
+        }
+
+        self.hyper_time_accumulator += dt as f64;
+
+        if self.hyper_time_accumulator >= self.hyper_duration_seconds {
+            self.is_enabled = false;
+            self.hyper_time_accumulator = 0.0;
+        }
+    }
 }
 
 impl JobInstance {
@@ -175,6 +224,7 @@ impl JobInstance {
             time_accumulator: 0.0,
             timeslot_cost: 1,
             has_paid_resources: false,
+            hyper_mode: HyperMode::new(),
         }
     }
 
@@ -201,16 +251,24 @@ impl JobInstance {
                 inventory.add_item(item, -amount);
             }
 
-            self.has_paid_resources = true; // Mark that we've paid resources
+            self.has_paid_resources = true;
         }
 
-        self.time_accumulator += dt as f64;
+        self.hyper_mode.update(dt);
+
+        let dt_progress = if self.hyper_mode.is_enabled {
+            dt * self.hyper_mode.hyper_multiplier as f32
+        } else {
+            dt
+        };
+
+        self.time_accumulator += dt_progress as f64;
         self.action_progress.set(self.time_accumulator / duration);
 
         if self.time_accumulator >= duration {
-            // reset job instance
             self.time_accumulator -= duration;
             self.has_paid_resources = false;
+            self.hyper_mode.increment_actions();
 
             vec![
                 Effect::AddItem { item: self.job_archetype.get_product(), amount: 1 },

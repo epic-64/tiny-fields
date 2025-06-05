@@ -76,7 +76,6 @@ impl SkillArchetype {
             ],
 
             Lumbering => vec![
-                JobArchetype::Lumbering(LumberingJobArchetype::Kindlewood),
                 JobArchetype::Lumbering(LumberingJobArchetype::Craftwood),
                 JobArchetype::Lumbering(LumberingJobArchetype::Graintree),
             ],
