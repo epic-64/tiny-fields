@@ -1,5 +1,3 @@
-use futures::future::join_all;
-use futures::join;
 use macroquad::prelude::{Font, Texture2D};
 use macroquad::text::load_ttf_font;
 use macroquad::texture::load_texture;
@@ -128,44 +126,24 @@ fn texture_paths() -> Vec<(AssetId, &'static str)> {
 
 pub async fn load_textures() -> HashMap<AssetId, Texture2D> {
     let paths = texture_paths();
-    let futures = paths.iter().map(|(_, path)| load_texture(path));
-    let results = join_all(futures).await; // only wait once
 
-    paths
-        .into_iter()
-        .zip(results)
-        .map(|((asset_id, _), res)| {
-            let texture = res.expect("Failed to load asset");
-            (asset_id, texture)
-        })
-        .collect()
-}
+    let mut textures = vec![];
 
-async fn load_fonts() -> HashMap<FontId, Font> {
-    let paths = vec![
-        (FontId::MonoBold, "Lekton-Bold.ttf"),
-        (FontId::TextRegular, "WorkSans-Regular.ttf"),
-        (FontId::TextBold, "WorkSans-SemiBold.ttf"),
-    ];
+    for (asset_id, path) in paths {
+        let texture = load_texture(path).await.expect(&format!("Failed to load texture: {}", path));
+        textures.push((asset_id, texture));
+    }
 
-    let futures = paths.iter().map(|(_, path)| load_ttf_font(path));
-    let results = join_all(futures).await;
-
-    paths.into_iter().zip(results)
-        .map(|((font_id, _), res)| {
-            let font = res.expect("Failed to load font");
-            (font_id, font)
-        })
-        .collect()
+    HashMap::from_iter(textures)
 }
 
 pub async fn load_assets() -> Assets {
-    let (texture_map, font_map) = join!(load_textures(), load_fonts());
+    let texture_map = load_textures().await;
 
     let fonts = Fonts {
-        mono: font_map.get(&FontId::MonoBold).expect("Couldn't find Mono font").clone(),
-        text: font_map.get(&FontId::TextRegular).expect("Couldn't find Text font").clone(),
-        text_bold: font_map.get(&FontId::TextBold).expect("Couldn't find Text bold font").clone(),
+        mono: load_ttf_font("Lekton-Bold.ttf").await.expect("Couldn't find Mono font"),
+        text: load_ttf_font("WorkSans-Regular.ttf").await.expect("Couldn't find Text font"),
+        text_bold: load_ttf_font("WorkSans-SemiBold.ttf").await.expect("Couldn't find Text bold font"),
     };
 
     Assets {

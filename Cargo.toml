@@ -8,6 +8,5 @@ edition = "2021"
 [dependencies]
 macroquad = { version = "0.4.13", features = ["audio"] }
 quad-storage = "0.1.3"
-futures = "0.3.31"
 strum = "0.27.1"
 strum_macros = "0.27.1"

@@ -7,10 +7,10 @@ use crate::skill::{SkillArchetype, SkillArchetypeInstances};
 use macroquad::color::Color;
 use macroquad::input::MouseButton;
 use macroquad::math::Vec2;
+use macroquad::miniquad::window::set_mouse_cursor;
+use macroquad::miniquad::CursorIcon;
 use macroquad::prelude::Texture2D;
 use std::collections::HashMap;
-use macroquad::miniquad::CursorIcon;
-use macroquad::miniquad::window::set_mouse_cursor;
 
 pub struct MouseInput {
     pub pressed: Vec<MouseButton>,
