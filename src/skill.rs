@@ -1,11 +1,11 @@
-use macroquad::prelude::Texture2D;
+use crate::assets::AssetId::{AlchemyAnim1, AlchemyAnim2, CookingAnim1, CookingAnim2, HerbalismAnim1, HerbalismAnim2, HuntingAnim1, HuntingAnim2, LumberingIcon, MiningAnim1, MiningAnim2, MiningIcon, SmithingAnim1, SmithingAnim2, WoodAnim1, WoodAnim2};
+use crate::assets::Assets;
 use crate::counts_actions::CountsActions;
+use crate::job::{AlchemyJobArchetype, CookingJobArchetype, HerbalismJobArchetype, HuntingJobArchetype, JobArchetype, LumberingJobArchetype, MiningJobArchetype, SmithingJobArchetype};
+use macroquad::prelude::Texture2D;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 use SkillArchetype::{Alchemy, Cooking, Herbalism, Hunting, Lumbering, Mining, Smithing};
-use crate::assets::AssetId::{AlchemyAnim1, AlchemyAnim2, CookingAnim1, CookingAnim2, HerbalismAnim1, HerbalismAnim2, HuntingAnim1, HuntingAnim2, MiningAnim1, MiningAnim2, SmithingAnim1, SmithingAnim2, WoodAnim1, WoodAnim2};
-use crate::assets::Assets;
-use crate::job::{AlchemyJobArchetype, CookingJobArchetype, HerbalismJobArchetype, HuntingJobArchetype, JobArchetype, LumberingJobArchetype, MiningJobArchetype, SmithingJobArchetype};
 
 #[derive(EnumIter, Clone, Debug)]
 pub enum SkillCategory {
@@ -108,6 +108,14 @@ impl SkillArchetype {
             Smithing => (SmithingAnim1.texture(assets), SmithingAnim2.texture(assets)),
             Cooking => (CookingAnim1.texture(assets), CookingAnim2.texture(assets)),
             Alchemy => (AlchemyAnim1.texture(assets), AlchemyAnim2.texture(assets)),
+        }
+    }
+
+    pub fn get_icon_texture(&self, assets: &Assets) -> Texture2D {
+        match self {
+            Lumbering => LumberingIcon.texture(assets),
+            Mining => MiningIcon.texture(assets),
+            _default => Texture2D::empty(),
         }
     }
 }

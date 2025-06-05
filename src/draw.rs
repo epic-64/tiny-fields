@@ -143,6 +143,10 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) -> () {
             draw_rectangle(r.x, r.y, r.w, r.h, *background_color);
             border_style.draw(r.x, r.y, r.w, r.h, BORDER_STRENGTH);
 
+            if is_mouse_down_on(command, mouse_input) {
+                draw_rectangle(r.x, r.y, r.w, r.h, palette::BUTTON_CLICKED.get_color());
+            }
+
             let the_font = Some(font);
             let text_measure = measure_text(text, the_font, *font_size as u16, 1.);
             let text_x = (r.x + (r.w - text_measure.width) / 2.0).round();
@@ -165,10 +169,28 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) -> () {
                 ..Default::default()
             };
             draw_texture_ex(texture, r.x, r.y, WHITE, params);
+            
+            if is_mouse_down_on(command, mouse_input) {
+                draw_rectangle(r.x, r.y, r.w, r.h, palette::BUTTON_CLICKED.get_color());
+            }
         }
         UiElement::Scissor { clip } => {
             gl.scissor(*clip)
         }
+    }
+}
+
+fn is_mouse_down_on(element: &UiElement, mouse_input: &MouseInput) -> bool {
+    if !mouse_input.down.contains(&macroquad::input::MouseButton::Left) {
+        return false;
+    }
+
+    match element {
+        UiElement::RectButton { rectangle, .. } |
+        UiElement::ImgButton { rectangle, .. } => {
+            rectangle.is_hovered(mouse_input)
+        }
+        _ => false,
     }
 }
 

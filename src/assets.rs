@@ -28,6 +28,7 @@ pub enum AssetId {
 
     // Skill Icons
     LumberingIcon,
+    MiningIcon,
 
     // Animations
     WoodAnim1,
@@ -77,10 +78,11 @@ fn texture_paths() -> Vec<(AssetId, &'static str)> {
         (AssetId::BackgroundParchment, "chatgpt/parchment.png"),
 
         // Icons
-        // (AssetId::LockIcon, "chatgpt/lock.png"),
+        (AssetId::LockIcon, "chatgpt/icons/lock.png"),
 
         // Skill Icons
         (AssetId::LumberingIcon, "chatgpt/skills/woodcutting.png"),
+        (AssetId::MiningIcon, "chatgpt/skills/mining.png"),
         
         // Animations
         (AssetId::WoodAnim1, "ChopChop_1_.png"),

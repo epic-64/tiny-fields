@@ -1,5 +1,7 @@
+use macroquad::miniquad::CursorIcon;
 use crate::assets::{load_assets, Assets};
 use macroquad::miniquad::date::now;
+use macroquad::miniquad::window::set_mouse_cursor;
 use macroquad::prelude::*;
 
 pub mod draw;
@@ -75,6 +77,8 @@ async fn main() {
             scroll_y: mouse_wheel().1,
         };
 
+        set_mouse_cursor(CursorIcon::Default);
+
         let all_ui_elements = build_ui_elements(&state, &assets, resolution_offset, show_debug);
         let all_intents: Vec<Intent> = get_intents(&all_ui_elements, &mouse_input);
         let _effects = state.step(&all_intents, dt);
@@ -149,7 +153,11 @@ pub fn get_intents(elements: &Vec<UiElement>, mouse_input: &MouseInput) -> Vec<I
                     }
                 }
 
-                if rectangle.is_clicked(mouse_input) {
+                if rectangle.is_hovered(mouse_input) {
+                    intents.push(Intent::SetMouseCursor(CursorIcon::Pointer));
+                }
+
+                if rectangle.is_released(mouse_input) {
                     intents.push(intent.clone());
                 }
             }
@@ -162,8 +170,7 @@ pub fn get_intents(elements: &Vec<UiElement>, mouse_input: &MouseInput) -> Vec<I
 
 pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
     let mut elements = vec![];
-
-
+    
     let button_width = 120.0;
     let button_height = 40.0;
     let button_spacing = 10.0;
@@ -187,7 +194,7 @@ pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
         border_style: BorderStyle::Solid,
     });
 
-    // Button for skipping 1 week
+    // Button for skipping 1 day
     elements.push(UiElement::RectButton {
         rectangle: UiRect {
             x: rect.x + button_width + button_spacing,
@@ -196,8 +203,8 @@ pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
             h: button_height,
         },
         font: assets.fonts.mono.clone(),
-        intent: Intent::SkipSeconds(604_800),
-        text: "Skip 1 week".to_string(),
+        intent: Intent::SkipSeconds(60 * 60 * 24), // 1 day in seconds
+        text: "Skip 1 day".to_string(),
         font_size: font_size,
         background_color: palette::BUTTON_BACKGROUND.get_color(),
         text_color: palette::BUTTON_TEXT.get_color(),

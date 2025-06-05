@@ -7,6 +7,7 @@ pub const CARD_BACKGROUND: PaletteC = PaletteC::White;
 pub const BAR_BACKGROUND: PaletteC = PaletteC::WhiteTransparent;
 pub const BUTTON_BACKGROUND: PaletteC = PaletteC::WhiteTransparent;
 pub const BUTTON_HOVER: PaletteC = PaletteC::Peach;
+pub const BUTTON_CLICKED: PaletteC = PaletteC::BlackTransparent;
 pub const BUTTON_TEXT: PaletteC = PaletteC::Anthracite;
 pub const IMAGE_BACKGROUND: PaletteC = PaletteC::WhiteTransparent;
 pub const SKILL_COLOR: PaletteC = PaletteC::Aqua;
@@ -29,6 +30,7 @@ pub enum PaletteC {
     White,
     WhiteTransparent,
     GreenTransparent,
+    BlackTransparent,
 }
 
 impl PaletteC {
@@ -47,6 +49,7 @@ impl PaletteC {
             PaletteC::White => Color::from_rgba(255, 255, 255, 255),
             PaletteC::WhiteTransparent => Color::from_rgba(255, 255, 255, 100),
             PaletteC::GreenTransparent => Color::from_rgba(126, 217, 87, 200),
+            PaletteC::BlackTransparent => Color::from_rgba(0, 0, 0, 40),
         }
     }
 }

@@ -89,7 +89,7 @@ impl CardLayout {
 fn locked_job_slot_ui(index: usize, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
     let mut elements = vec![];
 
-    let icon_size = 96.0;
+    let icon_size = 64.0;
 
     // Add image button of a lock in the middle of the card
     elements.push(UiElement::ImgButton {
@@ -99,7 +99,7 @@ fn locked_job_slot_ui(index: usize, assets: &Assets, offset: Vec2) -> Vec<UiElem
             icon_size,
             icon_size,
         ),
-        intent: Intent::ChangeJobSlotState(index, JobSlotState::Empty),
+        intent: Intent::ChangeJobSlotState(index, JobSlotState::PickingCategory),
         texture: LockIcon.texture(&assets),
         parent_clip: None,
         border_style: BorderStyle::None,
@@ -218,34 +218,47 @@ pub fn skill_selection_ui(
 ) -> Vec<UiElement> {
     let mut elements = vec![];
 
+    let title_font_size = 20.0;
     // Add title: Select Skill
     elements.push(UiElement::Text {
-        content: format!("Select Skill for {}", category.as_str()),
+        content: format!("Select {} Skill", category.as_str()),
         font: assets.fonts.text_bold.clone(),
         x: offset.x + 10.0,
-        y: offset.y + 10.0 + 32.0,
-        font_size: 32.0,
+        y: offset.y + 10.0 + title_font_size,
+        font_size: title_font_size,
         color: palette::TEXT.get_color(),
     });
 
+    // buttons are quadratic. 4 should fit in a row.
+    let button_spacing = 10.0;
+    let padding_x = 10.0;
+    let button_size = (JOB_CARD_WIDTH - padding_x * 2.0 - button_spacing * 3.0) / 4.0;
+
+
     // Add buttons for each skill in the category
     for (i, skill_archetype) in category.get_skill_archetypes().iter().enumerate() {
-        elements.push(UiElement::RectButton {
-            rectangle: UiRect {
-                x: offset.x + 10.0,
-                y: offset.y + 60.0 + (i as f32 * 40.0),
-                w: JOB_CARD_WIDTH - 20.0,
-                h: 30.0,
-            },
-            font_size: 16.0,
+        // add small text above the button
+        elements.push(UiElement::Text {
+            content: skill_archetype.get_name().to_string(),
             font: assets.fonts.text.clone(),
-            text: skill_archetype.get_name().to_string(),
-            background_color: palette::BUTTON_BACKGROUND.get_color(),
-            text_color: palette::BUTTON_TEXT.get_color(),
+            x: offset.x + 10.0 + (i as f32 * (button_size + button_spacing)),
+            y: offset.y + 60.0,
+            font_size: 12.0,
+            color: palette::TEXT.get_color(),
+        });
+
+        elements.push(UiElement::ImgButton {
+            rectangle: UiRect::new(
+                offset.x + 10.0 + (i as f32 * (button_size + button_spacing)),
+                offset.y + 64.0,
+                button_size,
+                button_size,
+            ),
             intent: Intent::ChangeJobSlotState(
                 job_slot_index,
                 JobSlotState::PickingProduct(skill_archetype.clone()),
             ),
+            texture: skill_archetype.get_icon_texture(assets),
             parent_clip: None,
             border_style: BorderStyle::None,
         });
@@ -598,7 +611,7 @@ pub fn job_card_ui(
         text: "x".to_string(),
         background_color: palette::BUTTON_BACKGROUND.get_color(),
         text_color: palette::BUTTON_TEXT.get_color(),
-        intent: Intent::ChangeJobSlotState(job_slot_id, JobSlotState::Empty),
+        intent: Intent::ChangeJobSlotState(job_slot_id, JobSlotState::Locked),
         border_style: BorderStyle::Solid,
     });
 

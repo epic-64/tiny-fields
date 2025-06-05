@@ -9,6 +9,8 @@ use macroquad::input::MouseButton;
 use macroquad::math::Vec2;
 use macroquad::prelude::Texture2D;
 use std::collections::HashMap;
+use macroquad::miniquad::CursorIcon;
+use macroquad::miniquad::window::set_mouse_cursor;
 
 pub struct MouseInput {
     pub pressed: Vec<MouseButton>,
@@ -126,6 +128,7 @@ pub enum Intent {
     SkipSeconds(i32),
     ToggleHyperMode(usize),
     ChangeJobSlotState(usize, JobSlotState),
+    SetMouseCursor(CursorIcon),
 }
 
 impl Intent {
@@ -149,6 +152,9 @@ impl Intent {
                 if let Some(slot) = game_state.job_slots.get_mut(*index) {
                     slot.state = new_state.clone();
                 }
+            },
+            Intent::SetMouseCursor(cursor_icon) => {
+                set_mouse_cursor(*cursor_icon);
             }
         }
     }
@@ -176,8 +182,8 @@ impl UiRect {
         self.contains_point(mouse_input.position)
     }
 
-    pub fn is_clicked(&self, mouse_input: &MouseInput) -> bool {
-        self.is_hovered(mouse_input) && mouse_input.pressed.contains(&MouseButton::Left)
+    pub fn is_released(&self, mouse_input: &MouseInput) -> bool {
+        self.is_hovered(mouse_input) && mouse_input.released.contains(&MouseButton::Left)
     }
 }
 
