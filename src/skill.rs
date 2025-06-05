@@ -1,4 +1,4 @@
-use crate::assets::AssetId::{AlchemyAnim1, AlchemyAnim2, CookingAnim1, CookingAnim2, HerbalismAnim1, HerbalismAnim2, HuntingAnim1, HuntingAnim2, LumberingIcon, MiningAnim1, MiningAnim2, MiningIcon, SmithingAnim1, SmithingAnim2, WoodAnim1, WoodAnim2};
+use crate::assets::AssetId::{AlchemyAnim1, AlchemyAnim2, CookingAnim1, CookingAnim2, CookingIcon, HerbalismAnim1, HerbalismAnim2, HerbalismIcon, HuntingAnim1, HuntingAnim2, HuntingIcon, LumberingIcon, MiningAnim1, MiningAnim2, MiningIcon, SmithingAnim1, SmithingAnim2, WoodAnim1, WoodAnim2};
 use crate::assets::Assets;
 use crate::counts_actions::CountsActions;
 use crate::job::{AlchemyJobArchetype, CookingJobArchetype, HerbalismJobArchetype, HuntingJobArchetype, JobArchetype, LumberingJobArchetype, MiningJobArchetype, SmithingJobArchetype};
@@ -115,6 +115,9 @@ impl SkillArchetype {
         match self {
             Lumbering => LumberingIcon.texture(assets),
             Mining => MiningIcon.texture(assets),
+            Hunting => HuntingIcon.texture(assets),
+            Herbalism => HerbalismIcon.texture(assets),
+            Cooking => CookingIcon.texture(assets),
             _default => Texture2D::empty(),
         }
     }
