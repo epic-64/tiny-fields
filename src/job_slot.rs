@@ -241,7 +241,7 @@ pub fn skill_selection_ui(
         elements.push(UiElement::Text {
             content: skill_archetype.get_name().to_string(),
             font: assets.fonts.text.clone(),
-            x: offset.x + 10.0 + (i as f32 * (button_size + button_spacing)),
+            x: offset.x + padding_x + (i as f32 * (button_size + button_spacing)),
             y: offset.y + 60.0,
             font_size: 12.0,
             color: palette::TEXT.get_color(),
@@ -249,7 +249,7 @@ pub fn skill_selection_ui(
 
         elements.push(UiElement::ImgButton {
             rectangle: UiRect::new(
-                offset.x + 10.0 + (i as f32 * (button_size + button_spacing)),
+                offset.x + padding_x + (i as f32 * (button_size + button_spacing)),
                 offset.y + 64.0,
                 button_size,
                 button_size,
