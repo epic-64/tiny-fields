@@ -2,7 +2,7 @@ use crate::game::{Intent, MouseInput, UiRect};
 use crate::palette;
 use macroquad::color::{Color, WHITE};
 use macroquad::math::Vec2;
-use macroquad::prelude::{draw_rectangle, draw_text_ex, draw_texture_ex, get_internal_gl, measure_text, DrawTextureParams, QuadGl, Texture2D};
+use macroquad::prelude::{draw_rectangle, draw_text, draw_text_ex, draw_texture_ex, get_internal_gl, measure_text, DrawTextureParams, QuadGl, Rect, Texture2D};
 use macroquad::shapes::{draw_circle, draw_line, draw_rectangle_lines};
 use macroquad::text::{Font, TextParams};
 
@@ -79,6 +79,7 @@ pub enum UiElement {
     Circle { x: f32, y: f32, radius: f32, color: Color },
     Rectangle { x: f32, y: f32, width: f32, height: f32, color: Color, border_style: BorderStyle },
     Image { x: f32, y: f32, width: f32, height: f32, texture: Texture2D, color: Color },
+    NinePatch { x: f32, y: f32, width: f32, height: f32, texture: Texture2D, },
     Scissor { clip: Option<(i32, i32, i32, i32)> },
 }
 
@@ -173,6 +174,17 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) -> () {
             if is_mouse_down_on(command, mouse_input) {
                 draw_rectangle(r.x, r.y, r.w, r.h, palette::BUTTON_CLICKED.get_color());
             }
+        }
+        UiElement::NinePatch { x, y, width, height, texture } => {
+            let color = WHITE;
+
+            let params = DrawTextureParams {
+                dest_size: Some(Vec2::new(*width, *height)),
+                source: Some(Rect::new(0.0, 0.0, texture.width(), texture.height())),
+                ..Default::default()
+            };
+
+            draw_texture_ex(texture, *x, *y, color, params);
         }
         UiElement::Scissor { clip } => {
             gl.scissor(*clip)

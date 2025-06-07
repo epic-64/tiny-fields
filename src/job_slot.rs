@@ -35,13 +35,12 @@ impl JobSlotState {
 
         let mut elements = vec![];
 
-        elements.push(UiElement::Image {
+        elements.push(UiElement::NinePatch {
             x: offset.x,
             y: offset.y,
             width: JOB_CARD_WIDTH,
             height: JOB_CARD_HEIGHT,
             texture: BackgroundParchment.texture(&assets),
-            color: palette::CARD_BACKGROUND.get_color(),
         });
 
         let layout = CardLayout::new(10.0, 10.0, 10.0, 10.0);
@@ -352,16 +351,6 @@ pub fn job_card_ui(
     };
 
     let mut elements = vec![];
-
-    // background image (parchment)
-    elements.push(UiElement::Image {
-        x: offset.x,
-        y: offset.y,
-        width: card_width,
-        height: card_height,
-        texture: assets.textures.get(&AssetId::BackgroundParchment).unwrap().clone(),
-        color: PaletteC::White.get_color(),
-    });
 
     // Job Animation Rectangle
     elements.push(UiElement::Rectangle {
