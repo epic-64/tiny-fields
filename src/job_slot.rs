@@ -514,39 +514,27 @@ pub fn job_card_ui(
 
     // Draw Skill instance level up progress bar
     let skill_progress_bar_width = card_width - card_padding_x - card_padding_x - right_side_width - card_spacing;
-    let skill_progress_bar_height = 12.0;
-    elements.push(UiElement::ProgressBar {
-        x: offset.x + card_padding_x,
-        y: offset.y + card_padding_y + 2.0,
-        width: skill_progress_bar_width,
-        height: font_size_large + 2.0,
-        progress: skill_instance.actions_counter.level_up_progress.get(),
-        background_color: palette::BAR_BACKGROUND.get_color(),
-        foreground_color: palette::SKILL_COLOR.get_color(),
-        border_style: BorderStyle::None,
-    });
-
+    
     // Draw Job instance level up progress bar
     elements.push(UiElement::ProgressBar {
         x: offset.x + card_padding_x,
         y: offset.y + card_padding_y + font_size_large + 6.0,
         width: skill_progress_bar_width,
-        height: font_size_large + 2.0,
+        height: 14.0,
         progress: job_archetype_instance.action_counter.level_up_progress.get(),
         background_color: palette::BAR_BACKGROUND.get_color(),
-        foreground_color: palette::PRODUCT_COLOR.get_color(),
+        foreground_color: palette::SKILL_COLOR.get_color(),
         border_style: BorderStyle::None,
     });
 
     // Skill Type and Level
     elements.push(UiElement::Text {
         content: format!(
-            "{} Lv. {} ({} / {})",
+            "{} {} {} {}",
             skill_instance.skill_type.get_name(),
-            skill_instance.actions_counter.level.to_string(),
-            skill_instance.actions_counter.actions_done_current_level,
-            skill_instance.actions_counter.actions_to_next_level(),
-        ),
+            skill_instance.actions_counter.level,
+            job.job_archetype.get_name(),
+            job_archetype_instance.action_counter.level),
         font: assets.fonts.text_bold.clone(),
         x: offset.x + card_padding_x,
         y: offset.y + card_padding_y + font_size_large,
@@ -557,8 +545,7 @@ pub fn job_card_ui(
     // Job Type and Level
     elements.push(UiElement::Text {
         content: format!(
-            "{} Lv. {} ({} / {})",
-            job.job_archetype.get_name(),
+            "Lv. {} ({} / {})",
             job_archetype_instance.action_counter.level,
             job_archetype_instance.action_counter.actions_done_current_level,
             job_archetype_instance.action_counter.actions_to_next_level(),
@@ -566,7 +553,7 @@ pub fn job_card_ui(
         font: assets.fonts.text.clone(),
         x: offset.x + card_padding_x,
         y: offset.y + card_padding_y + 36.,
-        font_size: font_size_small,
+        font_size: 12.0,
         color: color_secondary,
     });
 
