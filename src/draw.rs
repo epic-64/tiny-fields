@@ -179,7 +179,7 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) -> () {
         }
 
         UiElement::NinePatch { x, y, width, height, texture } => {
-            let corner_size = 32.0;
+            let corner_size = 64.0;
             draw_nine_patch(texture, *x, *y, *width, *height, corner_size, WHITE);
         }
 

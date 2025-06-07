@@ -320,9 +320,9 @@ pub fn job_card_ui(
     offset: Vec2,
 ) -> Vec<UiElement> {
     let job = job_instance;
-    let card_padding_x = 10.0;
-    let card_padding_y = 10.0;
-    let card_spacing = 10.0;
+    let card_padding_x = 16.0;
+    let card_padding_y = 16.0;
+    let card_spacing = 6.0;
     let clip = None;
 
     let skill_instance = state.skill_archetype_instances.get_skill_by_type(&job.job_archetype.get_skill_type());
@@ -429,13 +429,14 @@ pub fn job_card_ui(
     );
 
     // Draw 4 resource icons in the middle
-    let resource_icon_size = 50.0;
+    let resource_icon_size = 48.0;
     let resource_icon_padding = 4.0;
     let resource_icon_spacing = 4.0;
 
     let required_items = job.job_archetype.get_required_items();
     let item_slots = required_items.len();
     let empty_slots = 4 - item_slots;
+    let resource_y = offset.y + card_padding_y + 86.0;
 
     for (i, (required_item, required_amount)) in required_items.iter().enumerate() {
         let resource_x = inner_x + (i as f32 * (resource_icon_size + resource_icon_spacing));
@@ -447,7 +448,7 @@ pub fn job_card_ui(
         // draw background rectangle
         elements.push(UiElement::Rectangle {
             x: resource_x,
-            y: offset.y + card_padding_y + 96.0,
+            y: resource_y,
             width: resource_icon_size,
             height: resource_icon_size,
             color: if player_has_enough { palette::IMAGE_BACKGROUND.get_color() } else { PaletteC::Coral.get_color() },
@@ -458,7 +459,7 @@ pub fn job_card_ui(
         let inner_size = resource_icon_size - resource_icon_padding * 2.0;
         elements.push(UiElement::Image {
             x: resource_x + resource_icon_size / 2.0 - inner_size / 2.0,
-            y: offset.y + card_padding_y + 96.0 + resource_icon_size / 2.0 - inner_size / 2.0,
+            y: resource_y + resource_icon_size / 2.0 - inner_size / 2.0,
             width: inner_size,
             height: inner_size,
             texture: required_item.get_texture(&assets),
@@ -470,7 +471,7 @@ pub fn job_card_ui(
             elements.extend(
                 number_pill(
                     resource_x + resource_icon_size / 2.0 - 24.0 / 2.0,
-                    offset.y + card_padding_y + 96.0 - 14.0 / 2.0 - 2.0,
+                    resource_y - 14.0 / 2.0 - 2.0,
                     24.0,
                     14.0,
                     state.inventory.get_item_amount(required_item),
@@ -485,7 +486,7 @@ pub fn job_card_ui(
             elements.extend(
                 number_pill(
                     resource_x + resource_icon_size / 2.0 - pill_width / 2.0,
-                    offset.y + card_padding_y + 96.0 + resource_icon_size - pill_height / 2.0 + 2.0,
+                    resource_y + resource_icon_size - pill_height / 2.0 + 2.0,
                     pill_width,
                     pill_height,
                     *required_amount,
@@ -503,7 +504,7 @@ pub fn job_card_ui(
         // draw background rectangle
         elements.push(UiElement::Rectangle {
             x: resource_x,
-            y: offset.y + card_padding_y + 96.0,
+            y: resource_y,
             width: resource_icon_size,
             height: resource_icon_size,
             color: palette::IMAGE_BACKGROUND.get_color(),

@@ -2,7 +2,7 @@ use macroquad::color::Color;
 
 pub const TEXT: PaletteC = PaletteC::Anthracite;
 pub const BORDER: PaletteC = PaletteC::AnthraciteLight;
-pub const GAME_BACKGROUND: PaletteC = PaletteC::Mocha;
+pub const GAME_BACKGROUND: PaletteC = PaletteC::Brown;
 pub const CARD_BACKGROUND: PaletteC = PaletteC::White;
 pub const BAR_BACKGROUND: PaletteC = PaletteC::WhiteTransparent;
 pub const BUTTON_BACKGROUND: PaletteC = PaletteC::WhiteTransparent;
@@ -26,6 +26,7 @@ pub enum PaletteC {
     OffWhite,
     Grass,
     Mocha,
+    Brown,
     Black,
     White,
     WhiteTransparent,
@@ -45,6 +46,7 @@ impl PaletteC {
             PaletteC::OffWhite => Color::from_rgba(221, 221, 221, 255),
             PaletteC::Grass => Color::from_rgba(126, 217, 87, 255),
             PaletteC::Mocha => Color::from_rgba(195, 157, 117, 255),
+            PaletteC::Brown => Color::from_rgba(85, 39, 19, 255),
             PaletteC::Black => Color::from_rgba(0, 0, 0, 255),
             PaletteC::White => Color::from_rgba(255, 255, 255, 255),
             PaletteC::WhiteTransparent => Color::from_rgba(255, 255, 255, 100),
