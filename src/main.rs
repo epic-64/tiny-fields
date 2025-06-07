@@ -12,6 +12,7 @@ pub mod assets;
 pub mod skill;
 pub mod counts_actions;
 pub mod job_slot;
+pub mod awesome;
 
 use crate::assets::{load_assets, Assets};
 use crate::draw::{draw, BorderStyle, UiElement};
