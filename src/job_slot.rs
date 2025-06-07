@@ -1,4 +1,4 @@
-use crate::assets::AssetId::{BackgroundParchment, LockIcon};
+use crate::assets::AssetId::{BackgroundParchment, LockIcon, ParchmentFrame};
 use crate::assets::{AssetId, Assets};
 use crate::draw::{number_pill, BorderStyle, UiElement};
 use crate::game::{GameState, Intent, UiRect};
@@ -40,7 +40,7 @@ impl JobSlotState {
             y: offset.y,
             width: JOB_CARD_WIDTH,
             height: JOB_CARD_HEIGHT,
-            texture: BackgroundParchment.texture(&assets),
+            texture: ParchmentFrame.get_texture(assets),
         });
 
         let layout = CardLayout::new(10.0, 10.0, 10.0, 10.0);
@@ -99,7 +99,7 @@ fn locked_job_slot_ui(index: usize, assets: &Assets, offset: Vec2) -> Vec<UiElem
             icon_size,
         ),
         intent: Intent::ChangeJobSlotState(index, JobSlotState::PickingCategory),
-        texture: LockIcon.texture(&assets),
+        texture: LockIcon.get_texture(&assets),
         parent_clip: None,
         border_style: BorderStyle::None,
     });

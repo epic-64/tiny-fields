@@ -175,17 +175,50 @@ pub fn draw(command: &UiElement, mouse_input: &MouseInput) -> () {
                 draw_rectangle(r.x, r.y, r.w, r.h, palette::BUTTON_CLICKED.get_color());
             }
         }
+        
         UiElement::NinePatch { x, y, width, height, texture } => {
             let color = WHITE;
 
-            let params = DrawTextureParams {
-                dest_size: Some(Vec2::new(*width, *height)),
-                source: Some(Rect::new(0.0, 0.0, texture.width(), texture.height())),
-                ..Default::default()
+            // 1. Define corner size in SCREEN space (pixels)
+            let corner_size = 32.0;
+
+            // 2. Compute source rects from the texture
+            let tex_w = texture.width();
+            let tex_h = texture.height();
+
+            let third_w = tex_w / 3.0;
+            let third_h = tex_h / 3.0;
+
+            let stretch_w = *width - 2.0 * corner_size;
+            let stretch_h = *height - 2.0 * corner_size;
+
+            // Helper to draw a patch
+            let draw_patch = |dst_x: f32, dst_y: f32, dst_w: f32, dst_h: f32,
+                              src_x: f32, src_y: f32, src_w: f32, src_h: f32| {
+                draw_texture_ex(texture, dst_x, dst_y, color, DrawTextureParams {
+                    dest_size: Some(Vec2::new(dst_w, dst_h)),
+                    source: Some(Rect::new(src_x, src_y, src_w, src_h)),
+                    ..Default::default()
+                });
             };
 
-            draw_texture_ex(texture, *x, *y, color, params);
+            // Corners (not stretched)
+            draw_patch(*x, *y, corner_size, corner_size, 0.0, 0.0, third_w, third_h); // Top-left
+            draw_patch(*x + corner_size + stretch_w, *y, corner_size, corner_size, 2.0 * third_w, 0.0, third_w, third_h); // Top-right
+            draw_patch(*x, *y + corner_size + stretch_h, corner_size, corner_size, 0.0, 2.0 * third_h, third_w, third_h); // Bottom-left
+            draw_patch(*x + corner_size + stretch_w, *y + corner_size + stretch_h, corner_size, corner_size, 2.0 * third_w, 2.0 * third_h, third_w, third_h); // Bottom-right
+
+            // Edges (stretched in one direction)
+            draw_patch(*x + corner_size, *y, stretch_w, corner_size, third_w, 0.0, third_w, third_h); // Top
+            draw_patch(*x + corner_size, *y + corner_size + stretch_h, stretch_w, corner_size, third_w, 2.0 * third_h, third_w, third_h); // Bottom
+            draw_patch(*x, *y + corner_size, corner_size, stretch_h, 0.0, third_h, third_w, third_h); // Left
+            draw_patch(*x + corner_size + stretch_w, *y + corner_size, corner_size, stretch_h, 2.0 * third_w, third_h, third_w, third_h); // Right
+
+            // Center (stretched in both directions)
+            draw_patch(*x + corner_size, *y + corner_size, stretch_w, stretch_h, third_w, third_h, third_w, third_h); // Center
         }
+
+
         UiElement::Scissor { clip } => {
             gl.scissor(*clip)
         }

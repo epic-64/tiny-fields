@@ -290,14 +290,14 @@ impl Item {
 
     pub fn get_texture(&self, assets: &Assets) -> Texture2D {
         match self {
-            Item::Wood(WoodItem::Craftwood) => Craftwood.texture(assets),
-            Item::Wood(WoodItem::Graintree) => Graintree.texture(assets),
-            Item::Meat => MeatGame.texture(assets),
-            Item::Coin => Coin.texture(assets),
-            Item::Herb => Herbs.texture(assets),
-            Item::IronOre => IronOre.texture(assets),
-            Item::Sandwich => Sandwich.texture(assets),
-            Item::ManaPotion => ManaPotion.texture(assets),
+            Item::Wood(WoodItem::Craftwood) => Craftwood.get_texture(assets),
+            Item::Wood(WoodItem::Graintree) => Graintree.get_texture(assets),
+            Item::Meat => MeatGame.get_texture(assets),
+            Item::Coin => Coin.get_texture(assets),
+            Item::Herb => Herbs.get_texture(assets),
+            Item::IronOre => IronOre.get_texture(assets),
+            Item::Sandwich => Sandwich.get_texture(assets),
+            Item::ManaPotion => ManaPotion.get_texture(assets),
             _default => Texture2D::empty(),
         }
     }

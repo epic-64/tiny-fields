@@ -100,23 +100,23 @@ impl SkillArchetype {
 
     pub fn get_animation_images(&self, assets: &Assets) -> (Texture2D, Texture2D) {
         match self {
-            Lumbering => (WoodAnim1.texture(assets), WoodAnim2.texture(assets)),
-            Mining => (MiningAnim1.texture(assets), MiningAnim2.texture(assets)),
-            Hunting => (HuntingAnim1.texture(assets), HuntingAnim2.texture(assets)),
-            Herbalism => (HerbalismAnim1.texture(assets), HerbalismAnim2.texture(assets)),
-            Smithing => (SmithingAnim1.texture(assets), SmithingAnim2.texture(assets)),
-            Cooking => (CookingAnim1.texture(assets), CookingAnim2.texture(assets)),
-            Alchemy => (AlchemyAnim1.texture(assets), AlchemyAnim2.texture(assets)),
+            Lumbering => (WoodAnim1.get_texture(assets), WoodAnim2.get_texture(assets)),
+            Mining => (MiningAnim1.get_texture(assets), MiningAnim2.get_texture(assets)),
+            Hunting => (HuntingAnim1.get_texture(assets), HuntingAnim2.get_texture(assets)),
+            Herbalism => (HerbalismAnim1.get_texture(assets), HerbalismAnim2.get_texture(assets)),
+            Smithing => (SmithingAnim1.get_texture(assets), SmithingAnim2.get_texture(assets)),
+            Cooking => (CookingAnim1.get_texture(assets), CookingAnim2.get_texture(assets)),
+            Alchemy => (AlchemyAnim1.get_texture(assets), AlchemyAnim2.get_texture(assets)),
         }
     }
 
     pub fn get_icon_texture(&self, assets: &Assets) -> Texture2D {
         match self {
-            Lumbering => LumberingIcon.texture(assets),
-            Mining => MiningIcon.texture(assets),
-            Hunting => HuntingIcon.texture(assets),
-            Herbalism => HerbalismIcon.texture(assets),
-            Cooking => CookingIcon.texture(assets),
+            Lumbering => LumberingIcon.get_texture(assets),
+            Mining => MiningIcon.get_texture(assets),
+            Hunting => HuntingIcon.get_texture(assets),
+            Herbalism => HerbalismIcon.get_texture(assets),
+            Cooking => CookingIcon.get_texture(assets),
             _default => Texture2D::empty(),
         }
     }

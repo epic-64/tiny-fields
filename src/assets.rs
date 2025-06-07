@@ -2,6 +2,8 @@ use macroquad::prelude::{Font, Texture2D};
 use macroquad::text::load_ttf_font;
 use macroquad::texture::load_texture;
 use std::collections::HashMap;
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
 
 pub struct Fonts {
     pub mono: Font,
@@ -16,10 +18,11 @@ pub enum FontId {
     TextBold,
 }
 
-#[derive(Hash, Eq, PartialEq, Debug, Clone, Copy)]
+#[derive(EnumIter, Hash, Eq, PartialEq, Debug, Clone, Copy)]
 pub enum AssetId {
     // Backgrounds
     BackgroundParchment,
+    ParchmentFrame,
 
     // Icons
     LockIcon,
@@ -68,60 +71,55 @@ pub enum AssetId {
 }
 
 impl AssetId {
-    pub fn texture(&self, assets: &Assets) -> Texture2D {
+    pub fn get_texture(&self, assets: &Assets) -> Texture2D {
         assets.textures.get(self).unwrap_or(&Texture2D::empty()).clone()
+    }
+
+    pub fn get_path(&self) -> &'static str {
+        match self {
+            AssetId::BackgroundParchment => "chatgpt/parchment.png",
+            AssetId::LockIcon => "chatgpt/icons/lock.png",
+            AssetId::LumberingIcon => "chatgpt/skills/woodcutting.png",
+            AssetId::MiningIcon => "chatgpt/skills/mining.png",
+            AssetId::HuntingIcon => "chatgpt/skills/hunting.png",
+            AssetId::HerbalismIcon => "chatgpt/skills/herbalism.png",
+            AssetId::CookingIcon => "chatgpt/skills/cooking.png",
+            AssetId::WoodAnim1 => "ChopChop_1_.png",
+            AssetId::WoodAnim2 => "chop2_lanczos.png",
+            AssetId::CookingAnim1 => "pan_1.png",
+            AssetId::CookingAnim2 => "pan_2.png",
+            AssetId::HerbalismAnim1 => "ary/HerbHerb_1.png",
+            AssetId::HerbalismAnim2 => "ary/HerbHerb_2.png",
+            AssetId::AlchemyAnim1 => "ary/Alchemy_1.png",
+            AssetId::AlchemyAnim2 => "ary/Alchemy_2.png",
+            AssetId::MiningAnim1 => "ClingCling_1.png",
+            AssetId::MiningAnim2 => "ClingCling_2.png",
+            AssetId::HuntingAnim1 => "PewPew_1.png",
+            AssetId::HuntingAnim2 => "PewPew_2.png",
+            AssetId::SmithingAnim1 => "BomBom_1.png",
+            AssetId::SmithingAnim2 => "BomBom_2.png",
+            AssetId::Kindlewood => "chatgpt/kindlewood.png",
+            AssetId::Craftwood => "chatgpt/craftwood.png",
+            AssetId::Graintree => "chatgpt/graintree.png",
+            AssetId::IronOre => "chatgpt/iron_ore.png",
+            AssetId::MeatGame => "chatgpt/game.png",
+            AssetId::Coin => "coin.png",
+            AssetId::BagOfCoins => "chatgpt/bag_of_coins.png",
+            AssetId::Bread => "chatgpt/bread.png",
+            AssetId::Herbs => "chatgpt/herbs.png",
+            AssetId::Sandwich => "chatgpt/sandwich.png",
+            AssetId::Tree => "chatgpt/tree.png",
+            AssetId::Deer => "chatgpt/deer.png",
+            AssetId::ManaPotion => "chatgpt/mana_potion.png",
+            AssetId::ParchmentFrame => "chatgpt/ninepatch/frame.png",
+        }
     }
 }
 
 fn texture_paths() -> Vec<(AssetId, &'static str)> {
-    vec![
-        // Backgrounds
-        (AssetId::BackgroundParchment, "chatgpt/parchment.png"),
-
-        // Icons
-        (AssetId::LockIcon, "chatgpt/icons/lock.png"),
-
-        // Skill Icons
-        (AssetId::LumberingIcon, "chatgpt/skills/woodcutting.png"),
-        (AssetId::MiningIcon, "chatgpt/skills/mining.png"),
-        (AssetId::HuntingIcon, "chatgpt/skills/hunting.png"),
-        (AssetId::HerbalismIcon, "chatgpt/skills/herbalism.png"),
-        (AssetId::CookingIcon, "chatgpt/skills/cooking.png"),
-        
-        // Animations
-        (AssetId::WoodAnim1, "ChopChop_1_.png"),
-        (AssetId::WoodAnim2, "chop2_lanczos.png"),
-        (AssetId::CookingAnim1, "pan_1.png"),
-        (AssetId::CookingAnim2, "pan_2.png"),
-        (AssetId::HerbalismAnim1, "ary/HerbHerb_1.png"),
-        (AssetId::HerbalismAnim2, "ary/HerbHerb_2.png"),
-        (AssetId::AlchemyAnim1, "ary/Alchemy_1.png"),
-        (AssetId::AlchemyAnim2, "ary/Alchemy_2.png"),
-        (AssetId::MiningAnim1, "ClingCling_1.png"),
-        (AssetId::MiningAnim2, "ClingCling_2.png"),
-        (AssetId::HuntingAnim1, "PewPew_1.png"),
-        (AssetId::HuntingAnim2, "PewPew_2.png"),
-        (AssetId::SmithingAnim1, "BomBom_1.png"),
-        (AssetId::SmithingAnim2, "BomBom_2.png"),
-        
-        // Wood
-        (AssetId::Kindlewood, "chatgpt/kindlewood.png"),
-        (AssetId::Craftwood, "chatgpt/craftwood.png"),
-        (AssetId::Graintree, "chatgpt/graintree.png"),
-
-        // Ores
-        (AssetId::IronOre, "chatgpt/iron_ore.png"),
-        
-        (AssetId::MeatGame, "chatgpt/game.png"),
-        (AssetId::Coin, "coin.png"),
-        (AssetId::BagOfCoins, "chatgpt/bag_of_coins.png"),
-        (AssetId::Bread, "chatgpt/bread.png"),
-        (AssetId::Herbs, "chatgpt/herbs.png"),
-        (AssetId::Sandwich, "chatgpt/sandwich.png"),
-        (AssetId::Tree, "chatgpt/tree.png"),
-        (AssetId::Deer, "chatgpt/deer.png"),
-        (AssetId::ManaPotion, "chatgpt/mana_potion.png"),
-    ]
+    AssetId::iter()
+        .map(|asset_id| (asset_id, asset_id.get_path()))
+        .collect()
 }
 
 pub async fn load_textures() -> HashMap<AssetId, Texture2D> {
