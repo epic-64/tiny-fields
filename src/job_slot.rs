@@ -209,7 +209,7 @@ fn category_selection_ui(job_slot_index: usize, assets: &Assets, offset: Vec2, l
     elements
 }
 
-pub fn skill_selection_ui(
+fn skill_selection_ui(
     job_slot_index: usize,
     category: &SkillCategory,
     assets: &Assets,
@@ -265,7 +265,7 @@ pub fn skill_selection_ui(
     elements
 }
 
-pub fn product_selection_ui(
+fn product_selection_ui(
     job_slot_index: usize,
     skill_archetype: &SkillArchetype,
     assets: &Assets,
@@ -310,7 +310,7 @@ pub fn product_selection_ui(
     elements
 }
 
-pub fn job_card_ui(
+fn job_card_ui(
     state: &GameState,
     assets: &Assets,
     job_instance: &JobInstance,
