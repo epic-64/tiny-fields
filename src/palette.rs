@@ -14,7 +14,7 @@ pub const SKILL_COLOR: PaletteC = PaletteC::Aqua;
 pub const JOB_COLOR: PaletteC = PaletteC::WarmYellow;
 pub const PILL_COLOR: PaletteC = PaletteC::AnthraciteLight;
 pub const PILL_TEXT_COLOR: PaletteC = PaletteC::OffWhite;
-pub const PRODUCT_COLOR: PaletteC = PaletteC::Peach;
+pub const PRODUCT_COLOR: PaletteC = PaletteC::WhiteTransparent;
 pub const PROGRESS_COLOR: PaletteC = PaletteC::Grass;
 
 pub enum PaletteC {

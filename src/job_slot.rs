@@ -389,14 +389,17 @@ fn job_card_ui(
         color: PaletteC::White.get_color(),
     });
 
-    // Draw the HyperMode button on the right
+    let button_width = 30.0;
+    let button_spacing = 4.0;
+
+    // Draw the HyperMode button
     if job.hyper_mode.has_enough_actions() {
         elements.push(UiElement::RectButton {
             rectangle: UiRect {
-                x: offset.x + card_width - right_side_width - card_padding_x,
-                y: image_y,
+                x: offset.x + card_width - right_side_width - card_padding_x - right_side_width - card_spacing_x,
+                y: offset.y + card_padding_y,
                 w: right_side_width,
-                h: 24.0,
+                h: button_width,
             },
             font: assets.fonts.text_bold.clone(),
             parent_clip: clip.clone(),
@@ -408,6 +411,42 @@ fn job_card_ui(
             border_style: BorderStyle::Solid,
         });
     }
+
+    // Delete Button
+    elements.push(UiElement::RectButton {
+        rectangle: UiRect {
+            x: offset.x + card_width - button_width - card_padding_x,
+            y: offset.y + card_padding_y,
+            w: button_width,
+            h: button_width,
+        },
+        font: assets.fonts.text_bold.clone(),
+        parent_clip: clip.clone(),
+        font_size: font_size_small,
+        text: "x".to_string(),
+        background_color: palette::BUTTON_BACKGROUND.get_color(),
+        text_color: palette::BUTTON_TEXT.get_color(),
+        intent: Intent::ChangeJobSlotState(job_slot_id, JobSlotState::Locked),
+        border_style: BorderStyle::Solid,
+    });
+
+    // Start / Stop Button
+    elements.push(UiElement::RectButton {
+        rectangle: UiRect {
+            x: offset.x + card_width - button_width * 2.0 - button_spacing - card_padding_x,
+            y: offset.y + card_padding_y,
+            w: button_width,
+            h: button_width,
+        },
+        font: assets.fonts.text_bold.clone(),
+        parent_clip: clip.clone(),
+        font_size: font_size_small,
+        text: if job.running { "||".to_string() } else { ">".to_string() },
+        background_color: palette::BUTTON_BACKGROUND.get_color(),
+        text_color: palette::BUTTON_TEXT.get_color(),
+        intent: Intent::ToggleJob(job_slot_id),
+        border_style: BorderStyle::Solid,
+    });
 
     // Draw Product Image on the right
     elements.push(UiElement::Rectangle {
@@ -577,44 +616,6 @@ fn job_card_ui(
         y: offset.y + card_padding_y + 36.,
         font_size: 12.0,
         color: color_secondary,
-    });
-
-    // Delete Button
-    let button_dimensions = 30.0;
-    let button_spacing = 4.0;
-    elements.push(UiElement::RectButton {
-        rectangle: UiRect {
-            x: offset.x + card_width - button_dimensions - card_padding_x,
-            y: offset.y + card_padding_y,
-            w: button_dimensions,
-            h: button_dimensions,
-        },
-        font: assets.fonts.text_bold.clone(),
-        parent_clip: clip.clone(),
-        font_size: font_size_small,
-        text: "x".to_string(),
-        background_color: palette::BUTTON_BACKGROUND.get_color(),
-        text_color: palette::BUTTON_TEXT.get_color(),
-        intent: Intent::ChangeJobSlotState(job_slot_id, JobSlotState::Locked),
-        border_style: BorderStyle::Solid,
-    });
-
-    // Start / Stop Button
-    elements.push(UiElement::RectButton {
-        rectangle: UiRect {
-            x: offset.x + card_width - button_dimensions * 2.0 - button_spacing - card_padding_x,
-            y: offset.y + card_padding_y,
-            w: button_dimensions,
-            h: button_dimensions,
-        },
-        font: assets.fonts.text_bold.clone(),
-        parent_clip: clip.clone(),
-        font_size: font_size_small,
-        text: if job.running { "||".to_string() } else { ">".to_string() },
-        background_color: palette::BUTTON_BACKGROUND.get_color(),
-        text_color: palette::BUTTON_TEXT.get_color(),
-        intent: Intent::ToggleJob(job_slot_id),
-        border_style: BorderStyle::Solid,
     });
 
     elements
