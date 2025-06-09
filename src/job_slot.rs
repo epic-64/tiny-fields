@@ -335,13 +335,13 @@ fn job_card_ui(
     let card_height = JOB_CARD_HEIGHT;
     let card_width = JOB_CARD_WIDTH;
 
+    let right_side_width = 64.0;
     let image_width = 90.0f32;
     let image_height = 120.0f32;
     let image_x = offset.x + card_padding_x;
     let image_y = offset.y + card_height - image_height - card_padding_y;
     let inner_x = offset.x + card_padding_x + image_width + card_spacing_x;
-
-    let title_height = 36.0;
+    let inner_width = card_width - right_side_width - image_width - card_padding_x * 2.0 - card_spacing_x * 2.0;
 
     let (image1, image2) = job.job_archetype.get_skill_type().get_animation_images(assets);
 
@@ -373,8 +373,6 @@ fn job_card_ui(
         texture: chosen_image.clone(),
         color: PaletteC::White.get_color(),
     });
-
-    let right_side_width = 64.0;
 
     // Draw the HyperMode button on the right
     if job.hyper_mode.has_enough_actions() {
@@ -430,9 +428,9 @@ fn job_card_ui(
     );
 
     // Draw 4 resource icons in the middle
-    let resource_icon_size = 48.0;
     let resource_icon_padding = 4.0;
     let resource_icon_spacing = 4.0;
+    let resource_icon_size = (inner_width - resource_icon_spacing * 3.0) / 4.0;
 
     let required_items = job.job_archetype.get_required_items();
     let item_slots = required_items.len();
@@ -457,12 +455,12 @@ fn job_card_ui(
         });
 
         // draw resource icon
-        let inner_size = resource_icon_size - resource_icon_padding * 2.0;
+        let resource_inner_size = resource_icon_size - resource_icon_padding * 2.0;
         elements.push(UiElement::Image {
-            x: resource_x + resource_icon_size / 2.0 - inner_size / 2.0,
-            y: resource_y + resource_icon_size / 2.0 - inner_size / 2.0,
-            width: inner_size,
-            height: inner_size,
+            x: resource_x + resource_icon_size / 2.0 - resource_inner_size / 2.0,
+            y: resource_y + resource_icon_size / 2.0 - resource_inner_size / 2.0,
+            width: resource_inner_size,
+            height: resource_inner_size,
             texture: required_item.get_texture(&assets),
             color: PaletteC::White.get_color(),
         });
@@ -514,7 +512,6 @@ fn job_card_ui(
     }
 
     // Draw Skill instance level up progress bar
-    let inner_width = card_width - right_side_width - image_width - card_padding_x * 2.0 - card_spacing_x * 2.0;
     let progress_bar_height = 14.0;
     elements.push(UiElement::ProgressBar {
         x: inner_x,
