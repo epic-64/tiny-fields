@@ -43,15 +43,15 @@ impl JobSlotState {
             texture: ParchmentFrame.get_texture(assets),
         });
 
-        let layout = CardLayout::new(10.0, 10.0, 10.0, 10.0);
+        let layout = CardLayout::new(16.0, 16.0, 5.0, 5.0);
 
         let state_specific_elements = match self {
             JobSlotState::Locked => locked_job_slot_ui(job_slot_index, assets, offset),
             JobSlotState::Empty => empty_job_slot_ui(job_slot_index, assets, offset),
             JobSlotState::PickingCategory => category_selection_ui(job_slot_index, assets, offset, &layout),
-            JobSlotState::PickingSkill(category) => skill_selection_ui(job_slot_index, category, assets, offset),
-            JobSlotState::PickingProduct(skill_archetype) => product_selection_ui(job_slot_index, skill_archetype, assets, offset),
-            JobSlotState::RunningJob(job_instance) => job_card_ui(&state, assets, job_instance, job_slot_index, offset),
+            JobSlotState::PickingSkill(category) => skill_selection_ui(job_slot_index, category, assets, offset, &layout),
+            JobSlotState::PickingProduct(skill_archetype) => product_selection_ui(job_slot_index, skill_archetype, assets, offset, &layout),
+            JobSlotState::RunningJob(job_instance) => job_card_ui(&state, assets, job_instance, job_slot_index, offset, &layout),
         };
 
         elements.extend(state_specific_elements);
@@ -214,6 +214,7 @@ pub fn skill_selection_ui(
     category: &SkillCategory,
     assets: &Assets,
     offset: Vec2,
+    layout: &CardLayout,
 ) -> Vec<UiElement> {
     let mut elements = vec![];
 
@@ -222,17 +223,15 @@ pub fn skill_selection_ui(
     elements.push(UiElement::Text {
         content: format!("Select {} Skill", category.as_str()),
         font: assets.fonts.text_bold.clone(),
-        x: offset.x + 10.0,
-        y: offset.y + 10.0 + title_font_size,
+        x: offset.x + layout.padding_x,
+        y: offset.y + layout.padding_y + title_font_size,
         font_size: title_font_size,
         color: palette::TEXT.get_color(),
     });
 
-    // buttons are quadratic. 4 should fit in a row.
     let button_spacing = 10.0;
-    let padding_x = 10.0;
+    let padding_x = layout.padding_x;
     let button_size = (JOB_CARD_WIDTH - padding_x * 2.0 - button_spacing * 3.0) / 4.0;
-
 
     // Add buttons for each skill in the category
     for (i, skill_archetype) in category.get_skill_archetypes().iter().enumerate() {
@@ -271,26 +270,25 @@ pub fn product_selection_ui(
     skill_archetype: &SkillArchetype,
     assets: &Assets,
     offset: Vec2,
+    layout: &CardLayout,
 ) -> Vec<UiElement> {
     let mut elements = vec![];
 
-    // Add title: Select Product
     elements.push(UiElement::Text {
         content: format!("Select Product for {}", skill_archetype.get_name()),
         font: assets.fonts.text_bold.clone(),
-        x: offset.x + 10.0,
-        y: offset.y + 10.0 + 32.0,
+        x: offset.x + layout.padding_x,
+        y: offset.y + layout.padding_y + 32.0,
         font_size: 32.0,
         color: palette::TEXT.get_color(),
     });
 
-    // Here you would add buttons for each product related to the skill archetype
     for (i, job_archetype) in skill_archetype.get_job_archetypes().iter().enumerate() {
         elements.push(UiElement::RectButton {
             rectangle: UiRect {
-                x: offset.x + 10.0,
+                x: offset.x + layout.padding_x,
                 y: offset.y + 60.0 + (i as f32 * 40.0),
-                w: JOB_CARD_WIDTH - 20.0,
+                w: JOB_CARD_WIDTH - layout.padding_x * 2.0,
                 h: 30.0,
             },
             font_size: 16.0,
@@ -305,7 +303,7 @@ pub fn product_selection_ui(
                 })),
             ),
             parent_clip: None,
-            border_style: BorderStyle::None,
+            border_style: BorderStyle::Solid,
         });
     }
 
@@ -318,11 +316,12 @@ pub fn job_card_ui(
     job_instance: &JobInstance,
     job_slot_id: usize,
     offset: Vec2,
+    layout: &CardLayout,
 ) -> Vec<UiElement> {
     let job = job_instance;
-    let card_padding_x = 16.0;
-    let card_padding_y = 16.0;
-    let card_spacing = 6.0;
+    let card_padding_x = layout.padding_x;
+    let card_padding_y = layout.padding_y;
+    let card_spacing_x = layout.spacing_x;
     let clip = None;
 
     let skill_instance = state.skill_archetype_instances.get_skill_by_type(&job.job_archetype.get_skill_type());
@@ -340,7 +339,9 @@ pub fn job_card_ui(
     let image_height = 120.0f32;
     let image_x = offset.x + card_padding_x;
     let image_y = offset.y + card_height - image_height - card_padding_y;
-    let inner_x = offset.x + card_padding_x + image_width + card_spacing;
+    let inner_x = offset.x + card_padding_x + image_width + card_spacing_x;
+
+    let title_height = 36.0;
 
     let (image1, image2) = job.job_archetype.get_skill_type().get_animation_images(assets);
 
@@ -398,9 +399,9 @@ pub fn job_card_ui(
     // Draw Product Image on the right
     elements.push(UiElement::Rectangle {
         x: offset.x + card_width - right_side_width - card_padding_x,
-        y: image_y + 40.0,
+        y: image_y,
         width: right_side_width,
-        height: right_side_width,
+        height: image_height - 16.0,
         color: palette::PRODUCT_COLOR.get_color(),
         border_style: BorderStyle::Solid,
     });
@@ -513,7 +514,7 @@ pub fn job_card_ui(
     }
 
     // Draw Skill instance level up progress bar
-    let skill_progress_bar_width = card_width - card_padding_x - card_padding_x - right_side_width - card_spacing;
+    let skill_progress_bar_width = card_width - card_padding_x - card_padding_x - right_side_width - card_spacing_x;
     
     // Draw Job instance level up progress bar
     elements.push(UiElement::ProgressBar {
@@ -558,7 +559,7 @@ pub fn job_card_ui(
     });
 
 
-    let progress_bar_width = card_width - card_padding_x - image_width - card_spacing - card_padding_x;
+    let progress_bar_width = card_width - card_padding_x - image_width - card_spacing_x - card_padding_x;
     let progress_bar_height = 10.0;
     let progress_bar_action_y = offset.y + card_height - progress_bar_height - card_padding_y;
     // Action Progress Bar

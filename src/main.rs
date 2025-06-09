@@ -2,6 +2,8 @@ use macroquad::miniquad::date::now;
 use macroquad::miniquad::window::set_mouse_cursor;
 use macroquad::miniquad::CursorIcon;
 use macroquad::prelude::*;
+use crate::job::{JobArchetype, LumberingJobArchetype};
+use crate::job_slot::JobSlot;
 
 pub mod draw;
 pub mod game;
@@ -17,7 +19,9 @@ pub mod awesome;
 use crate::assets::{load_assets, Assets};
 use crate::draw::{draw, BorderStyle, UiElement};
 use crate::game::{GameState, Intent, MouseInput, UiRect};
+use crate::job::{JobInstance, JobParameters};
 use crate::job_slot::JobSlotState;
+use crate::palette::PaletteC;
 
 pub fn get_mouse_buttons(check: fn(MouseButton) -> bool) -> Vec<MouseButton> {
     vec![MouseButton::Left, MouseButton::Right, MouseButton::Middle]
@@ -38,9 +42,16 @@ async fn main() {
 
     let assets: Assets = load_assets().await;
 
-    for i in 0..state.job_slots.len() {
-        state.job_slots[i].state = JobSlotState::Locked;
-    }
+    state.job_slots[0] = JobSlot {
+        index: 0,
+        state: JobSlotState::RunningJob(JobInstance::new(
+            JobParameters {
+                job_archetype: JobArchetype::Lumbering(
+                    LumberingJobArchetype::Craftwood
+                )
+            },
+        )),
+    };
 
     // Example for using quad-storage
     // let storage = &mut quad_storage::STORAGE.lock().unwrap();
@@ -55,7 +66,6 @@ async fn main() {
         let resolution_offset_y = (screen_height() - 720.0) / 2.0;
         let resolution_offset = Vec2::new(resolution_offset_x, resolution_offset_y);
 
-        // toggle fullscreen on F11
         if is_key_pressed(KeyCode::F11) {
             is_fullscreen = !is_fullscreen;
             set_fullscreen(is_fullscreen);
@@ -64,7 +74,6 @@ async fn main() {
             }
         }
 
-        // toggle debug mode on F9
         if is_key_pressed(KeyCode::F9) {
             show_debug = !show_debug;
         }
@@ -86,6 +95,7 @@ async fn main() {
 
         clear_background(palette::GAME_BACKGROUND.get_color());
         all_ui_elements.iter().for_each(|el| draw(el, &mouse_input));
+        if show_debug {draw_rectangle_lines(resolution_offset_x, resolution_offset_y, 1280.0, 720.0, 2.0, PaletteC::Mocha.get_color()); }
 
         // Keep track of FPS
         let elapsed = now() - frame_start;

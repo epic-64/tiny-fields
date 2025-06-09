@@ -11,6 +11,7 @@ use macroquad::miniquad::window::set_mouse_cursor;
 use macroquad::miniquad::CursorIcon;
 use macroquad::prelude::Texture2D;
 use std::collections::HashMap;
+use crate::job::{JobParameters, LumberingJobArchetype};
 
 pub struct MouseInput {
     pub pressed: Vec<MouseButton>,
@@ -53,7 +54,7 @@ impl GameState {
             game_meta: GameMeta::new(),
             inventory: Inventory::new(),
             text_particles: vec![],
-            job_slots: (0..9).map(|i| JobSlot { index: i, state: JobSlotState::Empty }).collect()
+            job_slots: (0..9).map(|i| JobSlot { index: i, state: JobSlotState::Locked }).collect::<Vec<_>>()
         }
     }
 
