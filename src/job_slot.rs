@@ -514,18 +514,29 @@ fn job_card_ui(
     }
 
     // Draw Skill instance level up progress bar
-    let skill_progress_bar_width = card_width - card_padding_x - card_padding_x - right_side_width - card_spacing_x;
+    let inner_width = card_width - right_side_width - image_width - card_padding_x * 2.0 - card_spacing_x * 2.0;
+    let progress_bar_height = 14.0;
+    elements.push(UiElement::ProgressBar {
+        x: inner_x,
+        y: image_y,
+        width: inner_width,
+        height: progress_bar_height,
+        progress: skill_instance.actions_counter.level_up_progress.get(),
+        background_color: palette::BAR_BACKGROUND.get_color(),
+        foreground_color: palette::SKILL_COLOR.get_color(),
+        border_style: BorderStyle::Solid,
+    });
     
     // Draw Job instance level up progress bar
     elements.push(UiElement::ProgressBar {
-        x: offset.x + card_padding_x,
-        y: offset.y + card_padding_y + font_size_large + 6.0,
-        width: skill_progress_bar_width,
-        height: 14.0,
+        x: inner_x,
+        y: image_y + progress_bar_height + 4.0,
+        width: inner_width,
+        height: progress_bar_height,
         progress: job_archetype_instance.action_counter.level_up_progress.get(),
         background_color: palette::BAR_BACKGROUND.get_color(),
         foreground_color: palette::SKILL_COLOR.get_color(),
-        border_style: BorderStyle::None,
+        border_style: BorderStyle::Solid,
     });
 
     // Skill Type and Level
