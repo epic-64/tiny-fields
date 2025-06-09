@@ -11,6 +11,7 @@ pub const BUTTON_CLICKED: PaletteC = PaletteC::BlackTransparent;
 pub const BUTTON_TEXT: PaletteC = PaletteC::Anthracite;
 pub const IMAGE_BACKGROUND: PaletteC = PaletteC::WhiteTransparent;
 pub const SKILL_COLOR: PaletteC = PaletteC::Aqua;
+pub const JOB_COLOR: PaletteC = PaletteC::WarmYellow;
 pub const PILL_COLOR: PaletteC = PaletteC::AnthraciteLight;
 pub const PILL_TEXT_COLOR: PaletteC = PaletteC::OffWhite;
 pub const PRODUCT_COLOR: PaletteC = PaletteC::Peach;
@@ -29,6 +30,7 @@ pub enum PaletteC {
     Brown,
     Black,
     White,
+    WarmYellow,
     WhiteTransparent,
     GreenTransparent,
     BlackTransparent,
@@ -49,6 +51,7 @@ impl PaletteC {
             PaletteC::Brown => Color::from_rgba(85, 39, 19, 255),
             PaletteC::Black => Color::from_rgba(0, 0, 0, 255),
             PaletteC::White => Color::from_rgba(255, 255, 255, 255),
+            PaletteC::WarmYellow => Color::from_rgba(255, 200, 51, 255),
             PaletteC::WhiteTransparent => Color::from_rgba(255, 255, 255, 100),
             PaletteC::GreenTransparent => Color::from_rgba(126, 217, 87, 200),
             PaletteC::BlackTransparent => Color::from_rgba(0, 0, 0, 40),

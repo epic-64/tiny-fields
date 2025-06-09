@@ -353,6 +353,21 @@ fn job_card_ui(
 
     let mut elements = vec![];
 
+    // Skill Type and Level
+    elements.push(UiElement::Text {
+        content: format!(
+            "{} {} {} {}",
+            skill_instance.skill_type.get_name(),
+            skill_instance.actions_counter.level,
+            job.job_archetype.get_name(),
+            job_archetype_instance.action_counter.level),
+        font: assets.fonts.text_bold.clone(),
+        x: offset.x + card_padding_x,
+        y: offset.y + card_padding_y + font_size_large,
+        font_size: font_size_large,
+        color: color_primary,
+    });
+
     // Job Animation Rectangle
     elements.push(UiElement::Rectangle {
         x: image_x,
@@ -399,7 +414,7 @@ fn job_card_ui(
         x: offset.x + card_width - right_side_width - card_padding_x,
         y: image_y,
         width: right_side_width,
-        height: image_height - 16.0,
+        height: image_height,
         color: palette::PRODUCT_COLOR.get_color(),
         border_style: BorderStyle::Solid,
     });
@@ -407,18 +422,18 @@ fn job_card_ui(
     // Draw Product Image
     elements.push(UiElement::Image {
         x: offset.x + card_width - right_side_width - card_padding_x + 8.0,
-        y: image_y + 40.0 + 8.0,
+        y: image_y + 54.0 + 8.0,
         width: right_side_width - 16.0,
         height: right_side_width - 16.0,
         texture: job.job_archetype.get_product().get_texture(&assets),
         color: PaletteC::White.get_color(),
     });
 
-    // Draw Product Pill at the top of the rectangle
+    // Draw Product Pill below the Product Image
     elements.extend(
         number_pill(
             offset.x + card_width - right_side_width - card_padding_x + right_side_width / 2.0 - 24.0 / 2.0,
-            image_y + 40.0 - 14.0 / 2.0,
+            image_y + image_height - 14.0 / 2.0 - 2.0,
             24.0,
             14.0,
             state.inventory.get_item_amount(&job.job_archetype.get_product()),
@@ -435,8 +450,9 @@ fn job_card_ui(
     let required_items = job.job_archetype.get_required_items();
     let item_slots = required_items.len();
     let empty_slots = 4 - item_slots;
-    let resource_y = offset.y + card_padding_y + 86.0;
+    let resource_y = offset.y + card_padding_y + 100.0;
 
+    // Draw required resources
     for (i, (required_item, required_amount)) in required_items.iter().enumerate() {
         let resource_x = inner_x + (i as f32 * (resource_icon_size + resource_icon_spacing));
         let draw_pills = *required_amount > 0;
@@ -512,7 +528,7 @@ fn job_card_ui(
     }
 
     // Draw Skill instance level up progress bar
-    let progress_bar_height = 14.0;
+    let progress_bar_height = 12.0;
     elements.push(UiElement::ProgressBar {
         x: inner_x,
         y: image_y,
@@ -532,23 +548,20 @@ fn job_card_ui(
         height: progress_bar_height,
         progress: job_archetype_instance.action_counter.level_up_progress.get(),
         background_color: palette::BAR_BACKGROUND.get_color(),
-        foreground_color: palette::SKILL_COLOR.get_color(),
+        foreground_color: palette::JOB_COLOR.get_color(),
         border_style: BorderStyle::Solid,
     });
 
-    // Skill Type and Level
-    elements.push(UiElement::Text {
-        content: format!(
-            "{} {} {} {}",
-            skill_instance.skill_type.get_name(),
-            skill_instance.actions_counter.level,
-            job.job_archetype.get_name(),
-            job_archetype_instance.action_counter.level),
-        font: assets.fonts.text_bold.clone(),
-        x: offset.x + card_padding_x,
-        y: offset.y + card_padding_y + font_size_large,
-        font_size: font_size_large,
-        color: color_primary,
+    // Action Progress Bar
+    elements.push(UiElement::ProgressBar {
+        x: inner_x,
+        y: image_y + progress_bar_height * 2.0 + 8.0,
+        width: inner_width,
+        height: progress_bar_height,
+        progress: job.action_progress.get(),
+        background_color: palette::BAR_BACKGROUND.get_color(),
+        foreground_color: palette::PROGRESS_COLOR.get_color(),
+        border_style: BorderStyle::Solid,
     });
 
     // Job Type and Level
@@ -564,22 +577,6 @@ fn job_card_ui(
         y: offset.y + card_padding_y + 36.,
         font_size: 12.0,
         color: color_secondary,
-    });
-
-
-    let progress_bar_width = card_width - card_padding_x - image_width - card_spacing_x - card_padding_x;
-    let progress_bar_height = 10.0;
-    let progress_bar_action_y = offset.y + card_height - progress_bar_height - card_padding_y;
-    // Action Progress Bar
-    elements.push(UiElement::ProgressBar {
-        x: inner_x,
-        y: progress_bar_action_y,
-        width: progress_bar_width,
-        height: progress_bar_height,
-        progress: job.action_progress.get(),
-        background_color: palette::BAR_BACKGROUND.get_color(),
-        foreground_color: palette::PROGRESS_COLOR.get_color(),
-        border_style: BorderStyle::Solid,
     });
 
     // Delete Button
