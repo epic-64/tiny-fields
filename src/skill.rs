@@ -5,7 +5,7 @@ use crate::job::{AlchemyJobArchetype, CookingJobArchetype, HerbalismJobArchetype
 use macroquad::prelude::Texture2D;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
-use SkillArchetype::{Alchemy, Cooking, Herbalism, Hunting, Lumbering, Mining, Smithing};
+use SkillArchetype::{Alchemy, Cooking, Foraging, Hunting, Lumbering, Mining, Smithing};
 
 #[derive(EnumIter, Clone, Debug)]
 pub enum SkillCategory {
@@ -27,7 +27,7 @@ impl SkillCategory {
                 Lumbering,
                 Mining,
                 Hunting,
-                Herbalism,
+                Foraging,
             ],
             SkillCategory::Crafting => vec![
                 Smithing,
@@ -44,7 +44,7 @@ pub enum SkillArchetype {
     Lumbering,
     Mining,
     Hunting,
-    Herbalism,
+    Foraging,
 
     // Crafting Skills
     Smithing,
@@ -58,7 +58,7 @@ impl SkillArchetype {
             Lumbering => "Lumbering",
             Mining => "Mining",
             Hunting => "Hunting",
-            Herbalism => "Herbalism",
+            Foraging => "Herbalism",
             Smithing => "Smithing",
             Alchemy => "Alchemy",
             Cooking => "Cooking",
@@ -88,7 +88,7 @@ impl SkillArchetype {
                 JobArchetype::Hunting(HuntingJobArchetype::Deer),
             ],
 
-            Herbalism => vec![
+            Foraging => vec![
                 JobArchetype::Herbalism(HerbalismJobArchetype::Herb),
             ],
 
@@ -103,7 +103,7 @@ impl SkillArchetype {
             Lumbering => (WoodAnim1.get_texture(assets), WoodAnim2.get_texture(assets)),
             Mining => (MiningAnim1.get_texture(assets), MiningAnim2.get_texture(assets)),
             Hunting => (HuntingAnim1.get_texture(assets), HuntingAnim2.get_texture(assets)),
-            Herbalism => (HerbalismAnim1.get_texture(assets), HerbalismAnim2.get_texture(assets)),
+            Foraging => (HerbalismAnim1.get_texture(assets), HerbalismAnim2.get_texture(assets)),
             Smithing => (SmithingAnim1.get_texture(assets), SmithingAnim2.get_texture(assets)),
             Cooking => (CookingAnim1.get_texture(assets), CookingAnim2.get_texture(assets)),
             Alchemy => (AlchemyAnim1.get_texture(assets), AlchemyAnim2.get_texture(assets)),
@@ -115,7 +115,7 @@ impl SkillArchetype {
             Lumbering => LumberingIcon.get_texture(assets),
             Mining => MiningIcon.get_texture(assets),
             Hunting => HuntingIcon.get_texture(assets),
-            Herbalism => HerbalismIcon.get_texture(assets),
+            Foraging => HerbalismIcon.get_texture(assets),
             Cooking => CookingIcon.get_texture(assets),
             _default => Texture2D::empty(),
         }

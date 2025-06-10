@@ -92,7 +92,7 @@ impl JobArchetype {
                 (Item::Herb, 2),
             ],
             JobArchetype::Alchemy(AlchemyJobArchetype::ManaPotion) => vec![
-                (Item::Herb, 4),
+                (Item::Herb, 2),
             ],
             JobArchetype::Smithing(SmithingJobArchetype::IronBar) => vec![
                 (Item::IronOre, 2),
@@ -101,17 +101,13 @@ impl JobArchetype {
         }
     }
 
-    pub fn get_completion_effect(&self) -> Effect {
-        Effect::AddItem { item: self.get_product(), amount: 1 }
-    }
-
     pub fn get_skill_type(&self) -> SkillArchetype {
         match self {
             JobArchetype::Lumbering(LumberingJobArchetype::Craftwood) => SkillArchetype::Lumbering,
             JobArchetype::Lumbering(LumberingJobArchetype::Graintree) => SkillArchetype::Lumbering,
             JobArchetype::Mining(MiningJobArchetype::Iron) => SkillArchetype::Mining,
             JobArchetype::Hunting(HuntingJobArchetype::Deer) => SkillArchetype::Hunting,
-            JobArchetype::Herbalism(HerbalismJobArchetype::Herb) => SkillArchetype::Herbalism,
+            JobArchetype::Herbalism(HerbalismJobArchetype::Herb) => SkillArchetype::Foraging,
             JobArchetype::Cooking(CookingJobArchetype::Sandwich) => SkillArchetype::Cooking,
             JobArchetype::Alchemy(AlchemyJobArchetype::ManaPotion) => SkillArchetype::Alchemy,
             JobArchetype::Smithing(SmithingJobArchetype::IronBar) => SkillArchetype::Smithing,
