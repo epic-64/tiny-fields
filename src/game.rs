@@ -44,6 +44,7 @@ pub struct GameState {
     pub inventory: Inventory,
     pub text_particles: Vec<TextParticle>,
     pub job_slots: Vec<JobSlot>,
+    pub game_tab: GameTab,
 }
 
 impl GameState {
@@ -54,7 +55,8 @@ impl GameState {
             game_meta: GameMeta::new(),
             inventory: Inventory::new(),
             text_particles: vec![],
-            job_slots: (0..9).map(|i| JobSlot { index: i, state: JobSlotState::Locked }).collect::<Vec<_>>()
+            job_slots: (0..9).map(|i| JobSlot { index: i, state: JobSlotState::Locked }).collect::<Vec<_>>(),
+            game_tab: GameTab::Jobs,
         }
     }
 
@@ -124,12 +126,22 @@ impl GameState {
 }
 
 #[derive(Clone)]
+pub enum GameTab {
+    Jobs,
+    Skills,
+    Inventory,
+    Settings,
+    Stats,
+}
+
+#[derive(Clone)]
 pub enum Intent {
     ToggleJob(usize),
     SkipSeconds(i32),
     EnableHyperMode(usize),
     ChangeJobSlotState(usize, JobSlotState),
     SetMouseCursor(CursorIcon),
+    SelectGameTab(GameTab),
 }
 
 impl Intent {
@@ -158,6 +170,9 @@ impl Intent {
             },
             Intent::SetMouseCursor(cursor_icon) => {
                 set_mouse_cursor(*cursor_icon);
+            }
+            Intent::SelectGameTab(tab) => {
+                game_state.game_tab = tab.clone();
             }
         }
     }

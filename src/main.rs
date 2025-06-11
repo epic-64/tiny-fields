@@ -2,8 +2,6 @@ use macroquad::miniquad::date::now;
 use macroquad::miniquad::window::set_mouse_cursor;
 use macroquad::miniquad::CursorIcon;
 use macroquad::prelude::*;
-use crate::job::{JobArchetype, LumberingJobArchetype};
-use crate::job_slot::JobSlot;
 
 pub mod draw;
 pub mod game;
@@ -18,8 +16,10 @@ pub mod awesome;
 
 use crate::assets::{load_assets, Assets};
 use crate::draw::{draw, BorderStyle, UiElement};
-use crate::game::{GameState, Intent, MouseInput, UiRect};
+use crate::game::{GameState, GameTab, Intent, MouseInput, UiRect};
+use crate::job::{JobArchetype, LumberingJobArchetype};
 use crate::job::{JobInstance, JobParameters};
+use crate::job_slot::JobSlot;
 use crate::job_slot::JobSlotState;
 use crate::palette::PaletteC;
 
@@ -110,7 +110,14 @@ async fn main() {
 fn build_ui_elements(state: &GameState, assets: &Assets, resolution_offset: Vec2, show_debug: bool) -> Vec<UiElement> {
     let mut all_elements: Vec<UiElement> = vec![];
 
-    all_elements.extend(state.get_job_slot_ui(&state, &assets, Vec2::new(25.0, 100.0) + resolution_offset));
+    all_elements.extend(build_menu_ui(&state, &assets, resolution_offset));
+
+    match &state.game_tab {
+        GameTab::Jobs => {
+            all_elements.extend(state.get_job_slot_ui(&state, &assets, Vec2::new(25.0, 100.0) + resolution_offset));
+        }
+        _default => ()
+    }
 
     if show_debug {
         all_elements.extend(build_debug_elements(&state, &assets, UiRect::new(700.0, 25.0, 200.0, 40.0)));
@@ -118,6 +125,94 @@ fn build_ui_elements(state: &GameState, assets: &Assets, resolution_offset: Vec2
     }
 
     all_elements
+}
+
+fn build_menu_ui(state: &GameState, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
+    let mut elements = vec![];
+
+    // background rectangle
+    elements.push(UiElement::Rectangle {
+        x: offset.x,
+        y: offset.y,
+        width: 1280.0,
+        height: 80.0,
+        color: PaletteC::Black.get_color(),
+        border_style: BorderStyle::None,
+    });
+
+    // Add Jobs Button
+    elements.push(UiElement::RectButton {
+        rectangle: UiRect {
+            x: offset.x + 20.0,
+            y: offset.y + 20.0,
+            w: 120.0,
+            h: 40.0,
+        },
+        font: assets.fonts.mono.clone(),
+        intent: Intent::SelectGameTab(GameTab::Jobs),
+        text: "Jobs".to_string(),
+        font_size: 16.0,
+        background_color: palette::BUTTON_BACKGROUND.get_color(),
+        text_color: palette::BUTTON_TEXT.get_color(),
+        parent_clip: None,
+        border_style: BorderStyle::Solid,
+    });
+
+    // Add Inventory Button
+    elements.push(UiElement::RectButton {
+        rectangle: UiRect {
+            x: offset.x + 150.0,
+            y: offset.y + 20.0,
+            w: 120.0,
+            h: 40.0,
+        },
+        font: assets.fonts.mono.clone(),
+        intent: Intent::SelectGameTab(GameTab::Inventory),
+        text: "Inventory".to_string(),
+        font_size: 16.0,
+        background_color: palette::BUTTON_BACKGROUND.get_color(),
+        text_color: palette::BUTTON_TEXT.get_color(),
+        parent_clip: None,
+        border_style: BorderStyle::Solid,
+    });
+
+    // Add Skills Button
+    elements.push(UiElement::RectButton {
+        rectangle: UiRect {
+            x: offset.x + 280.0,
+            y: offset.y + 20.0,
+            w: 120.0,
+            h: 40.0,
+        },
+        font: assets.fonts.mono.clone(),
+        intent: Intent::SelectGameTab(GameTab::Skills),
+        text: "Skills".to_string(),
+        font_size: 16.0,
+        background_color: palette::BUTTON_BACKGROUND.get_color(),
+        text_color: palette::BUTTON_TEXT.get_color(),
+        parent_clip: None,
+        border_style: BorderStyle::Solid,
+    });
+
+    // Add Stats Button
+    elements.push(UiElement::RectButton {
+        rectangle: UiRect {
+            x: offset.x + 410.0,
+            y: offset.y + 20.0,
+            w: 120.0,
+            h: 40.0,
+        },
+        font: assets.fonts.mono.clone(),
+        intent: Intent::SelectGameTab(GameTab::Stats),
+        text: "Stats".to_string(),
+        font_size: 16.0,
+        background_color: palette::BUTTON_BACKGROUND.get_color(),
+        text_color: palette::BUTTON_TEXT.get_color(),
+        parent_clip: None,
+        border_style: BorderStyle::Solid,
+    });
+
+    elements
 }
 
 fn build_debug_elements(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiElement> {
