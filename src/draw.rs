@@ -205,7 +205,7 @@ fn is_mouse_down_on(element: &UiElement, mouse_input: &MouseInput) -> bool {
 }
 
 pub fn number_pill(x: f32, y: f32, w: f32, h: f32, number: i64, text_color: Option<Color>, font: Font) -> Vec<UiElement> {
-    pill(x, y, w, h, &to_pill_number(number), text_color, font)
+    pill(x, y, w, h, format!("{}", to_pill_number(number)).as_str(), text_color, font)
 }
 
 pub fn pill(x: f32, y: f32, w: f32, h: f32, text: &str, text_color: Option<Color>, font: Font) -> Vec<UiElement> {

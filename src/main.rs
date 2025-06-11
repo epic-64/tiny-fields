@@ -15,7 +15,7 @@ pub mod job_slot;
 pub mod awesome;
 
 use crate::assets::{load_assets, Assets};
-use crate::draw::{draw, BorderStyle, UiElement};
+use crate::draw::{draw, number_pill, pill, BorderStyle, UiElement};
 use crate::game::{GameState, GameTab, Intent, MouseInput, UiRect};
 use crate::job::{JobArchetype, LumberingJobArchetype};
 use crate::job::{JobInstance, JobParameters};
@@ -93,7 +93,7 @@ async fn main() {
         let all_intents: Vec<Intent> = get_intents(&all_ui_elements, &mouse_input);
         let _effects = state.step(&all_intents, dt);
 
-        clear_background(palette::GAME_BACKGROUND.get_color());
+        clear_background(palette::WINDOW_BACKGROUND.get_color());
         all_ui_elements.iter().for_each(|el| draw(el, &mouse_input));
         if show_debug {draw_rectangle_lines(resolution_offset_x, resolution_offset_y, 1280.0, 720.0, 2.0, PaletteC::Mocha.get_color()); }
 
@@ -110,11 +110,25 @@ async fn main() {
 fn build_ui_elements(state: &GameState, assets: &Assets, resolution_offset: Vec2, show_debug: bool) -> Vec<UiElement> {
     let mut all_elements: Vec<UiElement> = vec![];
 
+    // add background rectangle
+    all_elements.push(UiElement::Rectangle {
+        x: resolution_offset.x,
+        y: resolution_offset.y,
+        width: 1280.0,
+        height: 720.0,
+        // very dark brown
+        color: Color::from_rgba(30, 30, 30, 255),
+        border_style: BorderStyle::None,
+    });
+
     all_elements.extend(build_menu_ui(&state, &assets, resolution_offset));
 
     match &state.game_tab {
         GameTab::Jobs => {
             all_elements.extend(state.get_job_slot_ui(&state, &assets, Vec2::new(25.0, 100.0) + resolution_offset));
+        }
+        GameTab::Inventory => {
+            all_elements.extend(build_inventory_elements(&state, &assets, UiRect::new(25.0 + resolution_offset.x, 100.0 + resolution_offset.y, 400.0, 600.0)));
         }
         _default => ()
     }
@@ -136,80 +150,38 @@ fn build_menu_ui(state: &GameState, assets: &Assets, offset: Vec2) -> Vec<UiElem
         y: offset.y,
         width: 1280.0,
         height: 80.0,
-        color: PaletteC::Black.get_color(),
+        color: PaletteC::Anthracite.get_color(),
         border_style: BorderStyle::None,
     });
 
-    // Add Jobs Button
-    elements.push(UiElement::RectButton {
-        rectangle: UiRect {
-            x: offset.x + 20.0,
-            y: offset.y + 20.0,
-            w: 120.0,
-            h: 40.0,
-        },
-        font: assets.fonts.mono.clone(),
-        intent: Intent::SelectGameTab(GameTab::Jobs),
-        text: "Jobs".to_string(),
-        font_size: 16.0,
-        background_color: palette::BUTTON_BACKGROUND.get_color(),
-        text_color: palette::BUTTON_TEXT.get_color(),
-        parent_clip: None,
-        border_style: BorderStyle::Solid,
-    });
+    let game_tabs = [
+        GameTab::Jobs,
+        GameTab::Inventory,
+        GameTab::Skills,
+        GameTab::Stats,
+    ];
 
-    // Add Inventory Button
-    elements.push(UiElement::RectButton {
-        rectangle: UiRect {
-            x: offset.x + 150.0,
-            y: offset.y + 20.0,
-            w: 120.0,
-            h: 40.0,
-        },
-        font: assets.fonts.mono.clone(),
-        intent: Intent::SelectGameTab(GameTab::Inventory),
-        text: "Inventory".to_string(),
-        font_size: 16.0,
-        background_color: palette::BUTTON_BACKGROUND.get_color(),
-        text_color: palette::BUTTON_TEXT.get_color(),
-        parent_clip: None,
-        border_style: BorderStyle::Solid,
-    });
-
-    // Add Skills Button
-    elements.push(UiElement::RectButton {
-        rectangle: UiRect {
-            x: offset.x + 280.0,
-            y: offset.y + 20.0,
-            w: 120.0,
-            h: 40.0,
-        },
-        font: assets.fonts.mono.clone(),
-        intent: Intent::SelectGameTab(GameTab::Skills),
-        text: "Skills".to_string(),
-        font_size: 16.0,
-        background_color: palette::BUTTON_BACKGROUND.get_color(),
-        text_color: palette::BUTTON_TEXT.get_color(),
-        parent_clip: None,
-        border_style: BorderStyle::Solid,
-    });
-
-    // Add Stats Button
-    elements.push(UiElement::RectButton {
-        rectangle: UiRect {
-            x: offset.x + 410.0,
-            y: offset.y + 20.0,
-            w: 120.0,
-            h: 40.0,
-        },
-        font: assets.fonts.mono.clone(),
-        intent: Intent::SelectGameTab(GameTab::Stats),
-        text: "Stats".to_string(),
-        font_size: 16.0,
-        background_color: palette::BUTTON_BACKGROUND.get_color(),
-        text_color: palette::BUTTON_TEXT.get_color(),
-        parent_clip: None,
-        border_style: BorderStyle::Solid,
+    game_tabs.iter().enumerate().for_each(|(i, tab)| {
+        elements.push(UiElement::RectButton {
+            rectangle: UiRect {
+                x: offset.x + 25.0 + (i * 136) as f32,
+                y: offset.y + 15.0,
+                w: 130.0,
+                h: 50.0,
+            },
+            font: assets.fonts.mono.clone(),
+            intent: Intent::SelectGameTab(tab.clone()),
+            text: tab.to_string(),
+            font_size: 16.0,
+            background_color: if state.game_tab == *tab {
+                Color::from_rgba(255, 200, 51, 255) // Highlight color for the selected tab
+            } else {
+                palette::BUTTON_BACKGROUND.get_color()
+            },
+            text_color: palette::BUTTON_TEXT.get_color(),
+            parent_clip: None,
+            border_style: BorderStyle::Solid,
+        });
     });
 
     elements
@@ -353,37 +325,44 @@ pub fn build_inventory_elements(state: &GameState, assets: &Assets, rect: UiRect
     });
 
     let inventory = &state.inventory;
-    let item_size = 40.0;
+
+    let columns = 8;
+    let padding = 5.0;
+    let spacing = 5.0;
+    let item_size = (rect.w - padding * 2.0 - spacing * (columns as f32 - 1.0)) / columns as f32;
 
     let items = inventory.item_amounts.clone();
 
     for (index, (item_name, item_count)) in items.iter().enumerate() {
+        let texture = item_name.get_texture(assets);
+        let pos_x = rect.x + padding + (index as f32 % columns as f32) * (item_size + spacing);
+        let pos_y = rect.y + padding + (index as f32 / columns as f32).floor() * (item_size + spacing);
+
+        // background rectangle for the item
         elements.push(UiElement::Rectangle {
-            x: rect.x + index as f32 * (item_size + 5.0),
-            y: rect.y,
+            x: pos_x,
+            y: pos_y,
             width: item_size,
             height: item_size,
             color: palette::IMAGE_BACKGROUND.get_color(),
             border_style: BorderStyle::Solid,
         });
 
-        elements.push(UiElement::Text {
-            content: format!("{}", item_name.get_name()),
-            font: assets.fonts.mono.clone(),
-            x: rect.x + index as f32 * (item_size + 5.0),
-            y: rect.y + item_size / 2.0,
-            font_size: 14.0,
+        // item texture
+        elements.push(UiElement::Image {
+            texture: texture.clone(),
+            x: pos_x + 2.0,
+            y: pos_y + 2.0,
+            width: item_size - 4.0,
+            height: item_size - 4.0,
             color: WHITE,
         });
 
-        elements.push(UiElement::Text {
-            content: format!("{}", item_count),
-            font: assets.fonts.mono.clone(),
-            x: rect.x + index as f32 * (item_size + 5.0),
-            y: rect.y + item_size,
-            font_size: 14.0,
-            color: WHITE,
-        });
+        let pill_width = 20.0;
+        let pill_height = 10.0;
+        let pill_x = pos_x + (item_size - pill_width) / 2.0;
+        let pill_y = pos_y + item_size - pill_height / 2.0;
+        elements.extend(number_pill(pill_x, pill_y, pill_width, pill_height, *item_count, None, assets.fonts.mono.clone()));
     }
 
     elements

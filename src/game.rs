@@ -11,6 +11,7 @@ use macroquad::miniquad::window::set_mouse_cursor;
 use macroquad::miniquad::CursorIcon;
 use macroquad::prelude::Texture2D;
 use std::collections::HashMap;
+use strum_macros::Display;
 use crate::job::{JobParameters, LumberingJobArchetype};
 
 pub struct MouseInput {
@@ -125,7 +126,7 @@ impl GameState {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Display)]
 pub enum GameTab {
     Jobs,
     Skills,
