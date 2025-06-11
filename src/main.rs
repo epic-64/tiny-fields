@@ -15,11 +15,12 @@ pub mod job_slot;
 pub mod awesome;
 
 use crate::assets::{load_assets, Assets};
+use crate::awesome::nine_patch::draw_nine_patch;
 use crate::draw::{draw, number_pill, pill, BorderStyle, UiElement};
 use crate::game::{GameState, GameTab, Intent, MouseInput, UiRect};
 use crate::job::{JobArchetype, LumberingJobArchetype};
 use crate::job::{JobInstance, JobParameters};
-use crate::job_slot::JobSlot;
+use crate::job_slot::{JobSlot, JOB_CARD_HEIGHT, JOB_CARD_SPACING_OUTER};
 use crate::job_slot::JobSlotState;
 use crate::palette::PaletteC;
 
@@ -125,10 +126,11 @@ fn build_ui_elements(state: &GameState, assets: &Assets, resolution_offset: Vec2
 
     match &state.game_tab {
         GameTab::Jobs => {
-            all_elements.extend(state.get_job_slot_ui(&state, &assets, Vec2::new(25.0, 100.0) + resolution_offset));
+            all_elements.extend(build_inventory_elements(&state, &assets, UiRect::new(25.0 + resolution_offset.x, 100.0 + resolution_offset.y, 400.0, JOB_CARD_HEIGHT * 3.0 + JOB_CARD_SPACING_OUTER * 2.0)));
+            all_elements.extend(state.get_job_slot_ui(&state, &assets, Vec2::new(25.0 + resolution_offset.x + 400.0 + JOB_CARD_SPACING_OUTER, 100.0 + resolution_offset.y)));
         }
         GameTab::Inventory => {
-            all_elements.extend(build_inventory_elements(&state, &assets, UiRect::new(25.0 + resolution_offset.x, 100.0 + resolution_offset.y, 400.0, 600.0)));
+
         }
         _default => ()
     }
@@ -314,29 +316,29 @@ pub fn get_cheat_buttons(assets: &Assets, rect: UiRect) -> Vec<UiElement> {
 pub fn build_inventory_elements(state: &GameState, assets: &Assets, rect: UiRect) -> Vec<UiElement> {
     let mut elements = vec![];
 
-    // Inventory Rect
-    elements.push(UiElement::Rectangle {
+    // Inventory NinePatch
+    elements.push(UiElement::NinePatch {
+        texture: assets.textures.get(&assets::AssetId::ParchmentFrame).unwrap().clone(),
         x: rect.x,
         y: rect.y,
         width: rect.w,
         height: rect.h,
-        color: palette::CARD_BACKGROUND.get_color(),
-        border_style: BorderStyle::Solid,
     });
 
     let inventory = &state.inventory;
 
-    let columns = 8;
-    let padding = 5.0;
-    let spacing = 5.0;
-    let item_size = (rect.w - padding * 2.0 - spacing * (columns as f32 - 1.0)) / columns as f32;
+    let columns = 7;
+    let padding = 16.0;
+    let spacing_x = 5.0;
+    let spacing_y = 8.0;
+    let item_size = (rect.w - padding * 2.0 - spacing_x * (columns as f32 - 1.0)) / columns as f32;
 
     let items = inventory.item_amounts.clone();
 
     for (index, (item_name, item_count)) in items.iter().enumerate() {
         let texture = item_name.get_texture(assets);
-        let pos_x = rect.x + padding + (index as f32 % columns as f32) * (item_size + spacing);
-        let pos_y = rect.y + padding + (index as f32 / columns as f32).floor() * (item_size + spacing);
+        let pos_x = rect.x + padding + (index as f32 % columns as f32) * (item_size + spacing_x);
+        let pos_y = rect.y + padding + (index as f32 / columns as f32).floor() * (item_size + spacing_y);
 
         // background rectangle for the item
         elements.push(UiElement::Rectangle {
@@ -359,7 +361,7 @@ pub fn build_inventory_elements(state: &GameState, assets: &Assets, rect: UiRect
         });
 
         let pill_width = 20.0;
-        let pill_height = 10.0;
+        let pill_height = 12.0;
         let pill_x = pos_x + (item_size - pill_width) / 2.0;
         let pill_y = pos_y + item_size - pill_height / 2.0;
         elements.extend(number_pill(pill_x, pill_y, pill_width, pill_height, *item_count, None, assets.fonts.mono.clone()));

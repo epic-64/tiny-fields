@@ -25,8 +25,9 @@ pub enum JobSlotState {
 
 impl JobSlotState {
     pub fn build_ui(&self, job_slot_index: usize, state: &GameState, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
-        let column = job_slot_index % 3;
-        let row = job_slot_index / 3;
+        let columns = 2;
+        let column = job_slot_index % columns;
+        let row = job_slot_index / columns;
 
         let offset = Vec2::new(
             offset.x + (column as f32 * JOB_CARD_WIDTH) + JOB_CARD_SPACING_OUTER * (column as f32),

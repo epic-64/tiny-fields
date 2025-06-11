@@ -56,7 +56,7 @@ impl GameState {
             game_meta: GameMeta::new(),
             inventory: Inventory::new(),
             text_particles: vec![],
-            job_slots: (0..9).map(|i| JobSlot { index: i, state: JobSlotState::Locked }).collect::<Vec<_>>(),
+            job_slots: (0..6).map(|i| JobSlot { index: i, state: JobSlotState::Locked }).collect::<Vec<_>>(),
             game_tab: GameTab::Jobs,
         }
     }
