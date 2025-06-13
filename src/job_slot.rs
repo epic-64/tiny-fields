@@ -9,9 +9,10 @@ use crate::skill::{SkillArchetype, SkillCategory};
 use macroquad::prelude::Vec2;
 use strum::IntoEnumIterator;
 
-pub const JOB_CARD_HEIGHT: f32 = 192.0;
-pub const JOB_CARD_WIDTH: f32 = 404.0;
+pub const WINDOW_PADDING: f32 = 16.0;
+pub const JOB_CARD_HEIGHT: f32 = 196.0;
 pub const JOB_CARD_SPACING_OUTER: f32 = 8.0;
+pub const JOB_CARD_WIDTH: f32 = (1280.0 - (WINDOW_PADDING * 2.0) - (JOB_CARD_SPACING_OUTER * 2.0)) / 3.0;
 
 #[derive(Clone, Debug)]
 pub enum JobSlotState {

@@ -2,6 +2,7 @@ use macroquad::miniquad::date::now;
 use macroquad::miniquad::window::set_mouse_cursor;
 use macroquad::miniquad::CursorIcon;
 use macroquad::prelude::*;
+use tiny_fields::job_slot::JOB_CARD_WIDTH;
 
 pub mod draw;
 pub mod game;
@@ -20,7 +21,7 @@ use crate::draw::{draw, number_pill, pill, BorderStyle, UiElement};
 use crate::game::{GameState, GameTab, Intent, MouseInput, UiRect};
 use crate::job::{JobArchetype, LumberingJobArchetype};
 use crate::job::{JobInstance, JobParameters};
-use crate::job_slot::{JobSlot, JOB_CARD_HEIGHT, JOB_CARD_SPACING_OUTER};
+use crate::job_slot::{JobSlot, JOB_CARD_HEIGHT, JOB_CARD_SPACING_OUTER, WINDOW_PADDING};
 use crate::job_slot::JobSlotState;
 use crate::palette::PaletteC;
 
@@ -111,23 +112,12 @@ async fn main() {
 fn build_ui_elements(state: &GameState, assets: &Assets, resolution_offset: Vec2, show_debug: bool) -> Vec<UiElement> {
     let mut all_elements: Vec<UiElement> = vec![];
 
-    // add background rectangle
-    all_elements.push(UiElement::Rectangle {
-        x: resolution_offset.x,
-        y: resolution_offset.y,
-        width: 1280.0,
-        height: 720.0,
-        // very dark brown
-        color: Color::from_rgba(30, 30, 30, 255),
-        border_style: BorderStyle::None,
-    });
-
     all_elements.extend(build_menu_ui(&state, &assets, resolution_offset));
 
     match &state.game_tab {
         GameTab::Jobs => {
-            all_elements.extend(build_inventory_elements(&state, &assets, UiRect::new(25.0 + resolution_offset.x, 100.0 + resolution_offset.y, 400.0, JOB_CARD_HEIGHT * 3.0 + JOB_CARD_SPACING_OUTER * 2.0)));
-            all_elements.extend(state.get_job_slot_ui(&state, &assets, Vec2::new(25.0 + resolution_offset.x + 400.0 + JOB_CARD_SPACING_OUTER, 100.0 + resolution_offset.y)));
+            all_elements.extend(build_inventory_elements(&state, &assets, UiRect::new(WINDOW_PADDING + resolution_offset.x, 100.0 + resolution_offset.y, JOB_CARD_WIDTH, JOB_CARD_HEIGHT * 3.0 + JOB_CARD_SPACING_OUTER * 2.0)));
+            all_elements.extend(state.get_job_slot_ui(&state, &assets, Vec2::new(WINDOW_PADDING + resolution_offset.x + JOB_CARD_WIDTH + JOB_CARD_SPACING_OUTER, 100.0 + resolution_offset.y)));
         }
         GameTab::Inventory => {
 
@@ -136,8 +126,8 @@ fn build_ui_elements(state: &GameState, assets: &Assets, resolution_offset: Vec2
     }
 
     if show_debug {
-        all_elements.extend(build_debug_elements(&state, &assets, UiRect::new(700.0, 25.0, 200.0, 40.0)));
-        all_elements.extend(get_cheat_buttons(&assets, UiRect::new(25.0, 25.0, 400.0, 40.0)));
+        all_elements.extend(build_debug_elements(&state, &assets, UiRect::new(700.0, WINDOW_PADDING, 200.0, 40.0)));
+        all_elements.extend(get_cheat_buttons(&assets, UiRect::new(600.0, 30.0, 400.0, 40.0)));
     }
 
     all_elements
@@ -145,16 +135,6 @@ fn build_ui_elements(state: &GameState, assets: &Assets, resolution_offset: Vec2
 
 fn build_menu_ui(state: &GameState, assets: &Assets, offset: Vec2) -> Vec<UiElement> {
     let mut elements = vec![];
-
-    // background rectangle
-    elements.push(UiElement::Rectangle {
-        x: offset.x,
-        y: offset.y,
-        width: 1280.0,
-        height: 80.0,
-        color: PaletteC::Anthracite.get_color(),
-        border_style: BorderStyle::None,
-    });
 
     let game_tabs = [
         GameTab::Jobs,
