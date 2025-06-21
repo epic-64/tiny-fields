@@ -21,7 +21,7 @@ pub enum HuntingJobArchetype {
 }
 
 #[derive(EnumIter, Clone, PartialEq, Eq, Hash, Debug, Copy)]
-pub enum HerbalismJobArchetype {
+pub enum ForagingJobArchetype {
     Herb,
 }
 
@@ -45,7 +45,7 @@ pub enum JobArchetype {
     Lumbering(LumberingJobArchetype),
     Mining(MiningJobArchetype),
     Hunting(HuntingJobArchetype),
-    Herbalism(HerbalismJobArchetype),
+    Foraging(ForagingJobArchetype),
     Smithing(SmithingJobArchetype),
     Cooking(CookingJobArchetype),
     Alchemy(AlchemyJobArchetype),
@@ -66,7 +66,7 @@ impl JobArchetype {
             JobArchetype::Hunting(HuntingJobArchetype::Deer) => "Deer".to_string(),
             JobArchetype::Cooking(CookingJobArchetype::Sandwich) => "Sandwich".to_string(),
             JobArchetype::Alchemy(AlchemyJobArchetype::ManaPotion) => "Mana Potion".to_string(),
-            JobArchetype::Herbalism(HerbalismJobArchetype::Herb) => "Herb".to_string(),
+            JobArchetype::Foraging(ForagingJobArchetype::Herb) => "Herb".to_string(),
             JobArchetype::Smithing(SmithingJobArchetype::IronBar) => "Iron Bar".to_string(),
         }
     }
@@ -79,7 +79,7 @@ impl JobArchetype {
             JobArchetype::Hunting(HuntingJobArchetype::Deer) => Item::Meat,
             JobArchetype::Cooking(CookingJobArchetype::Sandwich) => Item::Sandwich,
             JobArchetype::Alchemy(AlchemyJobArchetype::ManaPotion) => Item::ManaPotion,
-            JobArchetype::Herbalism(HerbalismJobArchetype::Herb) => Item::Herb,
+            JobArchetype::Foraging(ForagingJobArchetype::Herb) => Item::Herb,
             JobArchetype::Smithing(SmithingJobArchetype::IronBar) => Item::IronBar,
         }
     }
@@ -107,7 +107,7 @@ impl JobArchetype {
             JobArchetype::Lumbering(LumberingJobArchetype::Graintree) => SkillArchetype::Lumbering,
             JobArchetype::Mining(MiningJobArchetype::Iron) => SkillArchetype::Mining,
             JobArchetype::Hunting(HuntingJobArchetype::Deer) => SkillArchetype::Hunting,
-            JobArchetype::Herbalism(HerbalismJobArchetype::Herb) => SkillArchetype::Foraging,
+            JobArchetype::Foraging(ForagingJobArchetype::Herb) => SkillArchetype::Foraging,
             JobArchetype::Cooking(CookingJobArchetype::Sandwich) => SkillArchetype::Cooking,
             JobArchetype::Alchemy(AlchemyJobArchetype::ManaPotion) => SkillArchetype::Alchemy,
             JobArchetype::Smithing(SmithingJobArchetype::IronBar) => SkillArchetype::Smithing,
@@ -286,7 +286,7 @@ impl JobArchetypeInstances {
         let instances = LumberingJobArchetype::iter().map(JobArchetype::Lumbering)
             .chain(MiningJobArchetype::iter().map(JobArchetype::Mining))
             .chain(HuntingJobArchetype::iter().map(JobArchetype::Hunting))
-            .chain(HerbalismJobArchetype::iter().map(JobArchetype::Herbalism))
+            .chain(ForagingJobArchetype::iter().map(JobArchetype::Foraging))
             .chain(CookingJobArchetype::iter().map(JobArchetype::Cooking))
             .chain(AlchemyJobArchetype::iter().map(JobArchetype::Alchemy))
             .chain(SmithingJobArchetype::iter().map(JobArchetype::Smithing))

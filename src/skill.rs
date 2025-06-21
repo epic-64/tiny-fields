@@ -1,7 +1,7 @@
 use crate::assets::AssetId::{AlchemyAnim1, AlchemyAnim2, CookingAnim1, CookingAnim2, CookingIcon, HerbalismAnim1, HerbalismAnim2, HerbalismIcon, HuntingAnim1, HuntingAnim2, HuntingIcon, LumberingIcon, MiningAnim1, MiningAnim2, MiningIcon, SmithingAnim1, SmithingAnim2, WoodAnim1, WoodAnim2};
 use crate::assets::Assets;
 use crate::counts_actions::CountsActions;
-use crate::job::{AlchemyJobArchetype, CookingJobArchetype, HerbalismJobArchetype, HuntingJobArchetype, JobArchetype, LumberingJobArchetype, MiningJobArchetype, SmithingJobArchetype};
+use crate::job::{AlchemyJobArchetype, CookingJobArchetype, ForagingJobArchetype, HuntingJobArchetype, JobArchetype, LumberingJobArchetype, MiningJobArchetype, SmithingJobArchetype};
 use macroquad::prelude::Texture2D;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
@@ -58,7 +58,7 @@ impl SkillArchetype {
             Lumbering => "Lumbering",
             Mining => "Mining",
             Hunting => "Hunting",
-            Foraging => "Herbalism",
+            Foraging => "Foraging",
             Smithing => "Smithing",
             Alchemy => "Alchemy",
             Cooking => "Cooking",
@@ -89,7 +89,7 @@ impl SkillArchetype {
             ],
 
             Foraging => vec![
-                JobArchetype::Herbalism(HerbalismJobArchetype::Herb),
+                JobArchetype::Foraging(ForagingJobArchetype::Herb),
             ],
 
             Smithing => vec![
